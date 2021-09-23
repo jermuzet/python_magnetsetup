@@ -1,0 +1,8 @@
+{
+    "Channel{{i}}":
+{
+    "expr1":"h{{i}}*x:h{{i}}:x",
+    "expr2":"x*h{{i}}*(Tw{{i}}+dTw{{i}}):h{{i}}:Tw{{i}}:dTw{{i}}:x"
+    // Tw = Tin*(z<Zmin0) + (dTw0/(Zmax0-Zmin0)*(z-Zmin0)+Tin)*(z>Zmin0)*(z<Zmax0) + (Tin+dTw0)*(z>Zmax0):z:Tin:dTw0:Zmin0:Zmax0
+}
+}

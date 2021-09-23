@@ -1,0 +1,6 @@
+{
+    "heat_c":"k*x:k:x",
+
+    "magnetic_c":"x/mu:x:mu",
+    "magnetic_beta":"{2/mu,0}:mu"
+}

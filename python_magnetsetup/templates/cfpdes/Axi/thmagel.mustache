@@ -1,0 +1,343 @@
+{
+    "Name": "Fully coupled Axi Stationnary model",
+    "ShortName":"FullAxiStat",
+    "Models":
+    {
+		"equations":[
+	    {
+			"name":"heat",
+			"unknown":
+			{
+		    	"basis":"Pch1",
+		    	"name":"temperature",
+		    	"symbol":"T"
+			}
+	    },
+	    {
+			"name":"magnetic",
+			"unknown":
+			{
+			    "basis":"Pch2",
+			    "name":"phi",
+			    "symbol":"phi"
+			}
+	    },
+	    {
+			"name":"elastic",
+			"unknown":
+			{
+			    "basis":"Pchv1",
+			    "name":"displacement",
+			    "symbol":"u"
+			}
+	    }
+		]
+    },
+    "Parameters":
+    {
+		"mu0":"4*pi*1e-7",
+		"T0":"293.",
+
+		"Tin":"284.15"
+    },
+    "Materials":
+    {
+		"Air":
+		{
+	    	"physics":"magnetic",
+	    	"magnetic_c":"x/mu0:x:mu0",
+	    	"magnetic_beta":"{2/mu0,0}:mu0"
+		}
+    },
+    "BoundaryConditions":
+    {
+		"magnetic":
+		{
+		    "Dirichlet":
+	    	{
+				"magdir":
+				{
+		    		"markers":["ZAxis","Infty"],
+		    		"expr":"0"
+				}
+			}
+	    },
+		"heat":
+		{
+	    	"Robin":
+	    	{
+	    	}
+		},
+		"elastic":
+		{
+	    	"Dirichlet":
+	    	{
+				"H1_Fixed":
+				{
+		    		"markers": ["R1_BP", "H1_HP", "H_HP"],
+		    		"expr":"{0,0}"
+				}
+	    	}
+		}
+    },
+    "PostProcess":
+    {
+		"use-model-name":1,
+		"cfpdes":
+		{
+	    	"Exports":
+	    	{
+				"fields":["heat.temperature","elastic.displacement"],
+				"expr":
+				{
+		    		"atheta":"magnetic_phi/x:magnetic_phi:x",
+		    		"B":
+		    		{
+						"expr":"{-magnetic_grad_phi_1/x,magnetic_grad_phi_0/x}:magnetic_grad_phi_0:magnetic_grad_phi_1:x",
+						"representation":["element"]
+		    		},
+		    		"U":
+		    		{
+						"expr":"materials_U:materials_U",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%"],
+			    			"index1": {{index_h}}
+						}
+		    		},
+		    		"Jth":
+		    		{
+						"expr":"-materials_sigma*materials_U/(2*pi*x):materials_sigma:materials_U:x",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%"],
+			    			"index1": {{index_h}}
+						}
+		    		},
+		    		"Qth":
+		    		{
+						"expr":"materials_sigma*(materials_U/(2*pi*x))*(materials_U/(2*pi*x)):materials_sigma:materials_U:x",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%"],
+			    			"index1": {{index_h}}
+						}
+		    		},
+		    		"Flaplace":
+		    		{
+						"expr":"{materials_F_laplace_0,materials_F_laplace_1}:materials_F_laplace_0:materials_F_laplace_1",
+						"markers":
+						{
+			    			"name": ["H1_Cu%1%", "H2_Cu%1%"],
+			    			"index1": {{index_h}}
+						}
+		    		},
+		    		"sigma_rr":
+		    		{
+						"expr":"materials_sigma_rr:materials_sigma_rr",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+		    		"sigma_thth":
+		    		{
+						"expr":"materials_sigma_thth:materials_sigma_thth",
+						"markers":
+						{
+				    		"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+				    		"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+		    		"sigma_zz":
+		    		{
+						"expr":"materials_sigma_zz:materials_sigma_zz",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+		    		"sigma_rz":
+		    		{
+						"expr":"materials_sigma_rz:materials_sigma_rz",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+		    		"sigma_tr":
+		    		{
+						"expr":"max(abs(materials_sigma_1-materials_sigma_2),max(abs(materials_sigma_1-materials_sigma_3),abs(materials_sigma_2-materials_sigma_3))):materials_sigma_1:materials_sigma_2:materials_sigma_3",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+		    		"sigma_vm":
+		    		{
+						"expr":"sqrt(2/3*(materials_sigma_1*materials_sigma_1+materials_sigma_2*materials_sigma_2+materials_sigma_3*materials_sigma_3-materials_sigma_1*materials_sigma_2-materials_sigma_1*materials_sigma_3-materials_sigma_2*materials_sigma_3)):materials_sigma_1:materials_sigma_2:materials_sigma_3",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+			    	"sigma_1":
+			    	{
+						"expr":"materials_sigma_1:materials_sigma_1",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+			    	"sigma_2":
+			    	{
+						"expr":"materials_sigma_2:materials_sigma_2",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+			    	"sigma_3":
+			    	{
+						"expr":"materials_sigma_3:materials_sigma_3",
+						"markers":
+						{
+				    		"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+				    		"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+		    		"epsilon_rr":
+		    		{
+						"expr":"elastic_r_grad_ur_0:elastic_r_grad_ur_0", 
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+			    	"epsilon_thth":
+			    	{
+						"expr":"1/x*elastic_r_ur:x:elastic_r_ur", 
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+			    	"epsilon_zz":
+			    	{
+						"expr":"elastic_z_grad_uz_1:elastic_z_grad_uz_1", 
+						"markers":
+						{
+					    	"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+					    	"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		},
+		    		"epsilon_rz":
+		    		{
+						"expr":"1/2*(elastic_r_grad_ur_1+elastic_z_grad_uz_0):elastic_r_grad_ur_1:elastic_z_grad_uz_0", 
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"index1": {{index_h}}
+						},
+						"representation":["element"]
+		    		}
+				}
+	    	}
+		},
+		"magnetic":
+		{
+	    	"Measures": 
+	    	{
+				"Statistics":
+				{
+		    		"MagneticEnergy":
+		    		{
+						"type":"integrate",
+						"expr":"-2*pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi):magnetic_phi:materials_sigma:materials_U:x",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%"],
+			    			"index1": {{index_h}}
+						}
+		    		}
+				}
+	    	}
+		},
+		"heat":
+		{
+	    	"Save":
+	    	{
+				"Fields":
+				{
+		    		"names":["temperature"]
+				}
+	    	},
+	    	"Measures":
+	    	{
+				"Statistics":
+				{
+		    		"MeanT": 
+		    		{
+						"type":["min","max","mean"], 
+						"field":"temperature" 
+		    		},
+					"MeanT_H%1_1%":
+					{
+    					"type":["min","max","mean"], 
+    					"field":"temperature",
+    					"markers":
+    					{
+							"name": ["H%1_1%_Cu%1_2%"],
+							"index1": {{index_h}}
+    					}
+					},
+					"Intensity_H%1_1%_Cu%1_2%":
+					{
+    					"type":"integrate",
+    					"expr":"-materials_sigma*materials_U/2/pi/x:materials_sigma:materials_U:x",
+    					"markers": "H%1_1%_Cu%1_2%",
+    					"index1": {{index_h}}
+					},
+					"Power_H%1_1%":
+					{
+    					"type":"integrate",
+    					"expr":"2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+    					"markers":
+    					{
+							"name": ["H%1_1%_Cu%1_2%"],
+							"index1": {{index_h}}
+    					}
+					},
+					"Flux_Channel%1%":
+					{
+    					"type":"integrate",
+					    "expr":"h%1%*(heat_T-(Tw%1%+dTw%1%))*2*pi*x:x:heat_T:h%1%:Tw%1%:dTw%1%",
+						"markers":"Channel%1%",
+					    "index1": "{{imin}}:{{imax}}"
+					}
+				}
+	    	}
+		}
+    }
+}
