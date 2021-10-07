@@ -1,13 +1,13 @@
 {
     "{{name}}":
 {
-    "k":"ThermalConductivity",
-    "mu": "MagnetPermeability",
+    "k":"{{ThermalConductivity}}",
+    "mu": "{{MagnetPermeability}} * mu0",
 
-    "E":"Young",
-    "nu":"Poisson",
-    "alphaT":"CoefDilatation",
+    "E":"{{Young}}",
+    "nu":"{{Poisson}}",
+    "alphaT":"{{CoefDilatation}}",
 
-    "filename":"insulator.json"
+    "filename":"$cfgdir/insulator.json"
 }
 }

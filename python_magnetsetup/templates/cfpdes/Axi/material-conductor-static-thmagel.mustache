@@ -1,14 +1,14 @@
 {
     "{{name}}":
 {
-    "alpha":"alpha",
-    "sigma":"ElectricalConductivity",
-    "k":"ThermalConductivity",
-    "mu": "MagnetPermeability",
+    "alpha":"{{alpha}}",
+    "sigma":"{{ElectricalConductivity}}",
+    "k":"{{ThermalConductivity}}",
+    "mu": "{{MagnetPermeability}} * mu0",
 
-    "E":"Young",
-    "nu":"Poisson",
-    "alphaT":"CoefDilatation",
+    "E":"{{Young}}",
+    "nu":"{{Poisson}}",
+    "alphaT":"{{CoefDilatation}}",
 
     "U":"U_{{name}}:U_{{name}}",
     "j_th":"-sigma*U/2/pi/x:sigma:U:x",
