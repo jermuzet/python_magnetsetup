@@ -20,6 +20,16 @@
 		    {
 			"mean": "channel-mean.mustache",
 			"grad": "channel-grad.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "material-conductor-static-thmagel.json",
+			"insulator": "material-insulator-static-thmagel.json"
 		    }
 		}
 	    },
