@@ -58,7 +58,7 @@ def main():
     parser.add_argument("--time", help="choose time type", type=str,
                     choices=['static', 'transient'], default='static')
     parser.add_argument("--geom", help="choose geom type", type=str,
-                    choices=['Axi', '3D'], default='Axi')
+                    choiceslt='Axi')
     parser.add_argument("--model", help="choose model type", type=str,
                     choices=['th', 'mag', 'thmag', 'thmagel'], default='thmagel')
     parser.add_argument("--cooling", help="choose cooling type", type=str,
@@ -105,6 +105,7 @@ def main():
             raise Exception("expected Insert yaml file")
 
     # load mustache template file
+    # cfg_model  = magnetsetup[args.method][args.time][args.geom][args.model]["cfg"]
     json_model = magnetsetup[args.method][args.time][args.geom][args.model]["model"]
     conductor_model = magnetsetup[args.method][args.time][args.geom][args.model]["conductor"]
     insulator_model = magnetsetup[args.method][args.time][args.geom][args.model]["insulator"]
@@ -169,7 +170,7 @@ def main():
         if args.geom == "Axi":
             for i in range(NHelices):
                 for j in range(Nsections[i]):
-                    params_dict["H%d_Cu%d" % (i+1, j+1)] = "1"
+                    params_dict["U_H%d_Cu%d" % (i+1, j+1)] = "1"
 
         for key in params_dict:
             data["Parameters"][key] = params_dict[key]
