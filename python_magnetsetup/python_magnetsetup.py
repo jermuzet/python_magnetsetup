@@ -58,7 +58,7 @@ def main():
     parser.add_argument("--time", help="choose time type", type=str,
                     choices=['static', 'transient'], default='static')
     parser.add_argument("--geom", help="choose geom type", type=str,
-                    choiceslt='Axi')
+                    choices=['Axi', '3D'], default='Axi')
     parser.add_argument("--model", help="choose model type", type=str,
                     choices=['th', 'mag', 'thmag', 'thmagel'], default='thmagel')
     parser.add_argument("--cooling", help="choose cooling type", type=str,
