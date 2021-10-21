@@ -1,6 +1,6 @@
 """
 Create template json model files for Feelpp/HiFiMagnet simu
-From a yaml defintion file of an insert
+From a yaml definition file of an insert
 
 Inputs:
 * method: 
@@ -99,7 +99,7 @@ def main():
 
     with open(yamlfile, 'r') as cfgdata:
         cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
-        if isinstance(cad, Insert.Insert):
+        if isinstance(cad, Insert):
             (NHelices, NRings, NChannels, Nsections, index_h, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = get_main_characteristics(cad)
         else:
             raise Exception("expected Insert yaml file")
@@ -117,6 +117,8 @@ def main():
     fmodel = os.path.join(template_path, json_model)
     fconductor = os.path.join(template_path, conductor_model)
     finsulator = os.path.join(template_path, insulator_model)
+    print("fconductor=", fconductor)
+    print("finsulator=", finsulator)
     fcooling = os.path.join(template_path, cooling_model)
     fflux = os.path.join(template_path, flux_model)
 
@@ -127,9 +129,10 @@ def main():
     if args.method == "cfpdes":
         from shutil import copyfile
         for jsonfile in material_generic_def:
-            filename = magnetsetup[args.method][args.time][args.geom][args.model][jsonfile]
+            filename = magnetsetup[args.method][args.time][args.geom][args.model]["filename"][jsonfile]
             src = os.path.join(template_path, filename)
             dst = os.path.join(cwd, jsonfile + ".json")
+            print(jsonfile, "filename=", filename, src, dst)
             copyfile(src, dst)
 
     with open(fmodel, "r") as ftemplate:
