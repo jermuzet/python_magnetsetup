@@ -80,6 +80,19 @@
 	    	}
 		}
     },
+    "InitialConditions":
+    {
+        "temperature":
+        {
+            "Expression":
+            {
+                "myic":
+                {
+                    "expr":"Tinit:Tinit"
+                }
+            }
+        }
+    },
     "PostProcess":
     {
 		"use-model-name":1,
@@ -102,7 +115,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_h}}
+			    			"index1": {{index_conductor}}
 						}
 		    		},
 		    		"Jth":
@@ -111,7 +124,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_h}}
+			    			"index1": {{index_conductor}}
 						}
 		    		},
 		    		"Qth":
@@ -120,7 +133,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_h}}
+			    			"index1": {{index_conductor}}
 						}
 		    		},
 		    		"Flaplace":
@@ -128,46 +141,16 @@
 						"expr":"{materials_F_laplace_0,materials_F_laplace_1}:materials_F_laplace_0:materials_F_laplace_1",
 						"markers":
 						{
-			    			"name": ["H1_Cu%1%", "H2_Cu%1%"],
-			    			"index1": {{index_h}}
+			    			"name": ["H%1_1%_Cu%1_2%"],
+			    			"index1": {{index_conductor}}
 						}
 		    		},
-		    		"sigma_rr":
+		    		"sigma":
 		    		{
-						"expr":"materials_sigma_rr:materials_sigma_rr",
-						"markers":
+						"expr":"{materials_sigma_rr,0,materials_sigma_rz, 0,materials_sigma_thth,0, materials_sigma_rz,0,materials_sigma_zz}:materials_sigma_rr:materials_sigma_rz:materials_sigma_thth:materials_sigma_zz",
+                        "markers":
 						{
-			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
-			    			"index1": {{index_h}}
-						},
-						"representation":["element"]
-		    		},
-		    		"sigma_thth":
-		    		{
-						"expr":"materials_sigma_thth:materials_sigma_thth",
-						"markers":
-						{
-				    		"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
-				    		"index1": {{index_h}}
-						},
-						"representation":["element"]
-		    		},
-		    		"sigma_zz":
-		    		{
-						"expr":"materials_sigma_zz:materials_sigma_zz",
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
-			    			"index1": {{index_h}}
-						},
-						"representation":["element"]
-		    		},
-		    		"sigma_rz":
-		    		{
-						"expr":"materials_sigma_rz:materials_sigma_rz",
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"name": ["H%1_1%_Cu%1_2%"],
 			    			"index1": {{index_h}}
 						},
 						"representation":["element"]
@@ -177,7 +160,7 @@
 						"expr":"max(abs(materials_sigma_1-materials_sigma_2),max(abs(materials_sigma_1-materials_sigma_3),abs(materials_sigma_2-materials_sigma_3))):materials_sigma_1:materials_sigma_2:materials_sigma_3",
 						"markers":
 						{
-			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"name": ["H%1_1%_Cu%1_2%"],
 			    			"index1": {{index_h}}
 						},
 						"representation":["element"]
@@ -187,77 +170,27 @@
 						"expr":"sqrt(2/3*(materials_sigma_1*materials_sigma_1+materials_sigma_2*materials_sigma_2+materials_sigma_3*materials_sigma_3-materials_sigma_1*materials_sigma_2-materials_sigma_1*materials_sigma_3-materials_sigma_2*materials_sigma_3)):materials_sigma_1:materials_sigma_2:materials_sigma_3",
 						"markers":
 						{
-			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"name": ["H%1_1%_Cu%1_2%"],
 			    			"index1": {{index_h}}
 						},
 						"representation":["element"]
 		    		},
-			    	"sigma_1":
+			    	"principle_stresses":
 			    	{
-						"expr":"materials_sigma_1:materials_sigma_1",
-						"markers":
+						"expr":"{materials_sigma_1,materials_sigma_2,materials_sigma_3}:materials_sigma_1:materials_sigma_2:materials_sigma_3",
+                        "markers":
 						{
-			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"name": ["H%1_1%_Cu%1_2%"],
 			    			"index1": {{index_h}}
 						},
 						"representation":["element"]
 		    		},
-			    	"sigma_2":
-			    	{
-						"expr":"materials_sigma_2:materials_sigma_2",
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
-			    			"index1": {{index_h}}
-						},
-						"representation":["element"]
-		    		},
-			    	"sigma_3":
-			    	{
-						"expr":"materials_sigma_3:materials_sigma_3",
-						"markers":
-						{
-				    		"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
-				    		"index1": {{index_h}}
-						},
-						"representation":["element"]
-		    		},
-		    		"epsilon_rr":
+		    		"epsilon":
 		    		{
-						"expr":"elastic_r_grad_ur_0:elastic_r_grad_ur_0", 
-						"markers":
+						"expr":"{elastic_grad_u_00,0,1/2*(elastic_grad_u_01+elastic_grad_u_10), 0,elastic_u_0/x,0, 1/2*(elastic_grad_u_01+elastic_grad_u_10),0,elastic_grad_u_11}:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11",
+                        "markers":
 						{
-			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
-			    			"index1": {{index_h}}
-						},
-						"representation":["element"]
-		    		},
-			    	"epsilon_thth":
-			    	{
-						"expr":"1/x*elastic_r_ur:x:elastic_r_ur", 
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
-			    			"index1": {{index_h}}
-						},
-						"representation":["element"]
-		    		},
-			    	"epsilon_zz":
-			    	{
-						"expr":"elastic_z_grad_uz_1:elastic_z_grad_uz_1", 
-						"markers":
-						{
-					    	"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
-					    	"index1": {{index_h}}
-						},
-						"representation":["element"]
-		    		},
-		    		"epsilon_rz":
-		    		{
-						"expr":"1/2*(elastic_r_grad_ur_1+elastic_z_grad_uz_0):elastic_r_grad_ur_1:elastic_z_grad_uz_0", 
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%", "H%1_1%_Cu%1_3%"],
+			    			"name": ["H%1_1%_Cu%1_2%"],
 			    			"index1": {{index_h}}
 						},
 						"representation":["element"]
@@ -278,9 +211,26 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_h}}
+			    			"index1": {{index_conductor}}
 						}
-		    		}
+		    		},
+					"Intensity_H%1_1%_Cu%1_2%":
+					{
+    					"type":"integrate",
+    					"expr":"-materials_sigma*materials_U/2/pi/x:materials_sigma:materials_U:x",
+    					"markers": "H%1_1%_Cu%1_2%",
+    					"index1": {{index_conductor}}
+					},
+					"Power_H%1_1%":
+					{
+    					"type":"integrate",
+    					"expr":"2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+    					"markers":
+    					{
+							"name": ["H%1_1%_Cu%1_2%"],
+							"index1": {{index_conductor}}
+    					}
+					}
 				}
 	    	}
 		},
@@ -302,32 +252,12 @@
 						"type":["min","max","mean"], 
 						"field":"temperature" 
 		    		},
-					"MeanT_H%1_1%":
+					"MeanT_H%1_1%_Cu%1_2%":
 					{
     					"type":["min","max","mean"], 
     					"field":"temperature",
-    					"markers":
-    					{
-							"name": ["H%1_1%_Cu%1_2%"],
-							"index1": {{index_h}}
-    					}
-					},
-					"Intensity_H%1_1%_Cu%1_2%":
-					{
-    					"type":"integrate",
-    					"expr":"-materials_sigma*materials_U/2/pi/x:materials_sigma:materials_U:x",
-    					"markers": "H%1_1%_Cu%1_2%",
-    					"index1": {{index_h}}
-					},
-					"Power_H%1_1%":
-					{
-    					"type":"integrate",
-    					"expr":"2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
-    					"markers":
-    					{
-							"name": ["H%1_1%_Cu%1_2%"],
-							"index1": {{index_h}}
-    					}
+    					"markers":"H%1_1%_Cu%1_2%",
+						"index1": {{index_h}}
 					},
 					"Flux_Channel%1%":
 					{
