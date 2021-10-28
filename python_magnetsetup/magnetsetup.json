@@ -13,27 +13,59 @@
 			"insulator": "material-insulator-static-th.mustache",
 			"cooling":
 		    {
-			"mean": "channel-mean.mustache",
-			"grad": "channel-grad.mustache"
+				"mean": "channel-mean.mustache",
+				"grad": "channel-grad.mustache"
 		    },
 		    "cooling-post":
 		    {
-			"mean": "flux-channel-mean.mustache",
-			"grad": "flux-channel-grad.mustache"
+				"mean": "flux-channel-mean.mustache",
+				"grad": "flux-channel-grad.mustache"
 		    },
 		    "filename":
 		    {
-			"conductor": "material-conductor-static-th.json",
-			"insulator": "material-insulator-static-th.json"
+				"conductor": "material-conductor-static-th.json",
+				"insulator": "material-insulator-static-th.json"
 		    }
+		},
+		"mag":
+		{
+			"model":"mag.mustache",
+			"conductor-linear": "material-conductor-linear-static-mag.mustache",
+			"insulator": "material-insulator-static-mag.mustache",
+		    "filename":
+		    {
+				"conductor": "material-conductor-static-mag.json",
+				"insulator": "material-insulator-static-mag.json"
+		    }
+			
 		},
 		"thmag":
 		{
+			"model": "thmag.mustache",
+			"conductor-linear": "material-conductor-linear-static-thmag.mustache",
+			"conductor-nonlinear": "material-conductor-nonlinear-static-thmag.mustache",
+			"insulator": "material-insulator-static-thmag.mustache",
+		    "cooling":
+		    {
+				"mean": "channel-mean.mustache",
+				"grad": "channel-grad.mustache"
+		    },
+		    "cooling-post":
+		    {
+				"mean": "flux-channel-mean.mustache",
+				"grad": "flux-channel-grad.mustache"
+		    },
+			"filename":
+			{
+				"conductor": "material-conductor-static-thmag.json",
+				"insulator": "material-insulator-static-thmag.json"
+			}
 		},
 		"thmagel":
 		{
 		    "model" : "thmagel.mustache",
-		    "conductor": "material-conductor-static-thmagel.mustache",
+		    "conductor-linear": "material-conductor-linear-static-thmagel.mustache",
+			"conductor-nonlinear": "material-conductor-nonlinear-static-thmagel.mustache",
 		    "insulator": "material-insulator-static-thmagel.mustache",
 		    "cooling":
 		    {
