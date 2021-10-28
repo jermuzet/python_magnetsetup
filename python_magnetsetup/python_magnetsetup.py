@@ -136,21 +136,25 @@ def main():
     elif args.phytype == 'nonlinear':
         conductor_model = magnetsetup[args.method][args.time][args.geom][args.model]["conductor-nonlinear"]
     insulator_model = magnetsetup[args.method][args.time][args.geom][args.model]["insulator"]
-    cooling_model = magnetsetup[args.method][args.time][args.geom][args.model]["cooling"][args.cooling]
-    flux_model = magnetsetup[args.method][args.time][args.geom][args.model]["cooling-post"][args.cooling]
+    if args.model != 'mag':
+        cooling_model = magnetsetup[args.method][args.time][args.geom][args.model]["cooling"][args.cooling]
+        flux_model = magnetsetup[args.method][args.time][args.geom][args.model]["cooling-post"][args.cooling]
 
     # TODO create default path to mustache according to method, geom
     template_path = os.path.join(default_path, "templates", args.method, args.geom)
     fmodel = os.path.join(template_path, json_model)
     fconductor = os.path.join(template_path, conductor_model)
     finsulator = os.path.join(template_path, insulator_model)
-    fcooling = os.path.join(template_path, cooling_model)
-    fflux = os.path.join(template_path, flux_model)
+    if args.model != 'mag':
+        fcooling = os.path.join(template_path, cooling_model)
+        fflux = os.path.join(template_path, flux_model)
 
     # copy json files to cwd (only for cfpdes)
     material_generic_def = ["conductor", "insulator"]
+
     if args.time == "transient":
         material_generic_def.append("conductor-nosource") # only for transient with mqs
+
     if args.method == "cfpdes":
         from shutil import copyfile
         for jsonfile in material_generic_def:
@@ -205,6 +209,7 @@ def main():
         # materials (Axi specific)
         materials_dict = {}
         for i in range(NHelices):
+            
             # section j==0:  treated as insulator in Axi
             with open(finsulator, "r") as ftemplate:
                 jsonfile = chevron.render(ftemplate, Merge({'name': "H%d_Cu%d" % (i+1, 0)}, confdata["Helix"][i]["material"]))
@@ -251,28 +256,31 @@ def main():
         else:
             data["Materials"] = materials_dict
         
-        # loop for Cooling BCs
-        bcs_dict = {}
-        for i in range(NChannels):
-            # load insulator template for j==0
-            with open(fcooling, "r") as ftemplate:
-                jsonfile = chevron.render(ftemplate, {'i': i})
-                jsonfile = jsonfile.replace("\'", "\"")
-                # shall get rid of comments: //*
-                mdata = json.loads(jsonfile)
-                bcs_dict["Channel%d" % i] = mdata["Channel%d" % i]
-        data["BoundaryConditions"]["heat"]["Robin"] = bcs_dict
-        
         # TODO add BCs for elasticity
-        # add flux_model for Flux_Channel calc
-        with open(fflux, "r") as ftemplate:
-            jsonfile = chevron.render(ftemplate, {'index_h': "0:%s" % str(NChannels)})
-            jsonfile = jsonfile.replace("\'", "\"")
-            mdata = json.loads(jsonfile)
-            data["PostProcess"]["heat"]["Measures"]["Statistics"]["Flux_Channel%1%"] = mdata["Flux"]["Flux_Channel%1%"]
-            for i in range(NHelices) :
-                data["PostProcess"]["heat"]["Measures"]["Statistics"]["MeanT_H{}".format(i+1)] = {"type" : ["min","max","mean"], "field":"temperature", "markers": {"name": "H{}_Cu%1%".format(i+1),"index1":index_Helices[i]}}
-        
+
+        # loop for Cooling BCs
+        if args.model != 'mag':
+            bcs_dict = {}
+            for i in range(NChannels):
+                # load insulator template for j==0
+                with open(fcooling, "r") as ftemplate:
+                    jsonfile = chevron.render(ftemplate, {'i': i})
+                    jsonfile = jsonfile.replace("\'", "\"")
+                    # shall get rid of comments: //*
+                    mdata = json.loads(jsonfile)
+                    bcs_dict["Channel%d" % i] = mdata["Channel%d" % i]
+            data["BoundaryConditions"]["heat"]["Robin"] = bcs_dict
+
+        if args.model != 'mag':
+            # add flux_model for Flux_Channel calc
+            with open(fflux, "r") as ftemplate:
+                jsonfile = chevron.render(ftemplate, {'index_h': "0:%s" % str(NChannels)})
+                jsonfile = jsonfile.replace("\'", "\"")
+                mdata = json.loads(jsonfile)
+                data["PostProcess"]["heat"]["Measures"]["Statistics"]["Flux_Channel%1%"] = mdata["Flux"]["Flux_Channel%1%"]
+                for i in range(NHelices) :
+                    data["PostProcess"]["heat"]["Measures"]["Statistics"]["MeanT_H{}".format(i+1)] = {"type" : ["min","max","mean"], "field":"temperature", "markers": {"name": "H{}_Cu%1%".format(i+1),"index1":index_Helices[i]}}
+            
         # save json (NB use x to avoid overwrite file)
         outfilename = args.datafile.replace(".json","")
         outfilename += "-" + args.method
