@@ -125,23 +125,6 @@
 	    	{
 				"Statistics":
 				{
-					"Intensity_H%1_1%_Cu%1_2%":
-					{
-    					"type":"integrate",
-    					"expr":"-materials_sigma*materials_U/2/pi/x:materials_sigma:materials_U:x",
-    					"markers": "H%1_1%_Cu%1_2%",
-    					"index1": {{index_conductor}}
-					},
-					"Power_H%1_1%":
-					{
-    					"type":"integrate",
-    					"expr":"2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
-    					"markers":
-    					{
-							"name": ["H%1_1%_Cu%1_2%"],
-							"index1": {{index_conductor}}
-    					}
-					},
 					"MagneticEnergy":
 		    		{
 						"type":"integrate",
@@ -151,7 +134,14 @@
 			    			"name": ["H%1_1%_Cu%1_2%"],
 			    			"index1": {{index_conductor}}
 						}
-		    		}
+		    		},
+					"Intensity_H%1_1%_Cu%1_2%":
+					{
+    					"type":"integrate",
+    					"expr":"-materials_H%1_1%_Cu%1_2%_sigma*materials_H%1_1%_Cu%1_2%_U/2/pi/x:materials_H%1_1%_Cu%1_2%_sigma:materials_H%1_1%_Cu%1_2%_U:x",
+    					"markers": "H%1_1%_Cu%1_2%",
+    					"index1": {{index_conductor}}
+					}
 				}
 	    	}
 		},
@@ -173,13 +163,6 @@
 						"type":["min","max","mean"], 
 						"field":"temperature" 
 		    		},
-					"MeanT_H%1_1%_Cu%1_2%":
-					{
-    					"type":["min","max","mean"], 
-    					"field":"temperature",
-    					"markers":"H%1_1%_Cu%1_2%",
-						"index1": {{index_h}}
-					},
 					"Flux_Channel%1%":
 					{
     					"type":"integrate",

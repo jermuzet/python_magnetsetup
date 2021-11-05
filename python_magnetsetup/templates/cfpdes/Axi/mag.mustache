@@ -106,19 +106,9 @@
                     "Intensity_H%1_1%_Cu%1_2%":
 					{
     					"type":"integrate",
-    					"expr":"-materials_sigma*materials_U/2/pi/x:materials_sigma:materials_U:x",
+    					"expr":"-materials_H%1_1%_Cu%1_2%_sigma*materials_H%1_1%_Cu%1_2%_U/2/pi/x:materials_H%1_1%_Cu%1_2%_sigma:materials_H%1_1%_Cu%1_2%_U:x",
     					"markers": "H%1_1%_Cu%1_2%",
-    					"index1": {{index_conductor}}
-					},
-					"Power_H%1_1%":
-					{
-    					"type":"integrate",
-    					"expr":"2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
-    					"markers":
-    					{
-							"name": ["H%1_1%_Cu%1_2%"],
-							"index1": {{index_conductor}}
-    					}
+			    		"index1": {{index_conductor}}
 					}
 				}
 	    	}
