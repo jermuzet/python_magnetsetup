@@ -54,7 +54,7 @@ def Merge(dict1, dict2):
     res = {**dict1, **dict2}
     return res
 
-def export_json(table: str):
+def export_table(table: str):
     """
     Return the pd.DataFrame correspondant to table of database from localhost:8000/api
     """
@@ -89,8 +89,8 @@ def create_confdata_magnet(magnet: str, debug=False):
     """
 
     # Export magnets table
-    data_magnets = export_json('magnets')
-
+    data_magnets = export_table('magnets')
+    data_magnets = export_table('mpartmagnetlink')
     # Search magnet
     names = data_magnets['name']
     if  magnet not in names.values :
@@ -103,11 +103,11 @@ def create_confdata_magnet(magnet: str, debug=False):
     serie_magnet = data_magnets[ data_magnets['name']==magnet ]
 
     # Export mparts of magnet
-    data_mparts = export_json('mparts')
+    data_mparts = export_table('mparts')
     data_mparts = data_mparts[ data_mparts['be']==serie_magnet['be'][0] ]
 
     # Recuperate the materials
-    data_materials = export_json('materials')
+    data_materials = export_table('materials')
 
     # Create dictionnary of magnet's configuration
     confdata = {}
@@ -146,7 +146,11 @@ def create_params_dict(args, Zmin, Zmax, Sh, Dh, NHelices, Nsections):
         params_dict["bool_dilatation"] = "1"
 
     # TODO : initialization of parameters
-    params_dict["Tinit"] = 293          #"Tinit"  
+    if ( args.model == 'thmagel' ) and ( args.phytype == 'linear' ):
+        params_dict["Tinit"] = 0          #"Tinit"
+    else :
+        params_dict["Tinit"] = 293
+
     params_dict["h"] = 58222.1          #"h"
     params_dict["Tw"] = 290.671         #"Tin:Tin"
     params_dict["dTw"] = 12.74          #"(Tout-Tin)/2.:Tin:Tout"
@@ -209,11 +213,30 @@ def create_materials_dict(confdata, finsulator, fconductor, NHelices, Nsections,
         # loop for Rings:  treated as insulator in Axi
         for i in range(NRings):
             with open(finsulator, "r") as ftemplate:
-                jsonfile = chevron.render(ftemplate, Merge({'name': "R%d" % (i+1)}, confdata["Helix"][i]["material"]))
+                jsonfile = chevron.render(ftemplate, Merge({'name': "R%d" % (i+1)}, confdata["Ring"][i]["material"]))
                 jsonfile = jsonfile.replace("\'", "\"")
                 # shall get rid of comments: //*
                 mdata = json.loads(jsonfile)
                 materials_dict["R%d" % (i+1)] = mdata["R%d" % (i+1)]
+        
+        # Leads: treated as insulator in Axi
+        # inner
+        '''
+        with open(finsulator, "r") as ftemplate:
+            jsonfile = chevron.render(ftemplate, Merge({'name': "iL1"}, confdata["Lead"][0]["material"]))
+            jsonfile = jsonfile.replace("\'", "\"")
+            # shall get rid of comments: //*
+            mdata = json.loads(jsonfile)
+            materials_dict["iL1"] = mdata["iL1"]
+
+        # outer
+        with open(finsulator, "r") as ftemplate:
+            jsonfile = chevron.render(ftemplate, Merge({'name': "oL2"}, confdata["Lead"][1]["material"]))
+            jsonfile = jsonfile.replace("\'", "\"")
+            # shall get rid of comments: //*
+            mdata = json.loads(jsonfile)
+            materials_dict["oL2"] = mdata["oL2"]
+        '''
 
     return materials_dict
 
@@ -255,7 +278,7 @@ def main():
                     choices=['linear', 'nonlinear'], default='linear')
     parser.add_argument("--cooling", help="choose cooling type", type=str,
                     choices=['mean', 'grad'], default='mean')
-    parser.add_argument("--scale", help="scale of geometry", type=float, default=1)
+    parser.add_argument("--scale", help="scale of geometry", type=float, default=1e-3)
 
     parser.add_argument("--debug", help="activate debug", action='store_true')
     parser.add_argument("--verbose", help="activate verbose", action='store_true')
@@ -289,7 +312,7 @@ def main():
         if args.debug:
             print("confdata=%s" % args.datafile)
             print(confdata['Helix'])
-    
+
     # Recuperate the data of configuration with the direct name of magnet
     if args.magnet != None:
         magnet = args.magnet
@@ -299,28 +322,46 @@ def main():
 
     if args.debug:
         print("yamlfile=%s" % yamlfile)
-
     with open(yamlfile, 'r') as cfgdata:
         cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         if isinstance(cad, Insert):
-            (NHelices, NRings, NChannels, Nsections, index_h, index_conductor,index_Helices, 
+            (NHelices, NRings, NChannels, Nsections, index_h, 
                 R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = python_magnetgeo.get_main_characteristics(cad)
         else:
             raise Exception("expected Insert yaml file")
 
     # TODO : manage the scale
-    for i in range(len(Zmin)):      # WARNING
-        Zmin[i] *= args.scale
-    
-    for i in range(len(Zmax)):
-        Zmax[i] *= args.scale
-    
-    for i in range(len(Dh)):
-        Dh[i] *= args.scale
-    
-    for i in range(len(Sh)):
-        Sh[i] *= args.scale
-        
+    for i in range(len(Zmin)): Zmin[i] *= args.scale
+    for i in range(len(Zmax)): Zmax[i] *= args.scale
+    for i in range(len(Dh)): Dh[i] *= args.scale
+    for i in range(len(Sh)): Sh[i] *= args.scale
+
+    index_h = []
+    index_conductor = []
+    index_Helices = []
+    index_HelicesConductor = []
+    for i in range(NHelices):
+        for j in range(Nsections[i]+2):
+            index_h.append( [str(i+1),str(j)] )
+        for j in range(Nsections[i]):
+            index_conductor.append( [str(i+1),str(j+1)] )
+        index_Helices.append(["0:{}".format(Nsections[i]+2)])
+        index_HelicesConductor.append(["1:{}".format(Nsections[i]+1)])
+
+    part_withoutAir = []  # list of name of all parts without Air
+    for i in range(NHelices):
+        for j in range(Nsections[i]+2):
+            part_withoutAir.append("H{}_Cu{}".format(i+1,j))
+    for i in range(1,NRings+1):
+        part_withoutAir.append("R{}".format(i))
+
+    boundary_Ring = [] # list of name of boundaries of Ring for elastic part
+    for i in range(1,NRings+1):
+        if i % 2 == 1 :
+            boundary_Ring.append("R{}_BP".format(i))
+        else :
+            boundary_Ring.append("R{}_HP".format(i))
+
     # load mustache template file
     # cfg_model  = magnetsetup[args.method][args.time][args.geom][args.model]["cfg"]
     json_model = magnetsetup[args.method][args.time][args.geom][args.model]["model"]
@@ -358,7 +399,7 @@ def main():
             copyfile(src, dst)
     
     with open(fmodel, "r") as ftemplate:
-        jsonfile = chevron.render(ftemplate, {'index_h': index_h, 'index_conductor':index_conductor, 'imin': 0, 'imax': NHelices+1 })  # dicuss on compact version of indexation
+        jsonfile = chevron.render(ftemplate, {'index_h': index_h, 'index_conductor':index_conductor, 'imin': 0, 'imax': NHelices+1, 'part_withoutAir':part_withoutAir })
         jsonfile = jsonfile.replace("\'", "\"")
         # shall get rid of comments: //*
         # now tweak obtained json
@@ -385,6 +426,9 @@ def main():
         if args.model != 'mag':
             data["BoundaryConditions"]["heat"]["Robin"] = create_bcs_dict(NChannels, fcooling)
 
+        #if args.model != 'thmagel':
+        #    data["BoundaryConditions"]["elastic"]["Dirichlet"] = {"elasdir":{"markers" : boundary_Ring, "expr":0 }}
+
         if args.model != 'mag':
             # add flux_model for Flux_Channel calc
             with open(fflux, "r") as ftemplate:
@@ -394,6 +438,14 @@ def main():
                 data["PostProcess"]["heat"]["Measures"]["Statistics"]["Flux_Channel%1%"] = mdata["Flux"]["Flux_Channel%1%"]
                 for i in range(NHelices) :
                     data["PostProcess"]["heat"]["Measures"]["Statistics"]["MeanT_H{}".format(i+1)] = {"type" : ["min","max","mean"], "field":"temperature", "markers": {"name": "H{}_Cu%1%".format(i+1),"index1":index_Helices[i]}}
+
+        if args.model != 'th':
+            # Add Electrical Power by Helix
+            for i in range(NHelices) :
+                data["PostProcess"]["magnetic"]["Measures"]["Statistics"]["Power_H{}".format(i+1)] = {"type" : "integrate",
+                    "expr":"2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x".format(i+1),
+                    "markers": {"name": "H{}_Cu%1%".format(i+1),"index1":index_HelicesConductor[i]}}
+
 
         # save json (NB use x to avoid overwrite file)
         if args.datafile != None :
