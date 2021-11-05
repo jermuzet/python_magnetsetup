@@ -90,7 +90,8 @@ def create_confdata_magnet(magnet: str, debug=False):
 
     # Export magnets table
     data_magnets = export_table('magnets')
-    data_magnets = export_table('mpartmagnetlink')
+    #data_magnets = export_table('mpartmagnetlink')
+    
     # Search magnet
     names = data_magnets['name']
     if  magnet not in names.values :
