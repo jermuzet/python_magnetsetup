@@ -104,5 +104,6 @@ ENV/
 # IDE settings
 .vscode/
 
-# Test for hdg
-/test_hdg
+*.msh
+*.xao
+*.brep

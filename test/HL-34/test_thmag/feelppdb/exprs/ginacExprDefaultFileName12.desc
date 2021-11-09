@@ -1,1 +1,0 @@
-k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0
