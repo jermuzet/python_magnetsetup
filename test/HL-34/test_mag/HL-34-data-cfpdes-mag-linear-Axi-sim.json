@@ -91,303 +91,303 @@
         },
         "H1_Cu0": {
             "mu": "1.0 * mu0:mu0",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-mag-Axi.json"
         },
         "H1_Cu1": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu1:U_H1_Cu1",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu2": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu2:U_H1_Cu2",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu3": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu3:U_H1_Cu3",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu4": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu4:U_H1_Cu4",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu5": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu5:U_H1_Cu5",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu6": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu6:U_H1_Cu6",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu7": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu7:U_H1_Cu7",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu8": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu8:U_H1_Cu8",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu9": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu9:U_H1_Cu9",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu10": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu10:U_H1_Cu10",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu11": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu11:U_H1_Cu11",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu12": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu12:U_H1_Cu12",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu13": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu13:U_H1_Cu13",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu14": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu14:U_H1_Cu14",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu15": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu15:U_H1_Cu15",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu16": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu16:U_H1_Cu16",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu17": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu17:U_H1_Cu17",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu18": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu18:U_H1_Cu18",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu19": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu19:U_H1_Cu19",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu20": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H1_Cu20:U_H1_Cu20",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H1_Cu21": {
             "mu": "1.0 * mu0:mu0",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-mag-Axi.json"
         },
         "R1": {
             "mu": "1.0 * mu0:mu0",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-mag-Axi.json"
         },
         "H2_Cu0": {
             "mu": "1.0 * mu0:mu0",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-mag-Axi.json"
         },
         "H2_Cu1": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu1:U_H2_Cu1",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu2": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu2:U_H2_Cu2",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu3": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu3:U_H2_Cu3",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu4": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu4:U_H2_Cu4",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu5": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu5:U_H2_Cu5",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu6": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu6:U_H2_Cu6",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu7": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu7:U_H2_Cu7",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu8": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu8:U_H2_Cu8",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu9": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu9:U_H2_Cu9",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu10": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu10:U_H2_Cu10",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu11": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu11:U_H2_Cu11",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu12": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu12:U_H2_Cu12",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu13": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu13:U_H2_Cu13",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu14": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu14:U_H2_Cu14",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu15": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu15:U_H2_Cu15",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu16": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu16:U_H2_Cu16",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu17": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu17:U_H2_Cu17",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu18": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu18:U_H2_Cu18",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu19": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu19:U_H2_Cu19",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu20": {
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "mu": "1.0 * mu0:mu0",
             "U": "U_H2_Cu20:U_H2_Cu20",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-mag-Axi.json"
         },
         "H2_Cu21": {
             "mu": "1.0 * mu0:mu0",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-mag-Axi.json"
         }
     },
     "BoundaryConditions": {

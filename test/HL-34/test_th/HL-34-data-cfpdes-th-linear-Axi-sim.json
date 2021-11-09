@@ -88,7 +88,7 @@
     "Materials": {
         "H1_Cu0": {
             "k": "360.0",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-th-Axi.json"
         },
         "H1_Cu1": {
             "alpha": "0.0036",
@@ -98,7 +98,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu1:U_H1_Cu1",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu2": {
             "alpha": "0.0036",
@@ -108,7 +108,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu2:U_H1_Cu2",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu3": {
             "alpha": "0.0036",
@@ -118,7 +118,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu3:U_H1_Cu3",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu4": {
             "alpha": "0.0036",
@@ -128,7 +128,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu4:U_H1_Cu4",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu5": {
             "alpha": "0.0036",
@@ -138,7 +138,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu5:U_H1_Cu5",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu6": {
             "alpha": "0.0036",
@@ -148,7 +148,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu6:U_H1_Cu6",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu7": {
             "alpha": "0.0036",
@@ -158,7 +158,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu7:U_H1_Cu7",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu8": {
             "alpha": "0.0036",
@@ -168,7 +168,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu8:U_H1_Cu8",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu9": {
             "alpha": "0.0036",
@@ -178,7 +178,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu9:U_H1_Cu9",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu10": {
             "alpha": "0.0036",
@@ -188,7 +188,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu10:U_H1_Cu10",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu11": {
             "alpha": "0.0036",
@@ -198,7 +198,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu11:U_H1_Cu11",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu12": {
             "alpha": "0.0036",
@@ -208,7 +208,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu12:U_H1_Cu12",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu13": {
             "alpha": "0.0036",
@@ -218,7 +218,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu13:U_H1_Cu13",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu14": {
             "alpha": "0.0036",
@@ -228,7 +228,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu14:U_H1_Cu14",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu15": {
             "alpha": "0.0036",
@@ -238,7 +238,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu15:U_H1_Cu15",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu16": {
             "alpha": "0.0036",
@@ -248,7 +248,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu16:U_H1_Cu16",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu17": {
             "alpha": "0.0036",
@@ -258,7 +258,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu17:U_H1_Cu17",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu18": {
             "alpha": "0.0036",
@@ -268,7 +268,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu18:U_H1_Cu18",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu19": {
             "alpha": "0.0036",
@@ -278,7 +278,7 @@
             "k": "k0:k0",
             "U": "U_H1_Cu19:U_H1_Cu19",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu20": {
             "alpha": "0.0036",
@@ -288,19 +288,19 @@
             "k": "k0:k0",
             "U": "U_H1_Cu20:U_H1_Cu20",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H1_Cu21": {
             "k": "360.0",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-th-Axi.json"
         },
         "R1": {
             "k": "360.0",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-th-Axi.json"
         },
         "H2_Cu0": {
             "k": "360.0",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-th-Axi.json"
         },
         "H2_Cu1": {
             "alpha": "0.0036",
@@ -310,7 +310,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu1:U_H2_Cu1",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu2": {
             "alpha": "0.0036",
@@ -320,7 +320,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu2:U_H2_Cu2",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu3": {
             "alpha": "0.0036",
@@ -330,7 +330,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu3:U_H2_Cu3",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu4": {
             "alpha": "0.0036",
@@ -340,7 +340,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu4:U_H2_Cu4",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu5": {
             "alpha": "0.0036",
@@ -350,7 +350,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu5:U_H2_Cu5",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu6": {
             "alpha": "0.0036",
@@ -360,7 +360,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu6:U_H2_Cu6",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu7": {
             "alpha": "0.0036",
@@ -370,7 +370,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu7:U_H2_Cu7",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu8": {
             "alpha": "0.0036",
@@ -380,7 +380,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu8:U_H2_Cu8",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu9": {
             "alpha": "0.0036",
@@ -390,7 +390,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu9:U_H2_Cu9",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu10": {
             "alpha": "0.0036",
@@ -400,7 +400,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu10:U_H2_Cu10",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu11": {
             "alpha": "0.0036",
@@ -410,7 +410,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu11:U_H2_Cu11",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu12": {
             "alpha": "0.0036",
@@ -420,7 +420,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu12:U_H2_Cu12",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu13": {
             "alpha": "0.0036",
@@ -430,7 +430,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu13:U_H2_Cu13",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu14": {
             "alpha": "0.0036",
@@ -440,7 +440,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu14:U_H2_Cu14",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu15": {
             "alpha": "0.0036",
@@ -450,7 +450,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu15:U_H2_Cu15",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu16": {
             "alpha": "0.0036",
@@ -460,7 +460,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu16:U_H2_Cu16",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu17": {
             "alpha": "0.0036",
@@ -470,7 +470,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu17:U_H2_Cu17",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu18": {
             "alpha": "0.0036",
@@ -480,7 +480,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu18:U_H2_Cu18",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu19": {
             "alpha": "0.0036",
@@ -490,7 +490,7 @@
             "k": "k0:k0",
             "U": "U_H2_Cu19:U_H2_Cu19",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu20": {
             "alpha": "0.0036",
@@ -500,11 +500,11 @@
             "k": "k0:k0",
             "U": "U_H2_Cu20:U_H2_Cu20",
             "j_th": "-sigma*U/2/pi/x:sigma:U:x",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-th-Axi.json"
         },
         "H2_Cu21": {
             "k": "360.0",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-th-Axi.json"
         }
     },
     "BoundaryConditions": {
