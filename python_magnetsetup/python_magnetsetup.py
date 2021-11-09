@@ -147,14 +147,11 @@ def create_params_dict(args, Zmin, Zmax, Sh, Dh, NHelices, Nsections):
         params_dict["bool_dilatation"] = "1"
 
     # TODO : initialization of parameters
-    if ( args.model == 'thmagel' ) and ( args.phytype == 'linear' ):
-        params_dict["Tinit"] = 0          #"Tinit"
-    else :
-        params_dict["Tinit"] = 293
 
-    params_dict["h"] = 58222.1          #"h"
-    params_dict["Tw"] = 290.671         #"Tin:Tin"
-    params_dict["dTw"] = 12.74          #"(Tout-Tin)/2.:Tin:Tout"
+    params_dict["Tinit"] = 293
+    params_dict["h"] = 58222.1
+    params_dict["Tw"] = 290.671
+    params_dict["dTw"] = 12.74
     
     # params per cooling channels
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
@@ -395,7 +392,7 @@ def main():
         for jsonfile in material_generic_def:
             filename = magnetsetup[args.method][args.time][args.geom][args.model]["filename"][jsonfile]
             src = os.path.join(template_path, filename)
-            dst = os.path.join(cwd, jsonfile + ".json")
+            dst = os.path.join(cwd, jsonfile + "-" + args.method + "-" + args.model + "-" + args.geom + ".json")
             #print(jsonfile, "filename=", filename, src, dst)
             copyfile(src, dst)
     
