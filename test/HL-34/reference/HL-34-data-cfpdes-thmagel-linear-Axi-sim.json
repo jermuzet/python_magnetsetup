@@ -35,7 +35,7 @@
         "Tin": "284.15",
         "bool_laplace": "1",
         "bool_dilatation": "1",
-        "Tinit": 0,
+        "Tinit": 293,
         "h": 58222.1,
         "Tw": 290.671,
         "dTw": 12.74,
@@ -113,7 +113,7 @@
             "E": "127000000000.0",
             "nu": "0.335",
             "alphaT": "1.8e-05",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu1": {
             "alpha": "0.0036",
@@ -126,7 +126,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu1:U_H1_Cu1",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu2": {
             "alpha": "0.0036",
@@ -139,7 +139,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu2:U_H1_Cu2",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu3": {
             "alpha": "0.0036",
@@ -152,7 +152,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu3:U_H1_Cu3",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu4": {
             "alpha": "0.0036",
@@ -165,7 +165,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu4:U_H1_Cu4",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu5": {
             "alpha": "0.0036",
@@ -178,7 +178,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu5:U_H1_Cu5",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu6": {
             "alpha": "0.0036",
@@ -191,7 +191,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu6:U_H1_Cu6",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu7": {
             "alpha": "0.0036",
@@ -204,7 +204,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu7:U_H1_Cu7",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu8": {
             "alpha": "0.0036",
@@ -217,7 +217,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu8:U_H1_Cu8",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu9": {
             "alpha": "0.0036",
@@ -230,7 +230,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu9:U_H1_Cu9",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu10": {
             "alpha": "0.0036",
@@ -243,7 +243,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu10:U_H1_Cu10",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu11": {
             "alpha": "0.0036",
@@ -256,7 +256,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu11:U_H1_Cu11",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu12": {
             "alpha": "0.0036",
@@ -269,7 +269,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu12:U_H1_Cu12",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu13": {
             "alpha": "0.0036",
@@ -282,7 +282,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu13:U_H1_Cu13",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu14": {
             "alpha": "0.0036",
@@ -295,7 +295,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu14:U_H1_Cu14",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu15": {
             "alpha": "0.0036",
@@ -308,7 +308,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu15:U_H1_Cu15",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu16": {
             "alpha": "0.0036",
@@ -321,7 +321,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu16:U_H1_Cu16",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu17": {
             "alpha": "0.0036",
@@ -334,7 +334,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu17:U_H1_Cu17",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu18": {
             "alpha": "0.0036",
@@ -347,7 +347,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu18:U_H1_Cu18",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu19": {
             "alpha": "0.0036",
@@ -360,7 +360,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu19:U_H1_Cu19",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu20": {
             "alpha": "0.0036",
@@ -373,7 +373,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H1_Cu20:U_H1_Cu20",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H1_Cu21": {
             "k": "360.0",
@@ -381,7 +381,7 @@
             "E": "127000000000.0",
             "nu": "0.335",
             "alphaT": "1.8e-05",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-thmagel-Axi.json"
         },
         "R1": {
             "k": "360.0",
@@ -389,7 +389,7 @@
             "E": "127000000000.0",
             "nu": "0.335",
             "alphaT": "1.8e-05",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu0": {
             "k": "360.0",
@@ -397,7 +397,7 @@
             "E": "127000000000.0",
             "nu": "0.335",
             "alphaT": "1.8e-05",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu1": {
             "alpha": "0.0036",
@@ -410,7 +410,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu1:U_H2_Cu1",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu2": {
             "alpha": "0.0036",
@@ -423,7 +423,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu2:U_H2_Cu2",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu3": {
             "alpha": "0.0036",
@@ -436,7 +436,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu3:U_H2_Cu3",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu4": {
             "alpha": "0.0036",
@@ -449,7 +449,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu4:U_H2_Cu4",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu5": {
             "alpha": "0.0036",
@@ -462,7 +462,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu5:U_H2_Cu5",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu6": {
             "alpha": "0.0036",
@@ -475,7 +475,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu6:U_H2_Cu6",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu7": {
             "alpha": "0.0036",
@@ -488,7 +488,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu7:U_H2_Cu7",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu8": {
             "alpha": "0.0036",
@@ -501,7 +501,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu8:U_H2_Cu8",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu9": {
             "alpha": "0.0036",
@@ -514,7 +514,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu9:U_H2_Cu9",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu10": {
             "alpha": "0.0036",
@@ -527,7 +527,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu10:U_H2_Cu10",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu11": {
             "alpha": "0.0036",
@@ -540,7 +540,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu11:U_H2_Cu11",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu12": {
             "alpha": "0.0036",
@@ -553,7 +553,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu12:U_H2_Cu12",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu13": {
             "alpha": "0.0036",
@@ -566,7 +566,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu13:U_H2_Cu13",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu14": {
             "alpha": "0.0036",
@@ -579,7 +579,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu14:U_H2_Cu14",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu15": {
             "alpha": "0.0036",
@@ -592,7 +592,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu15:U_H2_Cu15",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu16": {
             "alpha": "0.0036",
@@ -605,7 +605,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu16:U_H2_Cu16",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu17": {
             "alpha": "0.0036",
@@ -618,7 +618,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu17:U_H2_Cu17",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu18": {
             "alpha": "0.0036",
@@ -631,7 +631,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu18:U_H2_Cu18",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu19": {
             "alpha": "0.0036",
@@ -644,7 +644,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu19:U_H2_Cu19",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu20": {
             "alpha": "0.0036",
@@ -657,7 +657,7 @@
             "nu": "0.335",
             "alphaT": "1.8e-05",
             "U": "U_H2_Cu20:U_H2_Cu20",
-            "filename": "$cfgdir/conductor.json"
+            "filename": "$cfgdir/conductor-cfpdes-thmagel-Axi.json"
         },
         "H2_Cu21": {
             "k": "360.0",
@@ -665,7 +665,7 @@
             "E": "127000000000.0",
             "nu": "0.335",
             "alphaT": "1.8e-05",
-            "filename": "$cfgdir/insulator.json"
+            "filename": "$cfgdir/insulator-cfpdes-thmagel-Axi.json"
         }
     },
     "BoundaryConditions": {
@@ -700,9 +700,9 @@
             "Dirichlet": {
                 "H1_Fixed": {
                     "markers": [
-                        "R1_BP",
                         "H1_HP",
-                        "H_HP"
+                        "H_HP",
+                        "R1_BP"
                     ],
                     "expr": "{0,0}"
                 }
@@ -713,6 +713,53 @@
         "temperature": {
             "Expression": {
                 "myic": {
+                    "markers": [
+                        "H1_Cu0",
+                        "H1_Cu1",
+                        "H1_Cu2",
+                        "H1_Cu3",
+                        "H1_Cu4",
+                        "H1_Cu5",
+                        "H1_Cu6",
+                        "H1_Cu7",
+                        "H1_Cu8",
+                        "H1_Cu9",
+                        "H1_Cu10",
+                        "H1_Cu11",
+                        "H1_Cu12",
+                        "H1_Cu13",
+                        "H1_Cu14",
+                        "H1_Cu15",
+                        "H1_Cu16",
+                        "H1_Cu17",
+                        "H1_Cu18",
+                        "H1_Cu19",
+                        "H1_Cu20",
+                        "H1_Cu21",
+                        "H2_Cu0",
+                        "H2_Cu1",
+                        "H2_Cu2",
+                        "H2_Cu3",
+                        "H2_Cu4",
+                        "H2_Cu5",
+                        "H2_Cu6",
+                        "H2_Cu7",
+                        "H2_Cu8",
+                        "H2_Cu9",
+                        "H2_Cu10",
+                        "H2_Cu11",
+                        "H2_Cu12",
+                        "H2_Cu13",
+                        "H2_Cu14",
+                        "H2_Cu15",
+                        "H2_Cu16",
+                        "H2_Cu17",
+                        "H2_Cu18",
+                        "H2_Cu19",
+                        "H2_Cu20",
+                        "H2_Cu21",
+                        "R1"
+                    ],
                     "expr": "Tinit:Tinit"
                 }
             }
