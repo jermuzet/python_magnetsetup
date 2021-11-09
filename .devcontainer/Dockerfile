@@ -49,8 +49,8 @@ RUN apt-get update \
     && apt-get -y install curl \
     && apt-get -y install python3-requests \
     && pip install chevron \
-    && apt-get install python3-python-magnetgeo \
-    && apt-get install python3-gmsh \
+    && apt-get -y install python3-python-magnetgeo \
+    && apt-get -y install python3-gmsh \
     #\
     # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.\
     && groupadd --gid $USER_GID $USERNAME \
