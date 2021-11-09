@@ -1,0 +1,1856 @@
+{
+    "Name": "Fully coupled Axi Stationnary model",
+    "ShortName": "FullAxiStat",
+    "Models": {
+        "equations": [
+            {
+                "name": "heat",
+                "unknown": {
+                    "basis": "Pch1",
+                    "name": "temperature",
+                    "symbol": "T"
+                }
+            },
+            {
+                "name": "magnetic",
+                "unknown": {
+                    "basis": "Pch2",
+                    "name": "phi",
+                    "symbol": "phi"
+                }
+            }
+        ]
+    },
+    "Parameters": {
+        "mu0": "4*pi*1e-7",
+        "T0": "293.",
+        "Tin": "284.15",
+        "bool_laplace": "1",
+        "bool_dilatation": "1",
+        "Tinit": 293,
+        "h": 58222.1,
+        "Tw": 290.671,
+        "dTw": 12.74,
+        "h0": "h:h",
+        "Tw0": "Tw:Tw",
+        "dTw0": "dTw:dTw",
+        "Zmin0": -0.226,
+        "Zmax0": 0.108,
+        "Sh0": 0.09034717816899689,
+        "Dh0": 0.0015200000000000031,
+        "h1": "h:h",
+        "Tw1": "Tw:Tw",
+        "dTw1": "dTw:dTw",
+        "Zmin1": -0.226,
+        "Zmax1": 0.108,
+        "Sh1": 0.8090229401524438,
+        "Dh1": 0.011600000000000001,
+        "h2": "h:h",
+        "Tw2": "Tw:Tw",
+        "dTw2": "dTw:dTw",
+        "Zmin2": -0.108,
+        "Zmax2": 0.108,
+        "Sh2": 106.99966912222908,
+        "Dh2": 0.32230000000000003,
+        "U_H1_Cu1": -0.6875259928398838,
+        "U_H1_Cu2": -0.7093691092378962,
+        "U_H1_Cu3": -0.7128647035927942,
+        "U_H1_Cu4": -0.713423713904222,
+        "U_H1_Cu5": -0.713514618933993,
+        "U_H1_Cu6": -0.7135271258107894,
+        "U_H1_Cu7": -0.7135225606122404,
+        "U_H1_Cu8": -0.7135129045934022,
+        "U_H1_Cu9": -0.7135233540284426,
+        "U_H1_Cu10": -0.7135301503622337,
+        "U_H1_Cu11": -0.7135225269490559,
+        "U_H1_Cu12": -0.7135124448547753,
+        "U_H1_Cu13": -0.7135269692644437,
+        "U_H1_Cu14": -0.7135319725627283,
+        "U_H1_Cu15": -0.713530455635961,
+        "U_H1_Cu16": -0.7135151864380115,
+        "U_H1_Cu17": -0.7134166384473479,
+        "U_H1_Cu18": -0.7128411062351849,
+        "U_H1_Cu19": -0.7093427122544678,
+        "U_H1_Cu20": -0.6875194983143539,
+        "U_H2_Cu1": -0.8661394231929664,
+        "U_H2_Cu2": -0.8965845597252862,
+        "U_H2_Cu3": -0.901698404159666,
+        "U_H2_Cu4": -0.9025681576996953,
+        "U_H2_Cu5": -0.9027149872008776,
+        "U_H2_Cu6": -0.9027500546189522,
+        "U_H2_Cu7": -0.9027666619633602,
+        "U_H2_Cu8": -0.9027895668963886,
+        "U_H2_Cu9": -0.9027848553259282,
+        "U_H2_Cu10": -0.9027958666304411,
+        "U_H2_Cu11": -0.9027849994832721,
+        "U_H2_Cu12": -0.9027756558374689,
+        "U_H2_Cu13": -0.9027899517722223,
+        "U_H2_Cu14": -0.9027756028634784,
+        "U_H2_Cu15": -0.902778164873969,
+        "U_H2_Cu16": -0.9027276820304311,
+        "U_H2_Cu17": -0.9025736437668622,
+        "U_H2_Cu18": -0.901707020983813,
+        "U_H2_Cu19": -0.8965858058114069,
+        "U_H2_Cu20": -0.8661253488116121
+    },
+    "Materials": {
+        "Air": {
+            "physics": "magnetic",
+            "magnetic_c": "x/mu0:x:mu0",
+            "magnetic_beta": "{2/mu0,0}:mu0"
+        },
+        "H1_Cu0": {
+            "k": "360.0",
+            "mu": "1.0*mu0:mu0",
+            "filename": "$cfgdir/insulator.json"
+        },
+        "H1_Cu1": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu1:U_H1_Cu1",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu2": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu2:U_H1_Cu2",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu3": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu3:U_H1_Cu3",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu4": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu4:U_H1_Cu4",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu5": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu5:U_H1_Cu5",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu6": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu6:U_H1_Cu6",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu7": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu7:U_H1_Cu7",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu8": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu8:U_H1_Cu8",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu9": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu9:U_H1_Cu9",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu10": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu10:U_H1_Cu10",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu11": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu11:U_H1_Cu11",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu12": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu12:U_H1_Cu12",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu13": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu13:U_H1_Cu13",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu14": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu14:U_H1_Cu14",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu15": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu15:U_H1_Cu15",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu16": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu16:U_H1_Cu16",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu17": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu17:U_H1_Cu17",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu18": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu18:U_H1_Cu18",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu19": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu19:U_H1_Cu19",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu20": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H1_Cu20:U_H1_Cu20",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H1_Cu21": {
+            "k": "360.0",
+            "mu": "1.0*mu0:mu0",
+            "filename": "$cfgdir/insulator.json"
+        },
+        "R1": {
+            "k": "360.0",
+            "mu": "1.0*mu0:mu0",
+            "filename": "$cfgdir/insulator.json"
+        },
+        "H2_Cu0": {
+            "k": "360.0",
+            "mu": "1.0*mu0:mu0",
+            "filename": "$cfgdir/insulator.json"
+        },
+        "H2_Cu1": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu1:U_H2_Cu1",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu2": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu2:U_H2_Cu2",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu3": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu3:U_H2_Cu3",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu4": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu4:U_H2_Cu4",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu5": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu5:U_H2_Cu5",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu6": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu6:U_H2_Cu6",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu7": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu7:U_H2_Cu7",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu8": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu8:U_H2_Cu8",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu9": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu9:U_H2_Cu9",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu10": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu10:U_H2_Cu10",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu11": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu11:U_H2_Cu11",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu12": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu12:U_H2_Cu12",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu13": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu13:U_H2_Cu13",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu14": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu14:U_H2_Cu14",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu15": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu15:U_H2_Cu15",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu16": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu16:U_H2_Cu16",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu17": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu17:U_H2_Cu17",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu18": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu18:U_H2_Cu18",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu19": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu19:U_H2_Cu19",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu20": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+            "k0": "360.0",
+            "k": "k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+            "mu": "1.0*mu0:mu0",
+            "U": "U_H2_Cu20:U_H2_Cu20",
+            "filename": "$cfgdir/conductor.json"
+        },
+        "H2_Cu21": {
+            "k": "360.0",
+            "mu": "1.0*mu0:mu0",
+            "filename": "$cfgdir/insulator.json"
+        }
+    },
+    "BoundaryConditions": {
+        "magnetic": {
+            "Dirichlet": {
+                "magdir": {
+                    "markers": [
+                        "ZAxis",
+                        "Infty"
+                    ],
+                    "expr": "0"
+                }
+            }
+        },
+        "heat": {
+            "Robin": {
+                "Channel0": {
+                    "expr1": "h0*x:h0:x",
+                    "expr2": "x*h0*(Tw0+dTw0):h0:Tw0:dTw0:x"
+                },
+                "Channel1": {
+                    "expr1": "h1*x:h1:x",
+                    "expr2": "x*h1*(Tw1+dTw1):h1:Tw1:dTw1:x"
+                },
+                "Channel2": {
+                    "expr1": "h2*x:h2:x",
+                    "expr2": "x*h2*(Tw2+dTw2):h2:Tw2:dTw2:x"
+                }
+            }
+        }
+    },
+    "InitialConditions": {
+        "temperature": {
+            "Expression": {
+                "myic": {
+                    "expr": "Tinit:Tinit"
+                }
+            }
+        }
+    },
+    "PostProcess": {
+        "use-model-name": 1,
+        "cfpdes": {
+            "Exports": {
+                "fields": [
+                    "heat.temperature"
+                ],
+                "expr": {
+                    "atheta": "magnetic_phi/x:magnetic_phi:x",
+                    "B": {
+                        "expr": "{-magnetic_grad_phi_1/x,magnetic_grad_phi_0/x}:magnetic_grad_phi_0:magnetic_grad_phi_1:x",
+                        "representation": [
+                            "element"
+                        ]
+                    },
+                    "U": {
+                        "expr": "materials_U:materials_U",
+                        "markers": {
+                            "name": [
+                                "H%1_1%_Cu%1_2%"
+                            ],
+                            "index1": [
+                                [
+                                    "1",
+                                    "1"
+                                ],
+                                [
+                                    "1",
+                                    "2"
+                                ],
+                                [
+                                    "1",
+                                    "3"
+                                ],
+                                [
+                                    "1",
+                                    "4"
+                                ],
+                                [
+                                    "1",
+                                    "5"
+                                ],
+                                [
+                                    "1",
+                                    "6"
+                                ],
+                                [
+                                    "1",
+                                    "7"
+                                ],
+                                [
+                                    "1",
+                                    "8"
+                                ],
+                                [
+                                    "1",
+                                    "9"
+                                ],
+                                [
+                                    "1",
+                                    "10"
+                                ],
+                                [
+                                    "1",
+                                    "11"
+                                ],
+                                [
+                                    "1",
+                                    "12"
+                                ],
+                                [
+                                    "1",
+                                    "13"
+                                ],
+                                [
+                                    "1",
+                                    "14"
+                                ],
+                                [
+                                    "1",
+                                    "15"
+                                ],
+                                [
+                                    "1",
+                                    "16"
+                                ],
+                                [
+                                    "1",
+                                    "17"
+                                ],
+                                [
+                                    "1",
+                                    "18"
+                                ],
+                                [
+                                    "1",
+                                    "19"
+                                ],
+                                [
+                                    "1",
+                                    "20"
+                                ],
+                                [
+                                    "2",
+                                    "1"
+                                ],
+                                [
+                                    "2",
+                                    "2"
+                                ],
+                                [
+                                    "2",
+                                    "3"
+                                ],
+                                [
+                                    "2",
+                                    "4"
+                                ],
+                                [
+                                    "2",
+                                    "5"
+                                ],
+                                [
+                                    "2",
+                                    "6"
+                                ],
+                                [
+                                    "2",
+                                    "7"
+                                ],
+                                [
+                                    "2",
+                                    "8"
+                                ],
+                                [
+                                    "2",
+                                    "9"
+                                ],
+                                [
+                                    "2",
+                                    "10"
+                                ],
+                                [
+                                    "2",
+                                    "11"
+                                ],
+                                [
+                                    "2",
+                                    "12"
+                                ],
+                                [
+                                    "2",
+                                    "13"
+                                ],
+                                [
+                                    "2",
+                                    "14"
+                                ],
+                                [
+                                    "2",
+                                    "15"
+                                ],
+                                [
+                                    "2",
+                                    "16"
+                                ],
+                                [
+                                    "2",
+                                    "17"
+                                ],
+                                [
+                                    "2",
+                                    "18"
+                                ],
+                                [
+                                    "2",
+                                    "19"
+                                ],
+                                [
+                                    "2",
+                                    "20"
+                                ]
+                            ]
+                        }
+                    },
+                    "Jth": {
+                        "expr": "-materials_sigma*materials_U/(2*pi*x):materials_sigma:materials_U:x",
+                        "markers": {
+                            "name": [
+                                "H%1_1%_Cu%1_2%"
+                            ],
+                            "index1": [
+                                [
+                                    "1",
+                                    "1"
+                                ],
+                                [
+                                    "1",
+                                    "2"
+                                ],
+                                [
+                                    "1",
+                                    "3"
+                                ],
+                                [
+                                    "1",
+                                    "4"
+                                ],
+                                [
+                                    "1",
+                                    "5"
+                                ],
+                                [
+                                    "1",
+                                    "6"
+                                ],
+                                [
+                                    "1",
+                                    "7"
+                                ],
+                                [
+                                    "1",
+                                    "8"
+                                ],
+                                [
+                                    "1",
+                                    "9"
+                                ],
+                                [
+                                    "1",
+                                    "10"
+                                ],
+                                [
+                                    "1",
+                                    "11"
+                                ],
+                                [
+                                    "1",
+                                    "12"
+                                ],
+                                [
+                                    "1",
+                                    "13"
+                                ],
+                                [
+                                    "1",
+                                    "14"
+                                ],
+                                [
+                                    "1",
+                                    "15"
+                                ],
+                                [
+                                    "1",
+                                    "16"
+                                ],
+                                [
+                                    "1",
+                                    "17"
+                                ],
+                                [
+                                    "1",
+                                    "18"
+                                ],
+                                [
+                                    "1",
+                                    "19"
+                                ],
+                                [
+                                    "1",
+                                    "20"
+                                ],
+                                [
+                                    "2",
+                                    "1"
+                                ],
+                                [
+                                    "2",
+                                    "2"
+                                ],
+                                [
+                                    "2",
+                                    "3"
+                                ],
+                                [
+                                    "2",
+                                    "4"
+                                ],
+                                [
+                                    "2",
+                                    "5"
+                                ],
+                                [
+                                    "2",
+                                    "6"
+                                ],
+                                [
+                                    "2",
+                                    "7"
+                                ],
+                                [
+                                    "2",
+                                    "8"
+                                ],
+                                [
+                                    "2",
+                                    "9"
+                                ],
+                                [
+                                    "2",
+                                    "10"
+                                ],
+                                [
+                                    "2",
+                                    "11"
+                                ],
+                                [
+                                    "2",
+                                    "12"
+                                ],
+                                [
+                                    "2",
+                                    "13"
+                                ],
+                                [
+                                    "2",
+                                    "14"
+                                ],
+                                [
+                                    "2",
+                                    "15"
+                                ],
+                                [
+                                    "2",
+                                    "16"
+                                ],
+                                [
+                                    "2",
+                                    "17"
+                                ],
+                                [
+                                    "2",
+                                    "18"
+                                ],
+                                [
+                                    "2",
+                                    "19"
+                                ],
+                                [
+                                    "2",
+                                    "20"
+                                ]
+                            ]
+                        }
+                    },
+                    "Qth": {
+                        "expr": "materials_sigma*(materials_U/(2*pi*x))*(materials_U/(2*pi*x)):materials_sigma:materials_U:x",
+                        "markers": {
+                            "name": [
+                                "H%1_1%_Cu%1_2%"
+                            ],
+                            "index1": [
+                                [
+                                    "1",
+                                    "1"
+                                ],
+                                [
+                                    "1",
+                                    "2"
+                                ],
+                                [
+                                    "1",
+                                    "3"
+                                ],
+                                [
+                                    "1",
+                                    "4"
+                                ],
+                                [
+                                    "1",
+                                    "5"
+                                ],
+                                [
+                                    "1",
+                                    "6"
+                                ],
+                                [
+                                    "1",
+                                    "7"
+                                ],
+                                [
+                                    "1",
+                                    "8"
+                                ],
+                                [
+                                    "1",
+                                    "9"
+                                ],
+                                [
+                                    "1",
+                                    "10"
+                                ],
+                                [
+                                    "1",
+                                    "11"
+                                ],
+                                [
+                                    "1",
+                                    "12"
+                                ],
+                                [
+                                    "1",
+                                    "13"
+                                ],
+                                [
+                                    "1",
+                                    "14"
+                                ],
+                                [
+                                    "1",
+                                    "15"
+                                ],
+                                [
+                                    "1",
+                                    "16"
+                                ],
+                                [
+                                    "1",
+                                    "17"
+                                ],
+                                [
+                                    "1",
+                                    "18"
+                                ],
+                                [
+                                    "1",
+                                    "19"
+                                ],
+                                [
+                                    "1",
+                                    "20"
+                                ],
+                                [
+                                    "2",
+                                    "1"
+                                ],
+                                [
+                                    "2",
+                                    "2"
+                                ],
+                                [
+                                    "2",
+                                    "3"
+                                ],
+                                [
+                                    "2",
+                                    "4"
+                                ],
+                                [
+                                    "2",
+                                    "5"
+                                ],
+                                [
+                                    "2",
+                                    "6"
+                                ],
+                                [
+                                    "2",
+                                    "7"
+                                ],
+                                [
+                                    "2",
+                                    "8"
+                                ],
+                                [
+                                    "2",
+                                    "9"
+                                ],
+                                [
+                                    "2",
+                                    "10"
+                                ],
+                                [
+                                    "2",
+                                    "11"
+                                ],
+                                [
+                                    "2",
+                                    "12"
+                                ],
+                                [
+                                    "2",
+                                    "13"
+                                ],
+                                [
+                                    "2",
+                                    "14"
+                                ],
+                                [
+                                    "2",
+                                    "15"
+                                ],
+                                [
+                                    "2",
+                                    "16"
+                                ],
+                                [
+                                    "2",
+                                    "17"
+                                ],
+                                [
+                                    "2",
+                                    "18"
+                                ],
+                                [
+                                    "2",
+                                    "19"
+                                ],
+                                [
+                                    "2",
+                                    "20"
+                                ]
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "magnetic": {
+            "Measures": {
+                "Statistics": {
+                    "Intensity_H%1_1%_Cu%1_2%": {
+                        "type": "integrate",
+                        "expr": "-materials_sigma*materials_U/2/pi/x:materials_sigma:materials_U:x",
+                        "markers": "H%1_1%_Cu%1_2%",
+                        "index1": [
+                            [
+                                "1",
+                                "1"
+                            ],
+                            [
+                                "1",
+                                "2"
+                            ],
+                            [
+                                "1",
+                                "3"
+                            ],
+                            [
+                                "1",
+                                "4"
+                            ],
+                            [
+                                "1",
+                                "5"
+                            ],
+                            [
+                                "1",
+                                "6"
+                            ],
+                            [
+                                "1",
+                                "7"
+                            ],
+                            [
+                                "1",
+                                "8"
+                            ],
+                            [
+                                "1",
+                                "9"
+                            ],
+                            [
+                                "1",
+                                "10"
+                            ],
+                            [
+                                "1",
+                                "11"
+                            ],
+                            [
+                                "1",
+                                "12"
+                            ],
+                            [
+                                "1",
+                                "13"
+                            ],
+                            [
+                                "1",
+                                "14"
+                            ],
+                            [
+                                "1",
+                                "15"
+                            ],
+                            [
+                                "1",
+                                "16"
+                            ],
+                            [
+                                "1",
+                                "17"
+                            ],
+                            [
+                                "1",
+                                "18"
+                            ],
+                            [
+                                "1",
+                                "19"
+                            ],
+                            [
+                                "1",
+                                "20"
+                            ],
+                            [
+                                "2",
+                                "1"
+                            ],
+                            [
+                                "2",
+                                "2"
+                            ],
+                            [
+                                "2",
+                                "3"
+                            ],
+                            [
+                                "2",
+                                "4"
+                            ],
+                            [
+                                "2",
+                                "5"
+                            ],
+                            [
+                                "2",
+                                "6"
+                            ],
+                            [
+                                "2",
+                                "7"
+                            ],
+                            [
+                                "2",
+                                "8"
+                            ],
+                            [
+                                "2",
+                                "9"
+                            ],
+                            [
+                                "2",
+                                "10"
+                            ],
+                            [
+                                "2",
+                                "11"
+                            ],
+                            [
+                                "2",
+                                "12"
+                            ],
+                            [
+                                "2",
+                                "13"
+                            ],
+                            [
+                                "2",
+                                "14"
+                            ],
+                            [
+                                "2",
+                                "15"
+                            ],
+                            [
+                                "2",
+                                "16"
+                            ],
+                            [
+                                "2",
+                                "17"
+                            ],
+                            [
+                                "2",
+                                "18"
+                            ],
+                            [
+                                "2",
+                                "19"
+                            ],
+                            [
+                                "2",
+                                "20"
+                            ]
+                        ]
+                    },
+                    "Power_H%1_1%": {
+                        "type": "integrate",
+                        "expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+                        "markers": {
+                            "name": [
+                                "H%1_1%_Cu%1_2%"
+                            ],
+                            "index1": [
+                                [
+                                    "1",
+                                    "1"
+                                ],
+                                [
+                                    "1",
+                                    "2"
+                                ],
+                                [
+                                    "1",
+                                    "3"
+                                ],
+                                [
+                                    "1",
+                                    "4"
+                                ],
+                                [
+                                    "1",
+                                    "5"
+                                ],
+                                [
+                                    "1",
+                                    "6"
+                                ],
+                                [
+                                    "1",
+                                    "7"
+                                ],
+                                [
+                                    "1",
+                                    "8"
+                                ],
+                                [
+                                    "1",
+                                    "9"
+                                ],
+                                [
+                                    "1",
+                                    "10"
+                                ],
+                                [
+                                    "1",
+                                    "11"
+                                ],
+                                [
+                                    "1",
+                                    "12"
+                                ],
+                                [
+                                    "1",
+                                    "13"
+                                ],
+                                [
+                                    "1",
+                                    "14"
+                                ],
+                                [
+                                    "1",
+                                    "15"
+                                ],
+                                [
+                                    "1",
+                                    "16"
+                                ],
+                                [
+                                    "1",
+                                    "17"
+                                ],
+                                [
+                                    "1",
+                                    "18"
+                                ],
+                                [
+                                    "1",
+                                    "19"
+                                ],
+                                [
+                                    "1",
+                                    "20"
+                                ],
+                                [
+                                    "2",
+                                    "1"
+                                ],
+                                [
+                                    "2",
+                                    "2"
+                                ],
+                                [
+                                    "2",
+                                    "3"
+                                ],
+                                [
+                                    "2",
+                                    "4"
+                                ],
+                                [
+                                    "2",
+                                    "5"
+                                ],
+                                [
+                                    "2",
+                                    "6"
+                                ],
+                                [
+                                    "2",
+                                    "7"
+                                ],
+                                [
+                                    "2",
+                                    "8"
+                                ],
+                                [
+                                    "2",
+                                    "9"
+                                ],
+                                [
+                                    "2",
+                                    "10"
+                                ],
+                                [
+                                    "2",
+                                    "11"
+                                ],
+                                [
+                                    "2",
+                                    "12"
+                                ],
+                                [
+                                    "2",
+                                    "13"
+                                ],
+                                [
+                                    "2",
+                                    "14"
+                                ],
+                                [
+                                    "2",
+                                    "15"
+                                ],
+                                [
+                                    "2",
+                                    "16"
+                                ],
+                                [
+                                    "2",
+                                    "17"
+                                ],
+                                [
+                                    "2",
+                                    "18"
+                                ],
+                                [
+                                    "2",
+                                    "19"
+                                ],
+                                [
+                                    "2",
+                                    "20"
+                                ]
+                            ]
+                        }
+                    },
+                    "MagneticEnergy": {
+                        "type": "integrate",
+                        "expr": "-2*pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi):magnetic_phi:materials_sigma:materials_U:x",
+                        "markers": {
+                            "name": [
+                                "H%1_1%_Cu%1_2%"
+                            ],
+                            "index1": [
+                                [
+                                    "1",
+                                    "1"
+                                ],
+                                [
+                                    "1",
+                                    "2"
+                                ],
+                                [
+                                    "1",
+                                    "3"
+                                ],
+                                [
+                                    "1",
+                                    "4"
+                                ],
+                                [
+                                    "1",
+                                    "5"
+                                ],
+                                [
+                                    "1",
+                                    "6"
+                                ],
+                                [
+                                    "1",
+                                    "7"
+                                ],
+                                [
+                                    "1",
+                                    "8"
+                                ],
+                                [
+                                    "1",
+                                    "9"
+                                ],
+                                [
+                                    "1",
+                                    "10"
+                                ],
+                                [
+                                    "1",
+                                    "11"
+                                ],
+                                [
+                                    "1",
+                                    "12"
+                                ],
+                                [
+                                    "1",
+                                    "13"
+                                ],
+                                [
+                                    "1",
+                                    "14"
+                                ],
+                                [
+                                    "1",
+                                    "15"
+                                ],
+                                [
+                                    "1",
+                                    "16"
+                                ],
+                                [
+                                    "1",
+                                    "17"
+                                ],
+                                [
+                                    "1",
+                                    "18"
+                                ],
+                                [
+                                    "1",
+                                    "19"
+                                ],
+                                [
+                                    "1",
+                                    "20"
+                                ],
+                                [
+                                    "2",
+                                    "1"
+                                ],
+                                [
+                                    "2",
+                                    "2"
+                                ],
+                                [
+                                    "2",
+                                    "3"
+                                ],
+                                [
+                                    "2",
+                                    "4"
+                                ],
+                                [
+                                    "2",
+                                    "5"
+                                ],
+                                [
+                                    "2",
+                                    "6"
+                                ],
+                                [
+                                    "2",
+                                    "7"
+                                ],
+                                [
+                                    "2",
+                                    "8"
+                                ],
+                                [
+                                    "2",
+                                    "9"
+                                ],
+                                [
+                                    "2",
+                                    "10"
+                                ],
+                                [
+                                    "2",
+                                    "11"
+                                ],
+                                [
+                                    "2",
+                                    "12"
+                                ],
+                                [
+                                    "2",
+                                    "13"
+                                ],
+                                [
+                                    "2",
+                                    "14"
+                                ],
+                                [
+                                    "2",
+                                    "15"
+                                ],
+                                [
+                                    "2",
+                                    "16"
+                                ],
+                                [
+                                    "2",
+                                    "17"
+                                ],
+                                [
+                                    "2",
+                                    "18"
+                                ],
+                                [
+                                    "2",
+                                    "19"
+                                ],
+                                [
+                                    "2",
+                                    "20"
+                                ]
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "heat": {
+            "Save": {
+                "Fields": {
+                    "names": [
+                        "temperature"
+                    ]
+                }
+            },
+            "Measures": {
+                "Statistics": {
+                    "MeanT": {
+                        "type": [
+                            "min",
+                            "max",
+                            "mean"
+                        ],
+                        "field": "temperature"
+                    },
+                    "MeanT_H%1_1%": {
+                        "type": [
+                            "min",
+                            "max",
+                            "mean"
+                        ],
+                        "field": "temperature",
+                        "markers": {
+                            "name": [
+                                "H%1_1%_Cu%1_2%"
+                            ],
+                            "index1": [
+                                [
+                                    "1",
+                                    "0"
+                                ],
+                                [
+                                    "1",
+                                    "1"
+                                ],
+                                [
+                                    "1",
+                                    "2"
+                                ],
+                                [
+                                    "1",
+                                    "3"
+                                ],
+                                [
+                                    "1",
+                                    "4"
+                                ],
+                                [
+                                    "1",
+                                    "5"
+                                ],
+                                [
+                                    "1",
+                                    "6"
+                                ],
+                                [
+                                    "1",
+                                    "7"
+                                ],
+                                [
+                                    "1",
+                                    "8"
+                                ],
+                                [
+                                    "1",
+                                    "9"
+                                ],
+                                [
+                                    "1",
+                                    "10"
+                                ],
+                                [
+                                    "1",
+                                    "11"
+                                ],
+                                [
+                                    "1",
+                                    "12"
+                                ],
+                                [
+                                    "1",
+                                    "13"
+                                ],
+                                [
+                                    "1",
+                                    "14"
+                                ],
+                                [
+                                    "1",
+                                    "15"
+                                ],
+                                [
+                                    "1",
+                                    "16"
+                                ],
+                                [
+                                    "1",
+                                    "17"
+                                ],
+                                [
+                                    "1",
+                                    "18"
+                                ],
+                                [
+                                    "1",
+                                    "19"
+                                ],
+                                [
+                                    "1",
+                                    "20"
+                                ],
+                                [
+                                    "1",
+                                    "21"
+                                ],
+                                [
+                                    "2",
+                                    "0"
+                                ],
+                                [
+                                    "2",
+                                    "1"
+                                ],
+                                [
+                                    "2",
+                                    "2"
+                                ],
+                                [
+                                    "2",
+                                    "3"
+                                ],
+                                [
+                                    "2",
+                                    "4"
+                                ],
+                                [
+                                    "2",
+                                    "5"
+                                ],
+                                [
+                                    "2",
+                                    "6"
+                                ],
+                                [
+                                    "2",
+                                    "7"
+                                ],
+                                [
+                                    "2",
+                                    "8"
+                                ],
+                                [
+                                    "2",
+                                    "9"
+                                ],
+                                [
+                                    "2",
+                                    "10"
+                                ],
+                                [
+                                    "2",
+                                    "11"
+                                ],
+                                [
+                                    "2",
+                                    "12"
+                                ],
+                                [
+                                    "2",
+                                    "13"
+                                ],
+                                [
+                                    "2",
+                                    "14"
+                                ],
+                                [
+                                    "2",
+                                    "15"
+                                ],
+                                [
+                                    "2",
+                                    "16"
+                                ],
+                                [
+                                    "2",
+                                    "17"
+                                ],
+                                [
+                                    "2",
+                                    "18"
+                                ],
+                                [
+                                    "2",
+                                    "19"
+                                ],
+                                [
+                                    "2",
+                                    "20"
+                                ],
+                                [
+                                    "2",
+                                    "21"
+                                ]
+                            ]
+                        }
+                    },
+                    "Flux_Channel%1%": {
+                        "type": "integrate",
+                        "expr": "h%1%*(heat_T-(Tw%1%+dTw%1%))*2*pi*x:x:heat_T:h%1%:Tw%1%:dTw%1%",
+                        "markers": "Channel%1%",
+                        "index1": "0:3"
+                    },
+                    "MeanT_H1": {
+                        "type": [
+                            "min",
+                            "max",
+                            "mean"
+                        ],
+                        "field": "temperature",
+                        "markers": {
+                            "name": "H1_Cu%1%",
+                            "index1": [
+                                "0:22"
+                            ]
+                        }
+                    },
+                    "MeanT_H2": {
+                        "type": [
+                            "min",
+                            "max",
+                            "mean"
+                        ],
+                        "field": "temperature",
+                        "markers": {
+                            "name": "H2_Cu%1%",
+                            "index1": [
+                                "0:22"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "geom": "test.yaml",
+    "Helix": [
+        {
+            "geo": "HL-31_H1.yaml",
+            "material": {
+                "alpha": 0.0036,
+                "SpecificHeat": 380.0,
+                "Tref": 293.0,
+                "ThermalConductivity": 360.0,
+                "Young": 127000000000.0,
+                "CoefDilatation": 1.8e-05,
+                "nuance": "Cu5Ag5,08",
+                "VolumicMass": 9000.0,
+                "ElectricalConductivity": 50100000.0,
+                "MagnetPermeability": 1.0,
+                "Poisson": 0.335,
+                "Rpe": 481000000.0
+            }
+        },
+        {
+            "geo": "HL-31_H2.yaml",
+            "material": {
+                "alpha": 0.0036,
+                "SpecificHeat": 380.0,
+                "Tref": 293.0,
+                "ThermalConductivity": 360.0,
+                "Young": 127000000000.0,
+                "CoefDilatation": 1.8e-05,
+                "nuance": "Cu5Ag5,08",
+                "VolumicMass": 9000.0,
+                "ElectricalConductivity": 50100000.0,
+                "MagnetPermeability": 1.0,
+                "Poisson": 0.335,
+                "Rpe": 481000000.0
+            }
+        }
+    ],
+    "Ring": [
+        {
+            "geo": "Ring-H1H2.yaml",
+            "material": {
+                "alpha": 0.0036,
+                "SpecificHeat": 380.0,
+                "Tref": 293.0,
+                "ThermalConductivity": 360.0,
+                "Young": 127000000000.0,
+                "CoefDilatation": 1.8e-05,
+                "nuance": "Cu5Ag5,08",
+                "VolumicMass": 9000.0,
+                "ElectricalConductivity": 50100000.0,
+                "MagnetPermeability": 1.0,
+                "Poisson": 0.335,
+                "Rpe": 481000000.0
+            }
+        }
+    ],
+    "Lead": []
+}

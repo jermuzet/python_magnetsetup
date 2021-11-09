@@ -1,0 +1,1 @@
+h0*(heat_T-(Tw0+dTw0))*2*pi*x:x:heat_T:h0:Tw0:dTw0
