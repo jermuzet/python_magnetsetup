@@ -47,91 +47,15 @@ import json
 import argparse
 import pathlib
 
+# Global variables
+url_api = 'http://localhost:8000/api'
+
 def Merge(dict1, dict2):
     """
     Merge dict1 and dict2 to form a new dictionnary
     """
     res = {**dict1, **dict2}
     return res
-
-def export_table(table: str):
-    """
-    Return the pd.DataFrame correspondant to table of database from localhost:8000/api
-    """
-
-    # Connect to "http://localhost:8000/api/table/"
-    base_url_db_api="http://localhost:8000/api/" + table + "/"
-
-    page = requests.get(url=base_url_db_api)
-
-    print("connect :", page.url, page.status_code)
-
-    if page.status_code != 200 :
-        print("cannot logging to %s" % base_url_db_api)
-        sys.exit(1)
-    
-    # Create the DataFrame
-    list_table = ast.literal_eval(page.text)
-    n = len(list_table)
-
-    keys = list_table[0].keys()
-    data_table = pd.DataFrame(columns=keys)
-
-    for id in range(n):
-        serie = pd.Series(list_table[id])
-        data_table= data_table.append(serie, ignore_index=True)
-    
-    return data_table
-
-def create_confdata_magnet(magnet: str, debug=False):
-    """
-    Return confdata the dictionnary of configuration of magnet.
-    """
-
-    # Export magnets table
-    data_magnets = export_table('magnets')
-    #data_magnets = export_table('mpartmagnetlink')
-    
-    # Search magnet
-    names = data_magnets['name']
-    if  magnet not in names.values :
-        print("magnet : " + magnet + " isn\'t in database.")
-        exit(1)
-    
-    if debug:
-        print("magnet : " + magnet + " is in database.")
-
-    serie_magnet = data_magnets[ data_magnets['name']==magnet ]
-
-    # Export mparts of magnet
-    data_mparts = export_table('mparts')
-    data_mparts = data_mparts[ data_mparts['be']==serie_magnet['be'][0] ]
-
-    # Recuperate the materials
-    data_materials = export_table('materials')
-
-    # Create dictionnary of magnet's configuration
-    confdata = {}
-
-    confdata['geom'] = serie_magnet['geom'][0]
-    confdata['Helix'] = []
-    confdata['Ring'] = []
-    confdata['Lead'] = []
-    for id in data_mparts['id']:
-        mpart = data_mparts[ data_mparts['id'] == id ]
-        material = data_materials[ data_materials['id'] == mpart['material_id'].values[0] ]
-        
-        material = material.drop( labels=['name', 'id'], axis=1 )
-
-        dict_mpart = {'geo': mpart['geom'].values[0] }
-        dict_material = {}
-        for column in material.columns :
-            dict_material[column] = material[column].values[0]
-        dict_mpart['material'] = dict_material
-
-        confdata[ mpart['mtype'].values[0] ].append(dict_mpart)
-    
-    return confdata
 
 def create_params_dict(args, Zmin, Zmax, Sh, Dh, NHelices, Nsections):
     """
@@ -313,8 +237,9 @@ def main():
 
     # Recuperate the data of configuration with the direct name of magnet
     if args.magnet != None:
-        magnet = args.magnet
-        confdata = create_confdata_magnet(magnet, args.debug)
+        print(url_api + '/magnet/mdata/' + args.magnet)
+        r = requests.get(url= url_api + '/magnet/mdata/' + args.magnet )
+        confdata = ast.literal_eval(r.text)
 
     yamlfile = confdata["geom"]
 
@@ -449,7 +374,7 @@ def main():
         if args.datafile != None :
             outfilename = args.datafile.replace(".json","")
         if args.magnet != None :
-            outfilename = magnet
+            outfilename = args.magnet
         outfilename += "-" + args.method
         outfilename += "-" + args.model
         outfilename += "-" + args.phytype
