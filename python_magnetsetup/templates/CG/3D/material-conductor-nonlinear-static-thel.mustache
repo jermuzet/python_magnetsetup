@@ -1,0 +1,12 @@
+{
+    "{{name}}":
+{
+    "alpha":"{{alpha}}",
+
+    "sigma0":"{{ElectricalConductivity}}",
+    "sigma":"sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+
+    "k0":"{{ThermalConductivity}}",
+    "k":"k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0"
+}
+}

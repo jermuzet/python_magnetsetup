@@ -1,0 +1,6 @@
+{
+    "electric_c":"sigma:sigma",
+
+    "heat_c":"k:k",
+    "heat_f":"sigma*(electric_grad_V_0*electric_grad_V_0+electric_grad_V_1*electric_grad_V_1+electric_grad_V_2*electric_grad_V_2):sigma:electric_grad_V_0:electric_grad_V_1:electric_grad_V_2"
+}

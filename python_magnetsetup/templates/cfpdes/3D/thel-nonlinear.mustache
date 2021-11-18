@@ -1,19 +1,29 @@
 {
-    "Name": "ThermoElectric Axi Stationnary model",
-    "ShortName":"AxiThermoElectricStat",
+    "Name": "ThermoElectric 3D Stationnary model",
+    "ShortName":"3DThermoElectricStat",
     "Models":
     {
-		"equations":[
-	    {
-			"name":"heat",
-			"unknown":
-			{
-		    	"basis":"Pch1",
-		    	"name":"temperature",
-		    	"symbol":"T"
-			}
-	    }
-		]
+		"equations":
+	    [
+            {
+                "name":"electric",
+                "unknown": 
+                {
+                    "basis":"Pch1",
+                    "name":"V",
+                    "symbol":"V"
+                }
+            },
+            {
+                "name":"heat",
+                "unknown":
+                {
+                    "basis":"Pch1",
+                    "name":"temperature",
+                    "symbol":"T"
+                }
+            }
+	    ]
     },
     "Parameters":
     {
@@ -39,12 +49,23 @@
     {
         "temperature":
         {
-            "Expression":
+            "File":
             {
                 "myic":
                 {
-                    "markers": {{part_withoutAir}},
-                    "expr":"Tinit:Tinit"
+                    "filename": "{{temperature_initfile}}",
+                    "format":"hdf5"
+                }
+            }
+        },
+        "V":
+        {
+            "File":
+            {
+                "myic":
+                {
+                    "filename": "{{V_initfile}}",
+                    "format": "hdf5"
                 }
             }
         }
@@ -89,6 +110,16 @@
 				}
 	    	}
 		},
+		"electric":
+		{
+			"Save":
+	    	{
+				"Fields":
+				{
+		    		"names":["V"]
+				}
+	    	}
+		}
 		"heat":
 		{
 	    	"Save":

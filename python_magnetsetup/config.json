@@ -1,0 +1,14 @@
+{
+    "basedir": "",
+    "databases": "databases",
+    "geometries":
+    {
+	"CAD": "geometries/CAD",
+	"Gmsh": "geometries/Gmsh",
+	"Yaml": "geometries/Yaml",
+	"Json": "geometries/Json",
+	"Opt": "geometries/Opt",
+	"FAO": "geometries/FAO"
+    },
+    "meshes": "meshes"
+}
