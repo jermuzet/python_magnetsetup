@@ -434,9 +434,9 @@ def main():
     with open(fmodel, "r") as ftemplate:
         # TODO tell geom==Axi from geom==3D case
         if args.geom == "Axi":
-            jsonfile = chevron.render(ftemplate, {'index_h': index_h, 'index_conductor':index_conductor, 'imin': 0, 'imax': NHelices+1, 'part_withoutAir':part_withoutAir, 'boundary_Ring':boundary_Ring })
+            jsonfile = chevron.render(ftemplate, {'index_h': index_h, 'index_conductor':index_conductor, 'imin': 0, 'imax': NHelices+1, 'part_withoutAir':part_withoutAir, 'boundary_Meca':boundary_meca })
         else:
-            jsonfile = chevron.render(ftemplate, {'index_V0':index_V0, 'part_conductor':part_conductor, 'part_withoutAir':part_withoutAir, 'boundary_Ring':boundary_meca })
+            jsonfile = chevron.render(ftemplate, {'index_V0':index_V0, 'part_conductor':part_conductor, 'part_withoutAir':part_withoutAir, 'boundary_Meca':boundary_meca })
         jsonfile = jsonfile.replace("\'", "\"")
         # shall get rid of comments: //*
         # now tweak obtained json
