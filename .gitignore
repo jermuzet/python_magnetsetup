@@ -103,3 +103,17 @@ ENV/
 
 # IDE settings
 .vscode/
+
+# Mesg
+*.msh
+*.xao
+*.brep
+*~
+
+# data folder
+data
+
+log*
+
+\#*\#
+.\#*

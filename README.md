@@ -15,7 +15,7 @@ This will create a json file holding geometrical and material data for  magnet H
 You can use this file to create a setup for Axi Fully coupled model, using
 
 ```
-python -m python_magnetsetup.python_magnetsetup HL-34-data.json --method cfpdes --time static --geom Axi --model thmagel --cooling mean
+python -m python_magnetsetup.python_magnetsetup --datafile HL-34-data.json --method cfpdes --time static --geom Axi --model thmagel --phytype linear --cooling mean
 ```
 
 [NOTE]

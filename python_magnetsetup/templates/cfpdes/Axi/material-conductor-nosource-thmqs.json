@@ -5,5 +5,5 @@
 	    
     "magnetic_c":"x/mu:x:mu",
     "magnetic_beta":"{2/mu,0}:mu",
-    "magnetic_d":"sigma*x:x:sigma",
+    "magnetic_d":"sigma*x:x:sigma"
 }

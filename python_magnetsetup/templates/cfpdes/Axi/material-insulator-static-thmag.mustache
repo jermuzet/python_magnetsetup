@@ -1,12 +1,10 @@
 {
     "{{name}}":
 {
-    "k":"ThermalConductivity",
-    "mu": "MagnetPermeability",
+    "k":"{{ThermalConductivity}}",
+    "mu": "{{MagnetPermeability}}*mu0:mu0",
 
-    "E":"Young",
-    "nu":"Poisson",
-    "alphaT":"CoefDilatation",
+    "filename":"$cfgdir/insulator-cfpdes-thmag-Axi.json"
+}
 
-    "filename":"insulator.json"
 }
