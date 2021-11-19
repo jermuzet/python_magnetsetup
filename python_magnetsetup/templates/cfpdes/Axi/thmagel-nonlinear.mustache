@@ -35,14 +35,10 @@
     },
     "Parameters":
     {
+		"mu0":"4*pi*1e-7",
 		"T0":"293.",
-		"Tin":"284.15",
-	
-		{{#Params}}
-		"{{name}}": "{{value}}",
-		{{/Params}}
-		
-		"mu0":"4*pi*1e-7"
+
+		"Tin":"284.15"
     },
     "Materials":
     {
@@ -76,12 +72,11 @@
 		{
 	    	"Dirichlet":
 	    	{
-				{{#boundary_Meca_Dir}}
-				"{{name}}": 
-				{ 
-					expr: "{{value}}"
+				"H1_Fixed":
+				{
+		    		"markers": {{boundary_Meca}},
+		    		"expr":"{0,0}"
 				}
-				{{/boundary_Meca_Dir}}
 	    	}
 		}
     },
@@ -89,12 +84,12 @@
     {
         "temperature":
         {
-            "Expression":
+            "File":
             {
                 "myic":
                 {
-                    "markers": {{part_temperature}},
-		    		"expr":"Tinit:Tinit"
+                    "filename": {{temperature_init}},
+                    "format":"hdf5"
                 }
             }
         }
@@ -157,7 +152,7 @@
                         "markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
+			    			"index1": {{index_h}}
 						},
 						"representation":["element"]
 		    		},
@@ -167,7 +162,7 @@
                         "markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
+			    			"index1": {{index_h}}
 						},
 						"representation":["element"]
 		    		},
@@ -177,7 +172,7 @@
                         "markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
+			    			"index1": {{index_h}}
 						},
 						"representation":["element"]
 		    		},
@@ -187,7 +182,7 @@
                         "markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
+			    			"index1": {{index_h}}
 						},
 						"representation":["element"]
 		    		},
@@ -197,7 +192,7 @@
                         "markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
+			    			"index1": {{index_h}}
 						},
 						"representation":["element"]
 		    		}

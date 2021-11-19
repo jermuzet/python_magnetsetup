@@ -1,6 +1,6 @@
 {
-    "Name": "ThermoElectric Axi Stationnary model",
-    "ShortName":"AxiThermoElectricStat",
+    "Name": "Axi Thermo-Magnetostatic Stationnary model",
+    "ShortName":"AxiThermo-Magnetostatic",
     "Models":
     {
 		"equations":[
@@ -11,6 +11,15 @@
 		    	"basis":"Pch1",
 		    	"name":"temperature",
 		    	"symbol":"T"
+			}
+	    },
+	    {
+			"name":"magnetic",
+			"unknown":
+			{
+			    "basis":"Pch2",
+			    "name":"phi",
+			    "symbol":"phi"
 			}
 	    }
 		]
@@ -24,10 +33,26 @@
     },
     "Materials":
     {
-		
+		"Air":
+		{
+	    	"physics":"magnetic",
+	    	"magnetic_c":"x/mu0:x:mu0",
+	    	"magnetic_beta":"{2/mu0,0}:mu0"
+		}
     },
     "BoundaryConditions":
     {
+		"magnetic":
+		{
+		    "Dirichlet":
+	    	{
+				"magdir":
+				{
+		    		"markers":["ZAxis","Infty"],
+		    		"expr":"0"
+				}
+			}
+	    },
 		"heat":
 		{
 	    	"Robin":
@@ -59,6 +84,12 @@
 				"fields":["heat.temperature"],
 				"expr":
 				{
+		    		"atheta":"magnetic_phi/x:magnetic_phi:x",
+		    		"B":
+		    		{
+						"expr":"{-magnetic_grad_phi_1/x,magnetic_grad_phi_0/x}:magnetic_grad_phi_0:magnetic_grad_phi_1:x",
+						"representation":["element"]
+		    		},
 		    		"U":
 		    		{
 						"expr":"materials_U:materials_U",
@@ -89,6 +120,32 @@
 				}
 	    	}
 		},
+		"magnetic":
+		{
+	    	"Measures": 
+	    	{
+				"Statistics":
+				{
+					"MagneticEnergy":
+		    		{
+						"type":"integrate",
+						"expr":"-2*pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi):magnetic_phi:materials_sigma:materials_U:x",
+						"markers":
+						{
+			    			"name": ["H%1_1%_Cu%1_2%"],
+			    			"index1": {{index_electric}}
+						}
+		    		},
+					"Intensity_H%1_1%_Cu%1_2%":
+					{
+    					"type":"integrate",
+    					"expr":"-materials_H%1_1%_Cu%1_2%_sigma*materials_H%1_1%_Cu%1_2%_U/2/pi/x:materials_H%1_1%_Cu%1_2%_sigma:materials_H%1_1%_Cu%1_2%_U:x",
+    					"markers": "H%1_1%_Cu%1_2%",
+    					"index1": {{index_electric}}
+					}
+				}
+	    	}
+		},
 		"heat":
 		{
 	    	"Save":
@@ -102,14 +159,7 @@
 	    	{
 				"Statistics":
 				{
-		    		"Intensity_H%1_1%_Cu%1_2%":
-					{
-    					"type":"integrate",
-    					"expr":"-materials_H%1_1%_Cu%1_2%_sigma*materials_H%1_1%_Cu%1_2%_U/2/pi/x:materials_H%1_1%_Cu%1_2%_sigma:materials_H%1_1%_Cu%1_2%_U:x",
-    					"markers": "H%1_1%_Cu%1_2%",
-			    		"index1": {{index_electric}}
-					},
-					"MeanT": 
+		    		"MeanT": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 

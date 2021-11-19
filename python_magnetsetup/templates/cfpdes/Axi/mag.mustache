@@ -17,6 +17,13 @@
     },
     "Parameters":
     {
+		"T0":"293.",
+		"Tin":"284.15",
+		
+		{{#Params}}
+		"{{name}}": "{{value}}",
+		{{/Params}}
+
 		"mu0":"4*pi*1e-7"
     },
     "Materials":
@@ -63,7 +70,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_conductor}}
+			    			"index1": {{index_electric}}
 						}
 		    		},
 		    		"Jth":
@@ -72,7 +79,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_conductor}}
+			    			"index1": {{index_electric}}
 						}
 		    		},
 		    		"Qth":
@@ -81,7 +88,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_conductor}}
+			    			"index1": {{index_electric}}
 						}
 		    		}
 				}
@@ -100,7 +107,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_conductor}}
+			    			"index1": {{index_electric}}
 						}
 		    		},
                     "Intensity_H%1_1%_Cu%1_2%":
@@ -108,7 +115,7 @@
     					"type":"integrate",
     					"expr":"-materials_H%1_1%_Cu%1_2%_sigma*materials_H%1_1%_Cu%1_2%_U/2/pi/x:materials_H%1_1%_Cu%1_2%_sigma:materials_H%1_1%_Cu%1_2%_U:x",
     					"markers": "H%1_1%_Cu%1_2%",
-			    		"index1": {{index_conductor}}
+			    		"index1": {{index_electric}}
 					}
 				}
 	    	}
