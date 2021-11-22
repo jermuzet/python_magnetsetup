@@ -1,40 +1,31 @@
 {
-    "Name": "ThermoElectric 3D Stationnary model",
-    "ShortName":"3DThermoElectricStat",
+    "Name": "ThermoElectric Axi Stationnary model",
+    "ShortName":"AxiThermoElectricStat",
     "Models":
     {
-		"equations":
-	    [
-            {
-                "name":"electric",
-                "unknown": 
-                {
-                    "basis":"Pch1",
-                    "name":"V",
-                    "symbol":"V"
-                }
-            },
-            {
-                "name":"heat",
-                "unknown":
-                {
-                    "basis":"Pch1",
-                    "name":"temperature",
-                    "symbol":"T"
-                }
-            }
-	    ]
+		"equations":[
+	    {
+			"name":"heat",
+			"unknown":
+			{
+		    	"basis":"Pch1",
+		    	"name":"temperature",
+		    	"symbol":"T"
+			}
+	    }
+		]
     },
     "Parameters":
     {
 		"T0":"293.",
-		"Tin":"284.15",
+		"Tin":"284.15",		
 		
-		{{#Params}}
+		{{#Parameters}}
 		"{{name}}": "{{value}}",
-		{{/Params}}
-
+		{{/Parameters}}
+		
 		"mu0":"4*pi*1e-7"
+		
     },
     "Materials":
     {
@@ -42,41 +33,17 @@
     },
     "BoundaryConditions":
     {
-		"electric":
-		{
-	    	"Dirichlet":
-	    	{
-				{{#boundary_Electric_Dir}}
-				"{{name}}": { expr: "{{value}}"}
-				{{/boundary_Electric_Dir}}
-	    	},
-			"Neumann":
-			{
-				{{#boundary_Electric_Neu}}
-				"{{name}}": { expr: "{{value}}"}
-				{{/boundary_Electric_Neu}}
-			}
-		},
 		"heat":
 		{
 	    	"Robin":
 	    	{
 				{{#boundary_Therm_Robin}}
-				"{{name}}": 
-				{ 
-					expr1: "{{expr1}}",
-					expr2: "{{expr2}}"
-				}
-				{{/boundary_Therm_Rob}}
-	    	}
-	    	"Neumann":
-	    	{
-				{{#boundary_Therm_Neu}}
-				"{{name}}": 
-				{ 
-					expr: "{{value}}"
-				}
-				{{/boundary_Therm_Neu}}
+				"{{name}}":
+				{
+					"expr1": "{{expr1}}",
+					"expr2": "{{expr2}}"
+				},
+				{{/boundary_Therm_Robin}}
 	    	}
 		}
     },
@@ -84,23 +51,12 @@
     {
         "temperature":
         {
-            "File":
+            "Expression":
             {
                 "myic":
                 {
-                    "filename": "{{temperature_initfile}}",
-                    "format":"hdf5"
-                }
-            }
-        },
-        "V":
-        {
-            "File":
-            {
-                "myic":
-                {
-                    "filename": "{{V_initfile}}",
-                    "format": "hdf5"
+                    "markers": {{part_thermic}},
+                    "expr":"Tinit:Tinit"
                 }
             }
         }
@@ -145,16 +101,6 @@
 				}
 	    	}
 		},
-		"electric":
-		{
-			"Save":
-	    	{
-				"Fields":
-				{
-		    		"names":["V"]
-				}
-	    	}
-		}
 		"heat":
 		{
 	    	"Save":

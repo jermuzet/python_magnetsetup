@@ -47,10 +47,12 @@ class appenv():
         self.template_repo: Optional[str] = None
 
         from decouple import Config, RepositoryEnv
-        data = Config(RepositoryEnv("settings.env"))
-        
+        envdata = RepositoryEnv("settings.env")
+        data = Config(envdata)
+        print("appenv:", RepositoryEnv("settings.env").data)
+
         self.url_api = data.get('URL_API')
-        if data.get('TEMPLATE_REPO'):
+        if 'TEMPLATE_REPO' in envdata:
             self.template_repo = data.get('TEMPLATE_REPO')
 
     def template_path(self):
@@ -61,6 +63,7 @@ class appenv():
             default_path = os.path.dirname(os.path.abspath(__file__))
             template_repo = os.path.join(default_path, "templates")
 
+        print("appenv/template_path:", template_repo)
         return template_repo
 
 
@@ -88,7 +91,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     """
     
     [method, time, geom, model, cooling] = method_data
-    template_path = os.path.join(appenv.template_path(), "templates", method, geom)
+    template_path = os.path.join(appenv.template_path(), method, geom, model)
 
     cfg_model = appcfg[method][time][geom][model]["cfg"]
     json_model = appcfg[method][time][geom][model]["model"]
@@ -101,6 +104,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     insulator_model = appcfg[method][time][geom][model]["insulator"]
     
     fcfg = os.path.join(template_path, cfg_model)
+    print("fcfg:", fcfg, type(fcfg))
     fmodel = os.path.join(template_path, json_model)
     fconductor = os.path.join(template_path, conductor_model)
     finsulator = os.path.join(template_path, insulator_model)
@@ -111,6 +115,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
         stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
 
         fcooling = os.path.join(template_path, cooling_model)
+        print("fcooling:", fcooling, type(fcooling))
         fflux = os.path.join(template_path, flux_model)
         fstats_T = os.path.join(template_path, stats_T_model)
         fstats_Power = os.path.join(template_path, stats_Power_model)
@@ -130,7 +135,26 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
         "material_def" : material_generic_def
     }
 
+    if check_templates(dict):
+        pass
+
     return dict    
+
+def check_templates(templates: dict):
+    """
+    check if template file exist
+    """
+    for key in templates:
+        if isinstance(templates[key], str):
+            print(key, templates[key])
+            with open(templates[key], "r") as f: pass
+
+        elif isinstance(templates[key], str):
+            for s in templates[key]:
+                print(key, s)
+                with open(s, "r") as f: pass
+
+    return True
 
 def query_db(appenv: appenv, mtype: str, name: str):
     """
@@ -176,7 +200,7 @@ def load_object(appenv: appenv, datafile: str):
     if appenv.yaml_repo:
         print("Look for %s in %s" % (datafile, appenv.yaml_repo))
     else:
-        print("Look for %s in workingdir %s" % (datafile, os.pwd()))
+        print("Look for %s in workingdir %s" % (datafile, os.getcwd()))
     with open(datafile, 'r') as cfgdata:
             confdata = json.load(cfgdata)
     return confdata
@@ -186,7 +210,7 @@ def load_object_from_db(appenv: appenv, mtype: str, name: str):
     Load object props from db
     """
 
-    if not mtype in ["msite", "magnet", "Helix", "Bitter", "Supra"]:
+    if not mtype in ["msite", "magnet", "Helix", "Bitter", "Supra", "material"]:
         raise("query_bd: %s not supported" % mtype)
     
     try:
@@ -203,7 +227,8 @@ def create_cfg(cfgfile:str, name: str, nonlinear: bool, jsonfile: str, template:
     """
     Create a cfg file
     """
-    
+    print("create_cfg %s from %s" % (cfgfile, template) )
+
     dim = 2
     if method_data[2] == "3D":
         dim = 3
@@ -228,11 +253,12 @@ def create_cfg(cfgfile:str, name: str, nonlinear: bool, jsonfile: str, template:
         "partition": 0
     }
     
-    with open(template, "r") as f:
-        mdata = entry(f, data)
+    mdata = entry_cfg(template, data, debug)
+    if debug:
+        print("create_cfg/mdata=", mdata)
 
-    with open(jsonfile, "x") as out:
-        out.write(json.dumps(data, indent = 4))
+    with open(cfgfile, "x") as out:
+        out.write(mdata)
     
     pass
 
@@ -241,40 +267,40 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
     """
 
-    (Zmin, Zmax, Sh, Dh, NHelices, Nsections) = gdata
-
+    (NHelices, NRings, NChannels, Nsections, index_h, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+    
     # Tini, Aini for transient cases??
     params_data = { 'Parameters': []}
 
     # for cfpdes only
     if method_data[0] == "cfpdes":
-        params_data.append({"name":"bool_laplace", "value":"1"})
-        params_data.append({"name":"bool_dilatation", "value":"1"})
+        params_data['Parameters'].append({"name":"bool_laplace", "value":"1"})
+        params_data['Parameters'].append({"name":"bool_dilatation", "value":"1"})
 
     # TODO : initialization of parameters
 
-    params_data.append({"name":"Tinit", "value":293})
-    params_data.append({"name":"h", "value":58222.1})
-    params_data.append({"name":"Tw", "value":290.671})
-    params_data.append({"name":"dTw", "value":12.74})
+    params_data['Parameters'].append({"name":"Tinit", "value":293})
+    params_data['Parameters'].append({"name":"h", "value":58222.1})
+    params_data['Parameters'].append({"name":"Tw", "value":290.671})
+    params_data['Parameters'].append({"name":"dTw", "value":12.74})
     
     # params per cooling channels
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
 
     for i in range(NHelices+1):
-        params_data.append({"name":"h%d" % i, "value":"h:h"})
-        params_data.append({"name":"Tw%d" % i, "value":"Tw:Tw"})
-        params_data.append({"name":"dTw%d" % i, "value":"dTw:dTw"})
-        params_data.append({"name":"Zmin%d" % i, "value":Zmin[i]})
-        params_data.append({"name":"Zmax%d" % i, "value":Zmax[i]})
-        params_data.append({"name":"Sh%d" % i, "value":Sh[i]})
-        params_data.append({"name":"Dh%d" % i, "value":Dh[i]})
+        params_data['Parameters'].append({"name":"h%d" % i, "value":"h:h"})
+        params_data['Parameters'].append({"name":"Tw%d" % i, "value":"Tw:Tw"})
+        params_data['Parameters'].append({"name":"dTw%d" % i, "value":"dTw:dTw"})
+        params_data['Parameters'].append({"name":"Zmin%d" % i, "value":Zmin[i]})
+        params_data['Parameters'].append({"name":"Zmax%d" % i, "value":Zmax[i]})
+        params_data['Parameters'].append({"name":"Sh%d" % i, "value":Sh[i]})
+        params_data['Parameters'].append({"name":"Dh%d" % i, "value":Dh[i]})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
         for i in range(NHelices):
             for j in range(Nsections[i]):
-                params_data.append({"name":"U_H%d_Cu%d" % (i+1, j+1), "value":"1"})
+                params_data['Parameters'].append({"name":"U_H%d_Cu%d" % (i+1, j+1), "value":"1"})
     
     # TODO: CG: U_H%d%
     # TODO: HDG: U_H%d% if no ibc
@@ -282,7 +308,7 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
     return params_data
 
 
-def create_materials(gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False):
+def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templates: dict, method_data: List[str], debug: bool = False):
     # TODO loop for Plateau (Axi specific)
     materials_dict = {}
 
@@ -294,45 +320,49 @@ def create_materials(gdata: tuple, confdata: dict, templates: dict, method_data:
     # Loop for Helix
     for i in range(NHelices):
         if method_data[2] == "3D":
-            with open(fconductor, "r") as f:
-                mdata = entry(f, Merge({'name': "H%d" % (i+1)}, confdata["Helix"][i]["material"]), debug)
+            mdata = entry(fconductor, Merge({'name': "H%d" % (i+1), 'marker': "H%d_Cu" % (i+1)}, confdata["Helix"][i]["material"]) , debug)
             materials_dict["H%d" % (i+1)] = mdata["H%d" % (i+1)]
+
             # TODO deal with Glue/Kaptons
+            if idata:
+                for item in idata:
+                    if item(0) == "Glue":
+                        name = "Isolant%d" % (i+1)
+                        mdata = entry(finsulator, Merge({'name': name, 'marker': "H%d_Isolant" % (i+1)}, confdata["Helix"][i]["insulator"]), debug)
+                    else:
+                        name = "Kaptons%d" % (i+1)
+                        kapton_dict = { "name": "[\"Kapton%1%\"]", "index1": "0:%d" % item(1)}
+                        mdata = entry(finsulator, Merge({'name': name, 'marker': kapton_dict}, confdata["Helix"][i]["insulator"]), debug)
+                    materials_dict[name] = mdata[name]
         else:
             # section j==0:  treated as insulator in Axi
-            with open(finsulator, "r") as f:
-                mdata = entry(f, Merge({'name': "H%d_Cu%d" % (i+1, 0)}, confdata["Helix"][i]["material"]))
+            mdata = entry(finsulator, Merge({'name': "H%d_Cu%d" % (i+1, 0)}, confdata["Helix"][i]["material"]), debug)
             materials_dict["H%d_Cu%d" % (i+1, 0)] = mdata["H%d_Cu%d" % (i+1, 0)]
         
             # load conductor template
             for j in range(1,Nsections[i]+1):
-                with open(fconductor, "r") as f:
-                    mdata = entry(f, Merge({'name': "H%d_Cu%d" % (i+1, j)}, confdata["Helix"][i]["material"]))
+                mdata = entry(fconductor, Merge({'name': "H%d_Cu%d" % (i+1, j)}, confdata["Helix"][i]["material"]), debug)
                 materials_dict["H%d_Cu%d" % (i+1, j)] = mdata["H%d_Cu%d" % (i+1, j)]
 
             # section j==Nsections+1:  treated as insulator in Axi
-            with open(finsulator, "r") as f:
-                mdata = entry(f, Merge({'name': "H%d_Cu%d" % (i+1, Nsections[i]+1)}, confdata["Helix"][i]["material"]))
+            mdata = entry(finsulator, Merge({'name': "H%d_Cu%d" % (i+1, Nsections[i]+1)}, confdata["Helix"][i]["material"]), debug)
             materials_dict["H%d_Cu%d" % (i+1, Nsections[i]+1)] = mdata["H%d_Cu%d" % (i+1, Nsections[i]+1)]
 
     # loop for Rings
     for i in range(NRings):
         if method_data[2] == "3D":
-            with open(fconductor, "r") as f:
-                mdata = entry(f, Merge({'name': "R%d" % (i+1)}, confdata["Ring"][i]["material"]))
+            mdata = entry(fconductor, Merge({'name': "R%d" % (i+1)}, confdata["Ring"][i]["material"]), debug)
         else:
-            with open(finsulator, "r") as f:
-                mdata = entry(f, Merge({'name': "R%d" % (i+1)}, confdata["Ring"][i]["material"]))
+            mdata = entry(finsulator, Merge({'name': "R%d" % (i+1)}, confdata["Ring"][i]["material"]), debug)
         materials_dict["R%d" % (i+1)] = mdata["R%d" % (i+1)]
         
     # Leads: 
     if method_data[2] == "3D" and confdata["Lead"]:
-        with open(fconductor, "r") as f:
-            mdata = entry(f, Merge({'name': "iL1"}, confdata["Lead"][0]["material"]))
-            materials_dict["iL1"] = mdata["iL1"]
+        mdata = entry(fconductor, Merge({'name': "iL1"}, confdata["Lead"][0]["material"]), debug)
+        materials_dict["iL1"] = mdata["iL1"]
 
-            mdata = entry(f, Merge({'name': "oL2"}, confdata["Lead"][1]["material"]))
-            materials_dict["oL2"] = mdata["oL2"]
+        mdata = entry(fconductor, Merge({'name': "oL2"}, confdata["Lead"][1]["material"]), debug)
+        materials_dict["oL2"] = mdata["oL2"]
 
     return materials_dict
 
@@ -342,33 +372,33 @@ def create_bcs(boundary_meca: List,
                boundary_electric: List,
                gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False):
 
+    print("create_bcs from templates", templates)
     electric_bcs_dir = { 'boundary_Electric_Dir': []} # name, value, vol
     electric_bcs_neu = { 'boundary_Electric_Neu': []} # name, value
-    thermic_bcs_rob = { 'boundary_Therm_Rob': []} # name, expr1, expr2
+    thermic_bcs_rob = { 'boundary_Therm_Robin': []} # name, expr1, expr2
     thermic_bcs_neu = { 'boundary_Therm_Neu': []} # name, value
     meca_bcs_dir = { 'boundary_Meca_Dir': []} # name, value
     maxwell_bcs_dir = { 'boundary_Maxwell_Dir': []} # name, value
     
     (NHelices, NRings, NChannels, Nsections, index_h, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
     fcooling = templates["cooling"]
-
+    
     for i in range(NChannels):
         # load insulator template for j==0
-        with open(fcooling, "r") as f:
-            mdata = entry(f, {'i': i})
-            thermic_bcs_rob.append( Merge({"name": "Channel%d" % i}, mdata["Channel%d" % i]) )
+        mdata = entry(fcooling, {'i': i}, debug)
+        thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": "Channel%d" % i}, mdata["Channel%d" % i]) )
 
     for bc in boundary_meca:
-        meca_bcs_dir.append({"name":bc, "value":"{0,0}"})
+        meca_bcs_dir['boundary_Meca_Dir'].append({"name":bc, "value":"{0,0}"})
 
     for bc in boundary_maxwell:
         if method_data[2] == "3D":
-            meca_bcs_dir.append({"name":bc, "value":"{0,0}"})
+            maxwell_bcs_dir['boundary_Maxwell_Dir'].append({"name":bc, "value":"{0,0}"})
         else:
-            meca_bcs_dir.append({"name":bc, "value":"0"})
+            maxwell_bcs_dir['boundary_Maxwell_Dir'].append({"name":bc, "value":"0"})
 
     for bc in boundary_electric:
-        electric_bcs_dir.append({"name":bc[0], "value":bc[2]})
+        electric_bcs_dir['boundary_Electric_Dir'].append({"name":bc[0], "value":bc[2]})
         
 
     if method_data[3] == "thelec":
@@ -402,8 +432,8 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     Create a json model file
     """
 
-    with open(templates["model"], "r") as f:
-        data = entry(f, "", mdict, debug)
+    print("create_json=", jsonfile)
+    data = entry(templates["model"], mdict, debug)
     
     # material section
     if "Materials" in data:
@@ -415,31 +445,33 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     # postprocess
     if debug: print("flux")
     flux_data = mpost["flux"]
-    with open(templates["flux"], "r") as f:
-        add = data["PostProcess"]["heat"]["Measures"]["Statistics"]["Flux_Channel%1%"]
-        odata = entry(f, flux_data, debug)
-        add["Flux_Channel%1%"] = odata["Flux_Channel%1%"]
-
+    add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
+    odata = entry(templates["flux"], flux_data, debug)
+    for md in odata["Flux"]:
+        data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Flux"][md]
+    
     if debug: print("meanT_H")
     meanT_data = mpost["meanT_H"] # { "meanT_H": [] }
-    with open(templates["stats"][0], "r") as f:
-        add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
-        odata = entry(f, meanT_data, debug)
-        for md in odata["Stats_T"]:
-            add[md] = odata["Stats_T"][md]
+    add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
+    odata = entry(templates["stats"][0], meanT_data, debug)
+    for md in odata["Stats_T"]:
+        data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_T"][md]
 
     if debug: print("power_H")
     section = "electric"
     if method_data[0] == "cfpdes" and method_data[2] == "Axi": section = "heat" 
     powerH_data = mpost["power_H"] # { "Power_H": [] }
-    with open(templates["stats"][1], "r") as f:
-        add = data["PostProcess"][section]["Measures"]["Statistics"]
-        odata = entry(f, powerH_data, debug)
-        for md in odata["Stats_Power"]:
-            add[md] = odata["Stats_Power"][md]
+    add = data["PostProcess"][section]["Measures"]["Statistics"]
+    odata = entry(templates["stats"][1], powerH_data, debug)
+    for md in odata["Stats_Power"]:
+        data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
+    
+    mdata = json.dumps(data, indent = 4)
 
+    # print("corrected data:", re.sub(r'},\n					    	}\n', '}\n}\n', data))
+    # data = re.sub(r'},\n					    	}\n', '}\n}\n', data)
     with open(jsonfile, "x") as out:
-        out.write(json.dumps(data, indent = 4))
+        out.write(mdata)
     pass
 
 def Merge(dict1, dict2):
@@ -449,28 +481,42 @@ def Merge(dict1, dict2):
     res = {**dict1, **dict2}
     return res
 
-def entry(template: str, rdata: dict, debug: bool):
+def entry_cfg(template: str, rdata: dict, debug: bool = False):
     import chevron
 
+    if debug:
+        print("entry/loading %s" % str(template), type(template))
+        print("entry/rdata:", rdata)
     with open(template, "r") as f:
         jsonfile = chevron.render(f, rdata)
-        jsonfile = jsonfile.replace("\'", "\"")
-                
-        # replace lat occurrence of },
-        new = "}"
-        result = new.join(jsonfile.rsplit("},", 1))
-        if debug:
-            print("data (raw):", result)
-                
-    mdata = json.loads(result)
-    if debug:
-        print("data (json):\n", mdata)
+    jsonfile = jsonfile.replace("\'", "\"")
+    return jsonfile
 
+def entry(template: str, rdata: dict, debug: bool = False):
+    import chevron
+    import re
+    
+    if debug:
+        print("entry/loading %s" % str(template), type(template))
+        print("entry/rdata:", rdata)
+    with open(template, "r") as f:
+        jsonfile = chevron.render(f, rdata)
+    jsonfile = jsonfile.replace("\'", "\"")
+    if debug:
+        print("entry/jsonfile:", jsonfile)
+    print("corrected:", re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile))
+
+    corrected = re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile)
+    mdata = json.loads(corrected)
+    if debug:
+        print("entry/data (json):\n", mdata)
+   
     return mdata
     
 def main():
     """
     """
+    print("setup/main")
     import argparse
 
     # Manage Options
@@ -502,11 +548,6 @@ def main():
     
     # TODO make datafile/magnet exclusive one or the other
     
-    # Get current dir
-    cwd = os.getcwd()
-    if args.wd:
-        os.chdir(args.wd)
-    
     # load appenv
     MyEnv = appenv()
     print(MyEnv.template_path())
@@ -514,6 +555,11 @@ def main():
     # loadconfig
     AppCfg = loadconfig()
 
+    # Get current dir
+    cwd = os.getcwd()
+    if args.wd:
+        os.chdir(args.wd)
+    
     # load appropriate templates
     method_data = [args.method, args.time, args.geom, args.model, args.cooling]
     templates = loadtemplates(MyEnv, AppCfg, method_data, (not args.nonlinear) )
@@ -532,6 +578,7 @@ def main():
     part_electric = []
     index_electric = []
     index_Helices = []
+    index_Insulators = []
     
     boundary_meca = []
     boundary_maxwell = []
@@ -553,13 +600,18 @@ def main():
                         index_electric.append( [str(i+1),str(j+1)] )
                     index_Helices.append(["0:{}".format(Nsections[i]+2)])
                 
-                # else add Glue/Kaptons
+                else:
+                    with open(cad.Helices[i]+".yaml", "r") as f:
+                        hhelix = yaml.load(cad.Helices[i]+".yaml", Loader = yaml.FullLoader)
+                        (insulator_name, insulator_number) = hhelix.insulators()
+                        index_Insulators.append((insulator_name, insulator_number))
+
             for i in range(NRings):
                 part_thermic.append("R{}".format(i+1))
                 part_electric.append("R{}".format(i+1))
 
             # Add currentLeads
-            if len(cad.CurrentLeads):
+            if  args.geom == "3D" and len(cad.CurrentLeads):
                 part_thermic.append("iL1")
                 part_thermic.append("oL2")
                 part_electric.append("iL1")
@@ -650,10 +702,13 @@ def main():
                 "meanT_H": meanT_data ,
                 "power_H": powerH_data 
             }
-            mmat = create_materials(gdata, confdata, templates, method_data, args.debug)
+            mmat = create_materials(gdata, index_Insulators, confdata, templates, method_data, args.debug)
 
             # create cfg
-            jsonfile = args.magnet
+            if args.datafile: 
+                jsonfile = args.datafile.replace("-data.json","")
+            if args.magnet: 
+                jsonfile = args.magnet
             jsonfile += "-" + args.method
             jsonfile += "-" + args.model
             if args.nonlinear:
@@ -675,15 +730,49 @@ def main():
                 material_generic_def.append("conductor-nosource") # only for transient with mqs
 
             if args.method == "cfpdes":
+                print("cwd=", cwd)
                 from shutil import copyfile
                 for jsonfile in material_generic_def:
                     filename = AppCfg[args.method][args.time][args.geom][args.model]["filename"][jsonfile]
-                    src = os.path.join(MyEnv.template_path(), filename)
-                    dst = os.path.join(cwd, jsonfile + "-" + args.method + "-" + args.model + "-" + args.geom + ".json")
-                    #print(jsonfile, "filename=", filename, src, dst)
+                    src = os.path.join(MyEnv.template_path(), args.method, args.geom, args.model, filename)
+                    dst = os.path.join(jsonfile + "-" + args.method + "-" + args.model + "-" + args.geom + ".json")
+                    print(jsonfile, "filename=", filename, "src=%s" % src, "dst=%s" % dst)
                     copyfile(src, dst)
      
         else:
             raise Exception("expected Insert yaml file")
 
+    # Print command to run
+    print("=== Commands to run (ex pour cfpdes/Axi) ===")
+    salome = "/home/singularity/hifimagnet-salome-9.7.0.sif"
+    feelpp = "/home/singularity/feelpp-toolboxes-v0.109.0.sif"
+    partitioner = 'feelpp_mesh_partitioner'
+    exec = 'feelpp_toolbox'
+    pyfeel = 'cfpdes_insert_fixcurrent.py'
+    if args.geom == "Axi" and args.method == "cfpdes" :
+        xaofile = cad.name + "-Axi.xao"
+        geocmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--axi,--air,2,2" % (yamlfile)
+        
+        # if gmsh:
+        meshcmd = "python3 -m python_magnetgeo.xao %s mesh --group CoolingChannels --geo %s" % (xaofile, yamlfile)
+        meshfile = xaofile.replace(".xao", ".msh")
+
+        # if MeshGems:
+        #meshcmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--axi,--air,2,2,mesh,--group,CoolingChannels" % yamlfile
+        #meshfile = xaofile.replace(".xao", ".med")
+        
+        h5file = xaofile.replace(".xao", "_p.json")
+        partcmd = "feelpp_mesh_partition --ifile %s --ofile %s [--part NP] [--mesh.scale=0.001]" % (meshfile, h5file)
+        feelcmd = "[mpirun -np NP] %s --config-file %s" % (exec, cfgfile)
+        pyfeelcmd = "[mpirun -np NP] python %s" % pyfeel
+    
+        print("Guidelines for running a simu")
+        print("CAD:", geocmd)
+        print("Mesh:", meshcmd)
+        print("Partition:", partcmd)
+        print("Feel:", feelcmd)
+        print("pyfeel:", pyfeel)
     pass
+
+if __name__ == "__main__":
+    main()

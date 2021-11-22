@@ -7,10 +7,11 @@
 			{
 				"thelec":
 				{
-					"model": "th.mustache",
-					"conductor-linear": "material-conductor-linear-static-th.mustache",
-					"conductor-nonlinear": "material-conductor-nonlinear-static-th.mustache",
-					"insulator": "material-insulator-static-th.mustache",
+					"cfg": "cfg.mustache",
+					"model": "json.mustache",
+					"conductor-linear": "material-conductor-linear-static.mustache",
+					"conductor-nonlinear": "material-conductor-nonlinear-static.mustache",
+					"insulator": "material-insulator-static.mustache",
 					"cooling":
 					{
 						"mean": "channel-mean.mustache",
@@ -23,29 +24,31 @@
 					},
 					"filename":
 					{
-						"conductor": "material-conductor-static-th.json",
-						"insulator": "material-insulator-static-th.json"
+						"conductor": "material-conductor-static.json",
+						"insulator": "material-insulator-static.json"
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache"
 				},
 				"mag":
 				{
-					"model":"mag.mustache",
-					"conductor-linear": "material-conductor-linear-static-mag.mustache",
-					"insulator": "material-insulator-static-mag.mustache",
+					"cfg": "cfg.mustache",
+					"model":"json.mustache",
+					"conductor-linear": "material-conductor-linear-static.mustache",
+					"insulator": "material-insulator-static.mustache",
 					"filename":
 					{
-						"conductor": "material-conductor-static-mag.json",
-						"insulator": "material-insulator-static-mag.json"
+						"conductor": "material-conductor-static.json",
+						"insulator": "material-insulator-static.json"
 					}
 				},
 				"thmag":
 				{
-					"model": "thmag.mustache",
-					"conductor-linear": "material-conductor-linear-static-thmag.mustache",
-					"conductor-nonlinear": "material-conductor-nonlinear-static-thmag.mustache",
-					"insulator": "material-insulator-static-thmag.mustache",
+					"cfg": "cfg.mustache",
+					"model": "json.mustache",
+					"conductor-linear": "material-conductor-linear-static.mustache",
+					"conductor-nonlinear": "material-conductor-nonlinear-static.mustache",
+					"insulator": "material-insulator-static.mustache",
 					"cooling":
 					{
 						"mean": "channel-mean.mustache",
@@ -58,18 +61,19 @@
 					},
 					"filename":
 					{
-						"conductor": "material-conductor-static-thmag.json",
-						"insulator": "material-insulator-static-thmag.json"
+						"conductor": "material-conductor-static.json",
+						"insulator": "material-insulator-static.json"
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache"
 				},
 				"thmagel":
 				{
-					"model" : "thmagel.mustache",
-					"conductor-linear": "material-conductor-linear-static-thmagel.mustache",
-					"conductor-nonlinear": "material-conductor-nonlinear-static-thmagel.mustache",
-					"insulator": "material-insulator-static-thmagel.mustache",
+					"cfg": "cfg.mustache",
+					"model" : "json.mustache",
+					"conductor-linear": "material-conductor-linear-static.mustache",
+					"conductor-nonlinear": "material-conductor-nonlinear-static.mustache",
+					"insulator": "material-insulator-static.mustache",
 					"cooling":
 					{
 						"mean": "channel-mean.mustache",
@@ -82,8 +86,8 @@
 					},
 					"filename":
 					{
-						"conductor": "material-conductor-static-thmagel.json",
-						"insulator": "material-insulator-static-thmagel.json"
+						"conductor": "material-conductor-static.json",
+						"insulator": "material-insulator-static.json"
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache"
@@ -93,12 +97,12 @@
 			{
 				"thelec":
 				{
-					"model": "thel.mustache",
-					"model-nonlinear": "thel-nonlinear.mustache",
-					"cfg": "thelcfg.mustache",
-					"conductor-linear": "material-conductor-linear-static-thel.mustache",
-					"conductor-nonlinear": "material-conductor-nonlinear-static-thel.mustache",
-					"insulator": "material-insulator-static-thel.mustache",
+					"model": "json.mustache",
+					"model-nonlinear": "json-nonlinear.mustache",
+					"cfg": "cfg.mustache",
+					"conductor-linear": "material-conductor-linear-static.mustache",
+					"conductor-nonlinear": "material-conductor-nonlinear-static.mustache",
+					"insulator": "material-insulator-static.mustache",
 					"cooling":
 					{
 						"mean": "channel-mean.mustache",
@@ -111,8 +115,8 @@
 					},
 					"filename":
 					{
-						"conductor": "material-conductor-static-thel.json",
-						"insulator": "material-insulator-static-thel.json"
+						"conductor": "material-conductor-static.json",
+						"insulator": "material-insulator-static.json"
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache"
