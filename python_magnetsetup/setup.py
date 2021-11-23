@@ -767,11 +767,13 @@ def main():
         pyfeelcmd = "[mpirun -np NP] python %s" % pyfeel
     
         print("Guidelines for running a simu")
-        print("CAD:", geocmd)
+        print("CAD:", "singularity exec %s %s" % (salome,geocmd) )
+        # if gmsh
         print("Mesh:", meshcmd)
-        print("Partition:", partcmd)
-        print("Feel:", feelcmd)
-        print("pyfeel:", pyfeel)
+        # print("Mesh:", "singularity exec -B /opt/DISTENE/DLim8:/opt/DISTENE/DLim8:ro %s %s" % (salome,meshcmd))
+        print("Partition:", "singularity exec %s %s" % (feelpp, partcmd) )
+        print("Feel:", "singularity exec %s %s" % (feelpp, feelcmd) )
+        print("pyfeel:", "singularity exec %s %s" % (feelpp, pyfeel))
     pass
 
 if __name__ == "__main__":
