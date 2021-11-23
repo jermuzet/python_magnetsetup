@@ -289,7 +289,7 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
     unit_Length = 1.e-3
     unit_Area = 1.e-6
 
-    (NHelices, NRings, NChannels, Nsections, index_h, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
     
     # Tini, Aini for transient cases??
     params_data = { 'Parameters': []}
@@ -324,6 +324,9 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
         for i in range(NHelices):
             for j in range(Nsections[i]):
                 params_data['Parameters'].append({"name":"U_H%d_Cu%d" % (i+1, j+1), "value":"1"})
+        for i in range(NHelices):
+            for j in range(Nsections[i]):
+                params_data['Parameters'].append({"name":"N_H%d_Cu%d" % (i+1, j+1), "value":Nsections[i]})
     
     # TODO: CG: U_H%d%
     # TODO: HDG: U_H%d% if no ibc
@@ -338,7 +341,7 @@ def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templa
     fconductor = templates["conductor"]
     finsulator = templates["insulator"]
 
-    (NHelices, NRings, NChannels, Nsections, index_h, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
 
     # Loop for Helix
     for i in range(NHelices):
@@ -403,7 +406,7 @@ def create_bcs(boundary_meca: List,
     meca_bcs_dir = { 'boundary_Meca_Dir': []} # name, value
     maxwell_bcs_dir = { 'boundary_Maxwell_Dir': []} # name, value
     
-    (NHelices, NRings, NChannels, Nsections, index_h, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
     fcooling = templates["cooling"]
     
     for i in range(NChannels):
@@ -612,7 +615,7 @@ def main():
         cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         if isinstance(cad, Insert):
             gdata = python_magnetgeo.get_main_characteristics(cad)
-            (NHelices, NRings, NChannels, Nsections, index_h, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+            (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
 
             print("Insert: %s" % cad.name, "NHelices=%d NRings=%d NChannels=%d" % (NHelices, NRings, NChannels))
 
