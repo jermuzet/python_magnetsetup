@@ -40,7 +40,7 @@ from python_magnetgeo import python_magnetgeo
 
 class appenv():
     
-    def __init__(self):
+    def __init__(self, debug: bool = False):
         self.url_api: str = None
         self.yaml_repo: Optional[str] = None
         self.mesh_repo: Optional[str] = None
@@ -49,13 +49,14 @@ class appenv():
         from decouple import Config, RepositoryEnv
         envdata = RepositoryEnv("settings.env")
         data = Config(envdata)
-        print("appenv:", RepositoryEnv("settings.env").data)
+        if debug:
+            print("appenv:", RepositoryEnv("settings.env").data)
 
         self.url_api = data.get('URL_API')
         if 'TEMPLATE_REPO' in envdata:
             self.template_repo = data.get('TEMPLATE_REPO')
 
-    def template_path(self):
+    def template_path(self, debug: bool = False):
         """
         returns template_repo
         """
@@ -63,7 +64,8 @@ class appenv():
             default_path = os.path.dirname(os.path.abspath(__file__))
             template_repo = os.path.join(default_path, "templates")
 
-        print("appenv/template_path:", template_repo)
+        if debug:
+            print("appenv/template_path:", template_repo)
         return template_repo
 
 
@@ -77,7 +79,7 @@ def loadconfig():
         magnetsetup = json.load(appcfg)
     return magnetsetup
 
-def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear: bool=True):
+def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear: bool=True, debug: bool=False):
     """
     Load templates into a dict
 
@@ -104,7 +106,8 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     insulator_model = appcfg[method][time][geom][model]["insulator"]
     
     fcfg = os.path.join(template_path, cfg_model)
-    print("fcfg:", fcfg, type(fcfg))
+    if debug:
+        print("fcfg:", fcfg, type(fcfg))
     fmodel = os.path.join(template_path, json_model)
     fconductor = os.path.join(template_path, conductor_model)
     finsulator = os.path.join(template_path, insulator_model)
@@ -115,7 +118,8 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
         stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
 
         fcooling = os.path.join(template_path, cooling_model)
-        print("fcooling:", fcooling, type(fcooling))
+        if debug:
+            print("fcooling:", fcooling, type(fcooling))
         fflux = os.path.join(template_path, flux_model)
         fstats_T = os.path.join(template_path, stats_T_model)
         fstats_Power = os.path.join(template_path, stats_Power_model)
@@ -144,6 +148,7 @@ def check_templates(templates: dict):
     """
     check if template file exist
     """
+    print("\n\n=== Checking Templates ===")
     for key in templates:
         if isinstance(templates[key], str):
             print(key, templates[key])
@@ -153,36 +158,57 @@ def check_templates(templates: dict):
             for s in templates[key]:
                 print(key, s)
                 with open(s, "r") as f: pass
-
+    print("==========================\n\n")
+    
     return True
 
-def query_db(appenv: appenv, mtype: str, name: str):
+def query_db(appenv: appenv, mtype: str, name: str, debug: bool = False):
     """
     Get object from magnetdb
     """
 
     import requests
     import requests.exceptions
-    import ast
+    # import ast
 
     r = requests.get(url= appenv.url_api + '/' + mtype + '/mdata/' + name )
-    confdata = ast.literal_eval(r.text)
-    return confdata
+    if debug: print("request:", r)
+    if (r.status_code == requests.codes.ok):
+        if debug: print("request:", r.text)
+        mdata = json.loads(r.text)
+        if debug:
+            print("query_db/mdata:", mdata)
+        # confdata = ast.literal_eval(r.text)
+        return mdata
+    else:
+        print("failed to retreive %s from db" % name)
+        list_mtype_db(appenv, mtype)
+        print("available requested mtype in db are: ", list_mtype_db(appenv, mtype))
+        sys.exit(1)
 
-def list_mtype_db(appenv: appenv, mtype: str):
+def list_mtype_db(appenv: appenv, mtype: str, debug: bool = False):
     """
     List object of mtype stored in magnetdb
     """
 
     import requests
     import requests.exceptions
-    import ast
+    # import ast
 
+    names = []
     if mtype in ["Helix", "Bitter", "Supra"]:
         mtype = "mpart"
-    r = requests.get(url= appenv.url_api + '/' + mtype + 's' )
-    data = ast.literal_eval(r.text)
-    return data
+    r = requests.get(url= appenv.url_api + '/' + mtype + 's/' )
+    if debug:
+        print("url=%s", appenv.url_api)
+        print("request(url=%s):" % (appenv.url_api + '/' + mtype + 's/'), r)
+    if (r.status_code == requests.codes.ok):
+        data = json.loads(r.text)
+        # data = ast.literal_eval(r.text)
+        if debug:
+            print("list_mtype_db:", data)
+        return [ d["name"] for d in data ]
+    pass
 
 def Merge(dict1, dict2):
     """
@@ -192,7 +218,7 @@ def Merge(dict1, dict2):
     res = {**dict1, **dict2}
     return res    
 
-def load_object(appenv: appenv, datafile: str):
+def load_object(appenv: appenv, datafile: str, debug: bool = False):
     """
     Load object props
     """
@@ -205,7 +231,7 @@ def load_object(appenv: appenv, datafile: str):
             confdata = json.load(cfgdata)
     return confdata
 
-def load_object_from_db(appenv: appenv, mtype: str, name: str):
+def load_object_from_db(appenv: appenv, mtype: str, name: str, debug: bool = False):
     """
     Load object props from db
     """
@@ -213,16 +239,8 @@ def load_object_from_db(appenv: appenv, mtype: str, name: str):
     if not mtype in ["msite", "magnet", "Helix", "Bitter", "Supra", "material"]:
         raise("query_bd: %s not supported" % mtype)
     
-    try:
-        confdata = query_db(appenv, mtype, name)
-    except:
-        print("failed to retreive %s from db" % name)
-        list_mtype_db(appenv, mtype)
-        print("available requested mtype in db are: ", list_mtype_db(appenv, mtype))
-        sys.exit(1)
-
-    return confdata
-
+    return query_db(appenv, mtype, name, debug)
+    
 def create_cfg(cfgfile:str, name: str, nonlinear: bool, jsonfile: str, template: str, method_data: List[str], debug: bool=False):
     """
     Create a cfg file
@@ -372,7 +390,7 @@ def create_bcs(boundary_meca: List,
                boundary_electric: List,
                gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False):
 
-    print("create_bcs from templates", templates)
+    print("create_bcs from templates")
     electric_bcs_dir = { 'boundary_Electric_Dir': []} # name, value, vol
     electric_bcs_neu = { 'boundary_Electric_Neu': []} # name, value
     thermic_bcs_rob = { 'boundary_Therm_Robin': []} # name, expr1, expr2
@@ -504,7 +522,7 @@ def entry(template: str, rdata: dict, debug: bool = False):
     jsonfile = jsonfile.replace("\'", "\"")
     if debug:
         print("entry/jsonfile:", jsonfile)
-    print("corrected:", re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile))
+        print("corrected:", re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile))
 
     corrected = re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile)
     mdata = json.loads(corrected)
@@ -550,7 +568,7 @@ def main():
     
     # load appenv
     MyEnv = appenv()
-    print(MyEnv.template_path())
+    if args.debug: print(MyEnv.template_path())
 
     # loadconfig
     AppCfg = loadconfig()
@@ -566,11 +584,11 @@ def main():
 
     # Get Object
     if args.datafile != None:
-        confdata = load_object(MyEnv, args.datafile)
+        confdata = load_object(MyEnv, args.datafile, args.debug)
         jsonfile = args.datafile.replace(".json","")
 
     if args.magnet != None:
-        confdata = load_object_from_db(MyEnv, "magnet", args.magnet)
+        confdata = load_object_from_db(MyEnv, "magnet", args.magnet, args.debug)
         jsonfile = args.magnet
     
     # load geom: yamlfile = confdata["geom"]
@@ -590,6 +608,8 @@ def main():
         if isinstance(cad, Insert):
             gdata = python_magnetgeo.get_main_characteristics(cad)
             (NHelices, NRings, NChannels, Nsections, index_h, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+
+            print("Insert: %s" % cad.name, "NHelices=%d NRings=%d NChannels=%d" % (NHelices, NRings, NChannels))
 
             for i in range(NHelices):
                 part_electric.append("H{}".format(i+1))
@@ -730,24 +750,25 @@ def main():
                 material_generic_def.append("conductor-nosource") # only for transient with mqs
 
             if args.method == "cfpdes":
-                print("cwd=", cwd)
+                if args.debug: print("cwd=", cwd)
                 from shutil import copyfile
                 for jsonfile in material_generic_def:
                     filename = AppCfg[args.method][args.time][args.geom][args.model]["filename"][jsonfile]
                     src = os.path.join(MyEnv.template_path(), args.method, args.geom, args.model, filename)
                     dst = os.path.join(jsonfile + "-" + args.method + "-" + args.model + "-" + args.geom + ".json")
-                    print(jsonfile, "filename=", filename, "src=%s" % src, "dst=%s" % dst)
+                    if args.debug:
+                        print(jsonfile, "filename=", filename, "src=%s" % src, "dst=%s" % dst)
                     copyfile(src, dst)
      
         else:
             raise Exception("expected Insert yaml file")
 
     # Print command to run
-    print("=== Commands to run (ex pour cfpdes/Axi) ===")
+    print("\n\n=== Commands to run (ex pour cfpdes/Axi) ===")
     salome = "/home/singularity/hifimagnet-salome-9.7.0.sif"
     feelpp = "/home/singularity/feelpp-toolboxes-v0.109.0.sif"
     partitioner = 'feelpp_mesh_partitioner'
-    exec = 'feelpp_toolbox'
+    exec = 'feelpp_toolbox_coefficientformpdes'
     pyfeel = 'cfpdes_insert_fixcurrent.py'
     if args.geom == "Axi" and args.method == "cfpdes" :
         xaofile = cad.name + "-Axi.xao"
