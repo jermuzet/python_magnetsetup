@@ -285,17 +285,21 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
     """
 
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = 1.e-3
+    unit_Area = 1.e-6
+
     (NHelices, NRings, NChannels, Nsections, index_h, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
     
     # Tini, Aini for transient cases??
     params_data = { 'Parameters': []}
 
     # for cfpdes only
-    if method_data[0] == "cfpdes":
+    if method_data[0] == "cfpdes" and method_data[3] == "thmagel" :
         params_data['Parameters'].append({"name":"bool_laplace", "value":"1"})
         params_data['Parameters'].append({"name":"bool_dilatation", "value":"1"})
 
-    # TODO : initialization of parameters
+    # TODO : initialization of parameters with cooling model
 
     params_data['Parameters'].append({"name":"Tinit", "value":293})
     params_data['Parameters'].append({"name":"h", "value":58222.1})
@@ -307,13 +311,13 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
 
     # TODO: length data are written in mm should be in SI instead
     for i in range(NHelices+1):
-        params_data['Parameters'].append({"name":"h%d" % i, "value":"h:h"})
-        params_data['Parameters'].append({"name":"Tw%d" % i, "value":"Tw:Tw"})
-        params_data['Parameters'].append({"name":"dTw%d" % i, "value":"dTw:dTw"})
-        params_data['Parameters'].append({"name":"Zmin%d" % i, "value":Zmin[i]})
-        params_data['Parameters'].append({"name":"Zmax%d" % i, "value":Zmax[i]})
-        params_data['Parameters'].append({"name":"Sh%d" % i, "value":Sh[i]})
-        params_data['Parameters'].append({"name":"Dh%d" % i, "value":Dh[i]})
+        params_data['Parameters'].append({"name":"h%d" % i, "value":58222.1})
+        params_data['Parameters'].append({"name":"Tw%d" % i, "value":290.671})
+        params_data['Parameters'].append({"name":"dTw%d" % i, "value":12.74})
+        params_data['Parameters'].append({"name":"Zmin%d" % i, "value":Zmin[i] * unit_Length})
+        params_data['Parameters'].append({"name":"Zmax%d" % i, "value":Zmax[i] * unit_Length})
+        params_data['Parameters'].append({"name":"Sh%d" % i, "value":Sh[i] * unit_Length})
+        params_data['Parameters'].append({"name":"Dh%d" % i, "value":Dh[i] * unit_Area})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
@@ -789,7 +793,7 @@ def main():
         pyfeelcmd = "[mpirun -np NP] python %s" % pyfeel
     
         print("Guidelines for running a simu")
-        print("export HFIMAGNET=/opt/SALOME-9.7.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome")
+        print("export HIFIMAGNET=/opt/SALOME-9.7.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome")
         print("workingdir:", args.wd)
         print("CAD:", "singularity exec %s %s" % (salome,geocmd) )
         # if gmsh
