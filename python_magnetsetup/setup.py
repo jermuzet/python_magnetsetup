@@ -305,6 +305,7 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
     # params per cooling channels
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
 
+    # TODO: length data are written in mm should be in SI instead
     for i in range(NHelices+1):
         params_data['Parameters'].append({"name":"h%d" % i, "value":"h:h"})
         params_data['Parameters'].append({"name":"Tw%d" % i, "value":"Tw:Tw"})
@@ -771,11 +772,11 @@ def main():
     exec = 'feelpp_toolbox_coefficientformpdes'
     pyfeel = 'cfpdes_insert_fixcurrent.py'
     if args.geom == "Axi" and args.method == "cfpdes" :
-        xaofile = cad.name + "-Axi.xao"
-        geocmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--axi,--air,2,2" % (yamlfile)
+        xaofile = cad.name + "-Axi_withAir.xao"
+        geocmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--axi,--air,2,2,--wd,$PWD" % (yamlfile)
         
         # if gmsh:
-        meshcmd = "python3 -m python_magnetgeo.xao %s mesh --group CoolingChannels --geo %s" % (xaofile, yamlfile)
+        meshcmd = "python3 -m python_magnetgeo.xao %s --wd $PWD mesh --group CoolingChannels --geo %s --lc=1" % (xaofile, yamlfile)
         meshfile = xaofile.replace(".xao", ".msh")
 
         # if MeshGems:
@@ -788,10 +789,12 @@ def main():
         pyfeelcmd = "[mpirun -np NP] python %s" % pyfeel
     
         print("Guidelines for running a simu")
+        print("export HFIMAGNET=/opt/SALOME-9.7.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome")
+        print("workingdir:", args.wd)
         print("CAD:", "singularity exec %s %s" % (salome,geocmd) )
         # if gmsh
         print("Mesh:", meshcmd)
-        # print("Mesh:", "singularity exec -B /opt/DISTENE/DLim8:/opt/DISTENE/DLim8:ro %s %s" % (salome,meshcmd))
+        # print("Mesh:", "singularity exec -B /opt/DISTENE:/opt/DISTENE:ro %s %s" % (salome,meshcmd))
         print("Partition:", "singularity exec %s %s" % (feelpp, partcmd) )
         print("Feel:", "singularity exec %s %s" % (feelpp, feelcmd) )
         print("pyfeel:", "singularity exec %s %s" % (feelpp, pyfeel))
