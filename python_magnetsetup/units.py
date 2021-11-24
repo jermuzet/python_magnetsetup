@@ -119,7 +119,7 @@ def main():
             for mtype in ["Helix", "Ring", "Lead"]:
                 for i in range(len(confdata[mtype])):            
                     for prop in ["ThermalConductivity", "Young", "VolumicMass", "ElectricalConductivity"]:
-                        confdata[mtype][i]["material"][prop] = convert_data(units, ureg.Unit(distance_unit), confdata[mtype][i]["material"][prop], prop)
+                        confdata[mtype][i]["material"][prop] = convert_data(units, distance_unit, confdata[mtype][i]["material"][prop], prop)
             print("converted:", confdata)
 
             # mm -> distance_unit
