@@ -5,7 +5,10 @@ import os
 import json
 import yaml
 
+import math
+
 from .utils import Merge
+from .units import load_units, convert_data
 
 def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
     """
@@ -13,10 +16,18 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
     """
 
     # TODO: length data are written in mm should be in SI instead
-    unit_Length = 1.e-3
-    unit_Area = 1.e-6
+    unit_Length = method_data[5] # "meter"
+    units = load_units(unit_Length)
 
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+    
+    print("R1:", R1)
+    for data in [R1, R2, Z1, Z2, Zmin, Zmax, Dh]:
+        data = convert_data(units, unit_Length, data, "Length")
+    Sh = convert_data(units, unit_Length, Sh, "Area")
+
+    # chech dim
+    print("corrected R1:", R1)
     
     # Tini, Aini for transient cases??
     params_data = { 'Parameters': []}
@@ -29,7 +40,7 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
     # TODO : initialization of parameters with cooling model
 
     params_data['Parameters'].append({"name":"Tinit", "value":293})
-    params_data['Parameters'].append({"name":"h", "value":58222.1})
+    params_data['Parameters'].append({"name":"h", "value":convert_data(units, unit_Length, 58222.1, "h")})
     params_data['Parameters'].append({"name":"Tw", "value":290.671})
     params_data['Parameters'].append({"name":"dTw", "value":12.74})
     
@@ -38,13 +49,13 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
 
     # TODO: length data are written in mm should be in SI instead
     for i in range(NHelices+1):
-        params_data['Parameters'].append({"name":"h%d" % i, "value":58222.1})
+        params_data['Parameters'].append({"name":"h%d" % i, "value":convert_data(units, unit_Length, 58222.1, "h")})
         params_data['Parameters'].append({"name":"Tw%d" % i, "value":290.671})
         params_data['Parameters'].append({"name":"dTw%d" % i, "value":12.74})
-        params_data['Parameters'].append({"name":"Zmin%d" % i, "value":Zmin[i] * unit_Length})
-        params_data['Parameters'].append({"name":"Zmax%d" % i, "value":Zmax[i] * unit_Length})
-        params_data['Parameters'].append({"name":"Sh%d" % i, "value":Sh[i] * unit_Length})
-        params_data['Parameters'].append({"name":"Dh%d" % i, "value":Dh[i] * unit_Area})
+        params_data['Parameters'].append({"name":"Zmin%d" % i, "value":Zmin[i]})
+        params_data['Parameters'].append({"name":"Zmax%d" % i, "value":Zmax[i]})
+        params_data['Parameters'].append({"name":"Sh%d" % i, "value":Sh[i]})
+        params_data['Parameters'].append({"name":"Dh%d" % i, "value":Dh[i]})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
@@ -55,6 +66,8 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
             for j in range(Nsections[i]):
                 params_data['Parameters'].append({"name":"N_H%d_Cu%d" % (i+1, j+1), "value":Nsections[i]})
     
+    if "mag" in method_data[3] or "mqs" :
+        params_data['Parameters'].append({"name":"mu0", "value":convert_data(units, unit_Length, 4*math.pi*1e-7, "mu0")})
     # TODO: CG: U_H%d%
     # TODO: HDG: U_H%d% if no ibc
 
@@ -70,6 +83,14 @@ def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templa
 
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
 
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = method_data[5] # "meter"
+    units = load_units(unit_Length)
+    for mtype in ["Helix", "Ring", "Lead"]:
+        for i in range(len(confdata[mtype])):            
+            for prop in ["ThermalConductivity", "Young", "VolumicMass", "ElectricalConductivity"]:
+                confdata[mtype][i]["material"][prop] = convert_data(units, unit_Length, confdata[mtype][i]["material"][prop], prop)
+            
     # Loop for Helix
     for i in range(NHelices):
         if method_data[2] == "3D":
