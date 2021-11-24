@@ -43,7 +43,7 @@ class appenv():
         returns simage_repo
         """
         if not self.simage_repo:
-            repo = os.path.join("/home/signularity")
+            repo = os.path.join("/home/singularity")
         else:
             repo = self.simage_repo
 

@@ -167,7 +167,6 @@ def main():
         confdata = load_object_from_db(MyEnv, "msite", args.msite, args.debug)
         jsonfile = args.msite
 
-    print("confdata:", confdata)
     if "geom" in confdata:
         print("Load a magnet %s " % jsonfile)
         (mdict, mmat, mpost) = magnet_setup(confdata, method_data, templates, args.debug)
@@ -196,6 +195,8 @@ def main():
 
     name = confdata["name"]
     # TODO create_mesh() or load_mesh()
+    # generate properly meshfile for cfg
+    # generate solver section for cfg
     create_cfg(cfgfile, name, args.nonlinear, jsonfile, templates["cfg"], method_data, args.debug)
             
     # create json
@@ -218,13 +219,26 @@ def main():
                 print(jsonfile, "filename=", filename, "src=%s" % src, "dst=%s" % dst)
             copyfile(src, dst)
      
+    # TODO prepare a directory that contains every files needed to run simulation ??
+
     # Print command to run
-    print("\n\n=== Commands to run (ex pour cfpdes/Axi) ===")
-    salome = "/home/singularity/hifimagnet-salome-9.7.0.sif"
-    feelpp = "/home/singularity/feelpp-toolboxes-v0.109.0.sif"
-    partitioner = 'feelpp_mesh_partitioner'
-    exec = 'feelpp_toolbox_coefficientformpdes'
+    print("\n\n=== Guidelines for running a simu ===")
+    simage_path = MyEnv.simage_path()
+    hifimagnet = AppCfg["mesh"]["hifimagnet"]
+    salome = AppCfg["mesh"]["salome"]
+    feelpp = AppCfg[args.method]["feelpp"]
+    partitioner = AppCfg["mesh"]["partitioner"]
+    if "exec" in AppCfg[args.method]:
+        exec = AppCfg[args.method]["exec"]
+    if "exec" in AppCfg[args.method][args.model]:
+        exec = AppCfg[args.method]["exec"]
     pyfeel = 'cfpdes_insert_fixcurrent.py'
+
+    xaofile = confdata["name"] + "_withAir.xao"
+    geocmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--air,2,2,--wd,$PWD" % (name)
+    meshcmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--air,2,2,mesh,--group,CoolingChannels,Isolants" % yamlfile
+    meshfile = xaofile.replace(".xao", ".med")
+    
     if args.geom == "Axi" and args.method == "cfpdes" :
         xaofile = confdata["name"] + "-Axi_withAir.xao"
         geocmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--axi,--air,2,2,--wd,$PWD" % (name)
@@ -232,26 +246,29 @@ def main():
         # if gmsh:
         meshcmd = "python3 -m python_magnetgeo.xao %s --wd $PWD mesh --group CoolingChannels --geo %s --lc=1" % (xaofile, name)
         meshfile = xaofile.replace(".xao", ".msh")
-
-        # if MeshGems:
-        #meshcmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--axi,--air,2,2,mesh,--group,CoolingChannels" % yamlfile
-        #meshfile = xaofile.replace(".xao", ".med")
         
-        h5file = xaofile.replace(".xao", "_p.json")
-        partcmd = "feelpp_mesh_partition --ifile %s --ofile %s [--part NP] [--mesh.scale=0.001]" % (meshfile, h5file)
-        feelcmd = "[mpirun -np NP] %s --config-file %s" % (exec, cfgfile)
-        pyfeelcmd = "[mpirun -np NP] python %s" % pyfeel
+    h5file = xaofile.replace(".xao", "_p.json")
+    partcmd = "%s --ifile %s --ofile %s [--part NP] [--mesh.scale=0.001]" % (partitioner, meshfile, h5file)
+    feelcmd = "[mpirun -np NP] %s --config-file %s" % (exec, cfgfile)
+    pyfeelcmd = "[mpirun -np NP] python %s" % pyfeel
     
-        print("Guidelines for running a simu")
-        print("export HIFIMAGNET=/opt/SALOME-9.7.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome")
-        print("workingdir:", args.wd)
-        print("CAD:", "singularity exec %s %s" % (salome,geocmd) )
-        # if gmsh
+    print("Edit %s to fix the meshfile, scale, partition and solver props" % cfgfile))
+    print("export HIFIMAGNET=%s" % hifimagnet)
+    print("workingdir:", args.wd)
+    print("CAD:", "singularity exec %s %s" % (simage_path + "/" + salome,geocmd) )
+        
+    # if gmsh
+    if args.geom = "Axi":
         print("Mesh:", meshcmd)
-        # print("Mesh:", "singularity exec -B /opt/DISTENE:/opt/DISTENE:ro %s %s" % (salome,meshcmd))
-        print("Partition:", "singularity exec %s %s" % (feelpp, partcmd) )
-        print("Feel:", "singularity exec %s %s" % (feelpp, feelcmd) )
-        print("pyfeel:", "singularity exec %s %s" % (feelpp, pyfeel))
+    else:
+        print("Mesh:", "singularity exec -B /opt/DISTENE:/opt/DISTENE:ro %s %s" % (simage_path + "/" + salome,meshcmd))
+    
+    # eventually convertmeshcmd if feelpp since it is build without med support
+    print("Partition:", "singularity exec %s %s" % (simage_path + "/" + feelpp, partcmd) )
+    print("Feel:", "singularity exec %s %s" % (simage_path + "/" + feelpp, feelcmd) )
+    print("pyfeel:", "singularity exec %s %s" % (simage_path + "/" + feelpp, pyfeel))
+
+    # TODO what about postprocess??
     pass
 
 if __name__ == "__main__":

@@ -1,16 +1,30 @@
 {
+	"mesh":
+	{
+		"hfimagnet": "/opt/SALOME-9.7.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome",
+		"salome": "hifimagnet-salome-9.7.0.sif",
+		"partitioner": "feelpp_mesh_partitioner",
+		"3D": 
+		{
+			"MeshGems": "",
+			"Gmsh": ""
+		},
+		"Axi": 
+		{
+			"MeshGems":"",
+			"Gmsh": ""
+		}
+	},
 	"cfpdes":
 	{
+    	"feelpp": "feelpp-toolboxes-v0.109.0.sif",
+    	"exec": "feelpp_toolbox_coefficientformpdes",
 		"static":
 		{
 			"Axi":
 			{
 				"thelec":
 				{
-					"salome": "hifimagnet-salome-9.7.0.sif",
-    				"feelpp": "feelpp-toolboxes-v0.109.0.sif",
-    				"partitioner": "feelpp_mesh_partitioner",
-    				"exec": "feelpp_toolbox_coefficientformpdes",
 					"pyfeel":
 					{
 						"current": "cfpdes_insert_fixcurrent.py",
@@ -182,12 +196,14 @@
 	},
 	"CG":
 	{
-		"static":
+		"feelpp": "feelpp-toolboxes-v0.109.0.sif",
+    	"static":
 		{
 			"3D":
 		        {
 			    "thelec":
 			    {
+					"exec": "feelpp_toolbox_thermoelectric",
 					"model": "thel.mustache",
 					"conductor-linear": "conductor-linear-static-thel.mustache",
 					"conductor-nonlinear": "conductor-nonlinear-static-thel.mustache",
