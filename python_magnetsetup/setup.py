@@ -31,15 +31,69 @@ import os
 import json
 import yaml
 
-from python_magnetgeo import Insert
+from python_magnetgeo import Insert, MSite, Bitter, Supra
 from python_magnetgeo import python_magnetgeo
 
 from .config import appenv, loadconfig, loadtemplates
 from .objects import load_object, load_object_from_db
 from .utils import Merge
 from .cfg import create_cfg
-from .jsonmodel import create_json, create_params, create_bcs, create_materials
+from .jsonmodel import create_json
+
+from .insert import Insert_setup
+from .bitter import Bitter_setup
+from .supra import Supra_setup
     
+def msite_setup(confdata: str, method_data: List, templates: dict, debug: bool=False):
+    """
+    Creating dict for setup for magnet
+    """
+
+    mdict = None
+    mmat = None
+    mpost = None
+
+    for mtype in ["Insert", "Bitter", "Supra"]:
+        if mtype in confdata:
+            if isinstance(confdata[mtype], List):
+                for object in confdata[mtype]:
+                    print("object[geom]:", object["geom"])
+                    magnet_setup(object, method_data, templates, debug)
+            else:
+                print("object[geom]:", confdata[mtype]["geom"])
+                magnet_setup(confdata[mtype], method_data, templates, debug)
+    
+    return (mdict, mmat, mpost)
+
+def magnet_setup(confdata: str, method_data: List, templates: dict, debug: bool=False):
+    """
+    Creating dict for setup for magnet
+    """
+    
+    mdict = None
+    mmat = None
+    mpost = None
+
+    yamlfile = confdata["geom"]
+    if debug:
+        print("magnet_setup:", yamlfile)
+    
+    cad = None
+    with open(yamlfile, 'r') as cfgdata:
+        cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+        
+    if isinstance(cad, Insert):
+        (mdict, mmat, mpost) = Insert_setup(confdata, cad, method_data, templates, debug)
+    elif isinstance(cad, Bitter.Bitter):
+        (mdict, mmat, mpost) = Bitter_setup(confdata, cad, method_data, templates, debug)
+    elif isinstance(cad, Supra):
+        (mdict, mmat, mpost) = Supra_setup(confdata, cad, method_data, templates, debug)
+    else:
+        print("setup: unexpected cad type")
+        sys.exit(1)
+
+    return (mdict, mmat, mpost)
+
 def main():
     """
     """
@@ -52,6 +106,7 @@ def main():
     parser.add_argument("--datafile", help="input data file (ex. HL-34-data.json)", default=None)
     parser.add_argument("--wd", help="set a working directory", type=str, default="")
     parser.add_argument("--magnet", help="Magnet name from magnetdb (ex. HL-34)", default=None)
+    parser.add_argument("--msite", help="MSite name from magnetdb (ex. HL-34)", default=None)
 
     parser.add_argument("--method", help="choose method (default is cfpdes", type=str,
                     choices=['cfpdes', 'CG', 'HDG', 'CRB'], default='cfpdes')
@@ -73,7 +128,14 @@ def main():
     if args.debug:
         print(args)
     
-    # TODO make datafile/magnet exclusive one or the other
+    # make datafile/[magnet|msite] exclusive one or the other
+    if args.magnet != None and args.msite:
+        print("cannot specify both magnet and msite")
+        sys.exit(1)
+    if args.datafile != None:
+        if args.magnet != None or args.msite != None:
+            print("cannot specify both datafile and magnet or msite")
+            sys.exit(1)
     
     # load appenv
     MyEnv = appenv()
@@ -88,7 +150,8 @@ def main():
         os.chdir(args.wd)
     
     # load appropriate templates
-    method_data = [args.method, args.time, args.geom, args.model, args.cooling]
+    method_data = [args.method, args.time, args.geom, args.model, args.cooling, "meter"]
+    # TODO: if HDG meter -> millimeter
     templates = loadtemplates(MyEnv, AppCfg, method_data, (not args.nonlinear) )
 
     # Get Object
@@ -100,178 +163,61 @@ def main():
         confdata = load_object_from_db(MyEnv, "magnet", args.magnet, args.debug)
         jsonfile = args.magnet
     
-    # load geom: yamlfile = confdata["geom"]
-    part_thermic = []
-    part_electric = []
-    index_electric = []
-    index_Helices = []
-    index_Insulators = []
+    if args.msite != None:
+        confdata = load_object_from_db(MyEnv, "msite", args.msite, args.debug)
+        jsonfile = args.msite
+
+    print("confdata:", confdata)
+    if "geom" in confdata:
+        print("Load a magnet %s " % jsonfile)
+        (mdict, mmat, mpost) = magnet_setup(confdata, method_data, templates, args.debug)
+    else:
+        print("Load a msite %s" % confdata["name"])
+        for magnet in confdata["magnets"]:
+            print("magnet:", magnet)
+            mconfdata = load_object_from_db(MyEnv, "magnet", magnet, args.debug)
+            (mdict, mmat, mpost) = msite_setup(mconfdata, method_data, templates, args.debug)
+        print("msite not implemented")
+        sys.exit(1)
     
-    boundary_meca = []
-    boundary_maxwell = []
-    boundary_electric = []
 
-    yamlfile = confdata["geom"]
-    with open(yamlfile, 'r') as cfgdata:
-        cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
-        if isinstance(cad, Insert):
-            gdata = python_magnetgeo.get_main_characteristics(cad)
-            (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+    # create cfg
+    if args.datafile: 
+        jsonfile = args.datafile.replace("-data.json","")
+    if args.magnet: 
+        jsonfile = args.magnet
+    jsonfile += "-" + args.method
+    jsonfile += "-" + args.model
+    if args.nonlinear:
+        jsonfile += "-nonlinear"
+    jsonfile += "-" + args.geom
+    jsonfile += "-sim.json"
+    cfgfile = jsonfile.replace(".json", ".cfg")
 
-            print("Insert: %s" % cad.name, "NHelices=%d NRings=%d NChannels=%d" % (NHelices, NRings, NChannels))
-
-            for i in range(NHelices):
-                part_electric.append("H{}".format(i+1))
-                if args.geom == "Axi":
-                    for j in range(Nsections[i]+2):
-                        part_thermic.append("H{}_Cu{}".format(i+1,j))
-                    for j in range(Nsections[i]):
-                        index_electric.append( [str(i+1),str(j+1)] )
-                    index_Helices.append(["0:{}".format(Nsections[i]+2)])
-                
-                else:
-                    with open(cad.Helices[i]+".yaml", "r") as f:
-                        hhelix = yaml.load(cad.Helices[i]+".yaml", Loader = yaml.FullLoader)
-                        (insulator_name, insulator_number) = hhelix.insulators()
-                        index_Insulators.append((insulator_name, insulator_number))
-
-            for i in range(NRings):
-                part_thermic.append("R{}".format(i+1))
-                part_electric.append("R{}".format(i+1))
-
-            # Add currentLeads
-            if  args.geom == "3D" and len(cad.CurrentLeads):
-                part_thermic.append("iL1")
-                part_thermic.append("oL2")
-                part_electric.append("iL1")
-                part_electric.append("oL2")
-                boundary_electric.append(["Inner1_LV0", "iL1", "0"])
-                boundary_electric.append(["OuterL2_LV0", "oL2", "V0:V0"])
-                
-                boundary_meca.append("Inner1_LV0")
-                boundary_meca.append("OuterL2_LV0")
-
-                boundary_maxwell.append("InfV00")
-                boundary_maxwell.append("InfV01")
-
-            else:
-                boundary_electric.append(["H1_V0", "H1", "0"])
-                boundary_electric.append(["H%d_V0" % NHelices, "H%d" % NHelices, "V0:V0"])
-                
-                boundary_meca.append("H1_HP")
-                boundary_meca.append("H_HP")    
-                
-            boundary_maxwell.append("InfV1")
-            boundary_maxwell.append("InfR1")
-
+    name = confdata["name"]
+    # TODO create_mesh() or load_mesh()
+    create_cfg(cfgfile, name, args.nonlinear, jsonfile, templates["cfg"], method_data, args.debug)
             
-            for i in range(1,NRings+1):
-                if i % 2 == 1 :
-                    boundary_meca.append("R{}_BP".format(i))
-                else :
-                    boundary_meca.append("R{}_HP".format(i))
+    # create json
+    create_json(jsonfile, mdict, mmat, mpost, templates, method_data, args.debug)
 
-            # TODO : manage the scale
-            for i in range(NChannels):
-                 Zmin[i] *= args.scale
-                 Zmax[i] *= args.scale
-                 Dh[i] *= args.scale
-                 Sh[i] *= args.scale
-            
+    # copy some additional json file 
+    material_generic_def = ["conductor", "insulator"]
+
+    if args.time == "transient":
+        material_generic_def.append("conductor-nosource") # only for transient with mqs
+
+    if args.method == "cfpdes":
+        if args.debug: print("cwd=", cwd)
+        from shutil import copyfile
+        for jsonfile in material_generic_def:
+            filename = AppCfg[args.method][args.time][args.geom][args.model]["filename"][jsonfile]
+            src = os.path.join(MyEnv.template_path(), args.method, args.geom, args.model, filename)
+            dst = os.path.join(jsonfile + "-" + args.method + "-" + args.model + "-" + args.geom + ".json")
             if args.debug:
-                print("part_electric:", part_electric)
-                print("part_thermic:", part_thermic)
-
-            # params section
-            params_data = create_params(gdata, method_data, args.debug)
-
-            # bcs section
-            bcs_data = create_bcs(boundary_meca, 
-                                  boundary_maxwell,
-                                  boundary_electric,
-                                  gdata, confdata, templates, method_data, args.debug) # merge all bcs dict
-
-            # build dict from geom for templates
-            # TODO fix initfile name (see create_cfg for the name of output / see directory entry)
-            # eg: $home/feelppdb/$directory/cfppdes-heat.save
-
-            main_data = {
-                "part_thermic": part_thermic,
-                "part_electric": part_electric,
-                "index_electric": index_electric,
-                "index_V0": boundary_electric,
-                "temperature_initfile": "tini.h5",
-                "V_initfile": "Vini.h5"
-            }
-            mdict = Merge( Merge(main_data, params_data), bcs_data)
-
-            powerH_data = { "Power_H": [] }
-            meanT_data = { "meanT_H": [] }
-            if args.geom == "Axi":
-                for i in range(NHelices) :
-                    powerH_data["Power_H"].append( {"header": "Power_H{}".format(i+1), "name": "H{}_Cu%1%".format(i+1), "index": index_Helices[i]} )
-                    meanT_data["meanT_H"].append( {"header": "MeanT_H{}".format(i+1), "name": "H{}_Cu%1%".format(i+1), "index": index_Helices[i]} )
-            else:
-                for i in range(NHelices) :
-                    powerH_data["Power_H"].append( {"header": "Power_H{}".format(i+1), "name": "H{}".format(i+1)} )
-                    meanT_data["meanT_H"].append( {"header": "MeanT_H{}".format(i+1), "name": "H{}".format(i+1)} )
-                # TODO add Glue/Kaptons
-                for i in range(NRings) :
-                    powerH_data["Power_H"].append( {"header": "Power_R{}".format(i+1), "name": "R{}".format(i+1)} )
-                    meanT_data["meanT_H"].append( {"header": "MeanT_R{}".format(i+1), "name": "R{}".format(i+1)} )
-
-                if len(cad.CurrentLeads):
-                    powerH_data["Power_H"].append( {"header": "Power_iL1", "name": "iL1"} )
-                    powerH_data["Power_H"].append( {"header": "Power_oL2", "name": "oL2"} )
-                    meanT_data["meanT_H"].append( {"header": "MeanT_iL1", "name": "iL1"} )
-                    meanT_data["meanT_H"].append( {"header": "MeanT_oL2", "name": "oL2"} )
-
-            mpost = { 
-                "flux": {'index_h': "0:%s" % str(NChannels)},
-                "meanT_H": meanT_data ,
-                "power_H": powerH_data 
-            }
-            mmat = create_materials(gdata, index_Insulators, confdata, templates, method_data, args.debug)
-
-            # create cfg
-            if args.datafile: 
-                jsonfile = args.datafile.replace("-data.json","")
-            if args.magnet: 
-                jsonfile = args.magnet
-            jsonfile += "-" + args.method
-            jsonfile += "-" + args.model
-            if args.nonlinear:
-                jsonfile += "-nonlinear"
-            jsonfile += "-" + args.geom
-            jsonfile += "-sim.json"
-            cfgfile = jsonfile.replace(".json", ".cfg")
-
-            name = yamlfile.replace(".yaml","")
-            create_cfg(cfgfile, name, args.nonlinear, jsonfile, templates["cfg"], method_data, args.debug)
-            
-            # create json
-            create_json(jsonfile, mdict, mmat, mpost, templates, method_data, args.debug)
-
-            # copy some additional json file 
-            material_generic_def = ["conductor", "insulator"]
-
-            if args.time == "transient":
-                material_generic_def.append("conductor-nosource") # only for transient with mqs
-
-            if args.method == "cfpdes":
-                if args.debug: print("cwd=", cwd)
-                from shutil import copyfile
-                for jsonfile in material_generic_def:
-                    filename = AppCfg[args.method][args.time][args.geom][args.model]["filename"][jsonfile]
-                    src = os.path.join(MyEnv.template_path(), args.method, args.geom, args.model, filename)
-                    dst = os.path.join(jsonfile + "-" + args.method + "-" + args.model + "-" + args.geom + ".json")
-                    if args.debug:
-                        print(jsonfile, "filename=", filename, "src=%s" % src, "dst=%s" % dst)
-                    copyfile(src, dst)
+                print(jsonfile, "filename=", filename, "src=%s" % src, "dst=%s" % dst)
+            copyfile(src, dst)
      
-        else:
-            raise Exception("expected Insert yaml file")
-
     # Print command to run
     print("\n\n=== Commands to run (ex pour cfpdes/Axi) ===")
     salome = "/home/singularity/hifimagnet-salome-9.7.0.sif"
@@ -280,11 +226,11 @@ def main():
     exec = 'feelpp_toolbox_coefficientformpdes'
     pyfeel = 'cfpdes_insert_fixcurrent.py'
     if args.geom == "Axi" and args.method == "cfpdes" :
-        xaofile = cad.name + "-Axi_withAir.xao"
-        geocmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--axi,--air,2,2,--wd,$PWD" % (yamlfile)
+        xaofile = confdata["name"] + "-Axi_withAir.xao"
+        geocmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--axi,--air,2,2,--wd,$PWD" % (name)
         
         # if gmsh:
-        meshcmd = "python3 -m python_magnetgeo.xao %s --wd $PWD mesh --group CoolingChannels --geo %s --lc=1" % (xaofile, yamlfile)
+        meshcmd = "python3 -m python_magnetgeo.xao %s --wd $PWD mesh --group CoolingChannels --geo %s --lc=1" % (xaofile, name)
         meshfile = xaofile.replace(".xao", ".msh")
 
         # if MeshGems:

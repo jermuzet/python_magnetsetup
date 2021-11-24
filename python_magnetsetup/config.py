@@ -75,7 +75,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
 
     """
     
-    [method, time, geom, model, cooling] = method_data
+    [method, time, geom, model, cooling, units_def] = method_data
     template_path = os.path.join(appenv.template_path(), method, geom, model)
 
     cfg_model = appcfg[method][time][geom][model]["cfg"]

@@ -75,3 +75,4 @@ def load_object_from_db(appenv: appenv, mtype: str, name: str, debug: bool = Fal
         raise("query_bd: %s not supported" % mtype)
     
     return query_db(appenv, mtype, name, debug)
+

@@ -262,7 +262,13 @@ def entry(template: str, rdata: dict, debug: bool = False):
         print("corrected:", re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile))
 
     corrected = re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile)
-    mdata = json.loads(corrected)
+    try:
+        mdata = json.loads(corrected)
+    except json.decoder.JSONDecodeError:
+        print("entry: json.decoder.JSONDecodeError")
+        print("entry:", corrected)
+        sys.exit(1)
+
     if debug:
         print("entry/data (json):\n", mdata)
    
