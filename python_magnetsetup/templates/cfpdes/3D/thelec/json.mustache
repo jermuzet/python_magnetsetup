@@ -27,14 +27,12 @@
     },
     "Parameters":
     {
-		"T0":"293.",
-		"Tin":"284.15",
-		
-		{{#Params}}
+		{{#Parameters}}
 		"{{name}}": "{{value}}",
-		{{/Params}}
-
-		"mu0":"4*pi*1e-7"
+		{{/Parameters}}
+		
+		"T0":"293.",
+		"Tin":"284.15"
     },
     "Materials":
     {
@@ -44,12 +42,12 @@
     {
 		"electric":
 		{
-	    	"Dirichlet":
-	    	{
+			"Dirichlet":
+	    		{
 				{{#boundary_Electric_Dir}}
 				"{{name}}": { expr: "{{value}}"}
 				{{/boundary_Electric_Dir}}
-	    	},
+	    		},
 			"Neumann":
 			{
 				{{#boundary_Electric_Neu}}
@@ -59,8 +57,8 @@
 		},
 		"heat":
 		{
-	    	"Robin":
-	    	{
+			"Robin":
+	    		{
 				{{#boundary_Therm_Robin}}
 				"{{name}}": 
 				{ 
@@ -68,16 +66,16 @@
 					expr2: "{{expr2}}"
 				}
 				{{/boundary_Therm_Robin}}
-	    	}
-	    	"Neumann":
-	    	{
+	    		}
+	    		"Neumann":
+	    		{
 				{{#boundary_Therm_Neu}}
 				"{{name}}": 
 				{ 
 					expr: "{{value}}"
 				}
 				{{/boundary_Therm_Neu}}
-	    	}
+	    		}
 		}
     },
     "InitialConditions":

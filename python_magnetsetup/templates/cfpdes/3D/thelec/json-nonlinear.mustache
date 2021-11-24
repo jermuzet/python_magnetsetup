@@ -1,6 +1,6 @@
 {
-    "Name": "ThermoElectric 3D Stationnary model",
-    "ShortName":"3DThermoElectricStat",
+    "Name": "ThermoElectric NL 3D Stationnary model",
+    "ShortName":"3DNLThermoElectricStat",
     "Models":
     {
 		"equations":
@@ -27,14 +27,12 @@
     },
     "Parameters":
     {
-		"T0":"293.",
-		"Tin":"284.15",
-		
-		{{#Params}}
+		{{#Parameters}}
 		"{{name}}": "{{value}}",
-		{{/Params}}
+		{{/Parameters}}
 
-		"mu0":"4*pi*1e-7"
+		"T0":"293.",
+		"Tin":"284.15"
     },
     "Materials":
     {
