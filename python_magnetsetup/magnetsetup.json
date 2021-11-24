@@ -7,6 +7,15 @@
 			{
 				"thelec":
 				{
+					"salome": "hifimagnet-salome-9.7.0.sif",
+    				"feelpp": "feelpp-toolboxes-v0.109.0.sif",
+    				"partitioner": "feelpp_mesh_partitioner",
+    				"exec": "feelpp_toolbox_coefficientformpdes",
+					"pyfeel":
+					{
+						"current": "cfpdes_insert_fixcurrent.py",
+						"commissioning": ""
+					},
 					"cfg": "cfg.mustache",
 					"model": "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -16,12 +25,16 @@
 					"cooling":
 					{
 						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache"
+						"grad": "channel-grad.mustache",
+						"meanH": "channel-meanH.mustache",
+						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post":
 					{
 						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache"
+						"grad": "flux-channel-grad.mustache",
+						"meanH": "flux-channel-meanH.mustache",
+						"gradH": "flux-channel-gradH.mustache"
 					},
 					"filename":
 					{
@@ -55,12 +68,16 @@
 					"cooling":
 					{
 						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache"
+						"grad": "channel-grad.mustache",
+						"meanH": "channel-meanH.mustache",
+						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post":
 					{
 						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache"
+						"grad": "flux-channel-grad.mustache",
+						"meanH": "flux-channel-meanH.mustache",
+						"gradH": "flux-channel-gradH.mustache"
 					},
 					"filename":
 					{
@@ -81,12 +98,16 @@
 					"cooling":
 					{
 						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache"
+						"grad": "channel-grad.mustache",
+						"meanH": "channel-meanH.mustache",
+						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post":
 					{
 						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache"
+						"grad": "flux-channel-grad.mustache",
+						"meanH": "flux-channel-meanH.mustache",
+						"gradH": "flux-channel-gradH.mustache"
 					},
 					"filename":
 					{
@@ -110,12 +131,16 @@
 					"cooling":
 					{
 						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache"
+						"grad": "channel-grad.mustache",
+						"meanH": "channel-meanH.mustache",
+						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post":
 					{
 						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache"
+						"grad": "flux-channel-grad.mustache",
+						"meanH": "flux-channel-meanH.mustache",
+						"gradH": "flux-channel-gradH.mustache"
 					},
 					"filename":
 					{
@@ -170,12 +195,16 @@
 					"cooling":
 					{
 						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache"
+						"grad": "channel-grad.mustache",
+						"meanH": "channel-meanH.mustache",
+						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post":
 					{
 						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache"
+						"grad": "flux-channel-grad.mustache",
+						"meanH": "flux-channel-meanH.mustache",
+						"gradH": "flux-channel-gradH.mustache"
 					},
 				    "filename":
 				    {

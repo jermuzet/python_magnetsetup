@@ -45,6 +45,7 @@ class appenv():
         self.yaml_repo: Optional[str] = None
         self.mesh_repo: Optional[str] = None
         self.template_repo: Optional[str] = None
+        self.simage_repo: Optional[str] = None
 
         from decouple import Config, RepositoryEnv
         envdata = RepositoryEnv("settings.env")
@@ -55,6 +56,8 @@ class appenv():
         self.url_api = data.get('URL_API')
         if 'TEMPLATE_REPO' in envdata:
             self.template_repo = data.get('TEMPLATE_REPO')
+        if 'SIMAGE_REPO' in envdata:
+            self.simage_repo = data.get('SIMAGE_REPO')
 
     def template_path(self, debug: bool = False):
         """
@@ -62,11 +65,26 @@ class appenv():
         """
         if not self.template_repo:
             default_path = os.path.dirname(os.path.abspath(__file__))
-            template_repo = os.path.join(default_path, "templates")
+            repo = os.path.join(default_path, "templates")
+        else:
+            repo = self.template_repo
 
         if debug:
-            print("appenv/template_path:", template_repo)
-        return template_repo
+            print("appenv/template_path:", repo)
+        return repo
+
+    def simage_path(self, debug: bool = False):
+        """
+        returns simage_repo
+        """
+        if not self.simage_repo:
+            repo = os.path.join("/home/signularity")
+        else:
+            repo = self.simage_repo
+
+        if debug:
+            print("appenv/simage_path:", repo)
+        return repo
 
 
 def loadconfig():
@@ -169,8 +187,7 @@ def query_db(appenv: appenv, mtype: str, name: str, debug: bool = False):
 
     import requests
     import requests.exceptions
-    # import ast
-
+    
     r = requests.get(url= appenv.url_api + '/' + mtype + '/mdata/' + name )
     if debug: print("request:", r)
     if (r.status_code == requests.codes.ok):
@@ -193,8 +210,7 @@ def list_mtype_db(appenv: appenv, mtype: str, debug: bool = False):
 
     import requests
     import requests.exceptions
-    # import ast
-
+    
     names = []
     if mtype in ["Helix", "Bitter", "Supra"]:
         mtype = "mpart"
@@ -349,7 +365,6 @@ def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templa
             mdata = entry(fconductor, Merge({'name': "H%d" % (i+1), 'marker': "H%d_Cu" % (i+1)}, confdata["Helix"][i]["material"]) , debug)
             materials_dict["H%d" % (i+1)] = mdata["H%d" % (i+1)]
 
-            # TODO deal with Glue/Kaptons
             if idata:
                 for item in idata:
                     if item(0) == "Glue":
@@ -562,7 +577,7 @@ def main():
                     choices=['thelec', 'mag', 'thmag', 'thmagel'], default='thmagel')
     parser.add_argument("--nonlinear", help="force non-linear", action='store_true')
     parser.add_argument("--cooling", help="choose cooling type", type=str,
-                    choices=['mean', 'grad'], default='mean')
+                    choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
     parser.add_argument("--scale", help="scale of geometry", type=float, default=1e-3)
 
     parser.add_argument("--debug", help="activate debug", action='store_true')
