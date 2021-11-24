@@ -3,6 +3,10 @@
     "ShortName":"ThermoElec3D",
     "Parameters":
     {
+	    {{#Parameters}}
+		"{{name}}": "{{value}}",
+		{{/Parameters}}
+		
         "T0":"293",
 	    "Tin":"293"
     },
@@ -13,16 +17,26 @@
     {
         "electric-potential":
         {
-            "Dirichlet":
-            {
-            }
+			"Dirichlet":
+	    		{
+				{{#boundary_Electric_Dir}}
+				"{{name}}": { expr: "{{value}}"}
+				{{/boundary_Electric_Dir}}
+	    		}
         },
-        "temperature":
-        {
-            "Robin":
-            {
-            }
-        }
+		"temperature":
+		{
+	    	"Robin":
+	    	{
+				{{#boundary_Therm_Robin}}
+				"{{name}}":
+				{
+					"expr1": "{{expr1}}",
+					"expr2": "{{expr2}}"
+				},
+				{{/boundary_Therm_Robin}}
+	    	}
+		}
     },
     "PostProcess":
     {
