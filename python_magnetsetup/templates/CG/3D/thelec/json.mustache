@@ -38,6 +38,31 @@
 	    	}
 		}
     },
+    "InitialConditions":
+    {
+        "temperature":
+        {
+            "File":
+            {
+                "myic":
+                {
+                    "filename": "{{temperature_initfile}}",
+                    "format":"hdf5"
+                }
+            }
+        },
+        "electric-potential":
+        {
+            "File":
+            {
+                "myic":
+                {
+                    "filename": "{{V_initfile}}",
+                    "format": "hdf5"
+                }
+            }
+        }
+    },
     "PostProcess":
     {
         "use-model-name":1,
