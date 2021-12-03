@@ -104,24 +104,11 @@ def magnet_setup(confdata: str, method_data: List, templates: dict, debug: bool=
         print("magnet_setup: mdict=", mdict)
     return (mdict, mmat, mpost)
 
-def setup(args):
+def setup(MyEnv, args, confdata, jsonfile):
     """
     """
     print("setup/main")
     
-    # make datafile/[magnet|msite] exclusive one or the other
-    if args.magnet != None and args.msite:
-        print("cannot specify both magnet and msite")
-        sys.exit(1)
-    if args.datafile != None:
-        if args.magnet != None or args.msite != None:
-            print("cannot specify both datafile and magnet or msite")
-            sys.exit(1)
-    
-    # load appenv
-    MyEnv = appenv()
-    if args.debug: print(MyEnv.template_path())
-
     # loadconfig
     AppCfg = loadconfig()
 
@@ -131,6 +118,7 @@ def setup(args):
         os.chdir(args.wd)
     
     # load appropriate templates
+    # TODO force millimeter when args.method == "HDG"
     method_data = [args.method, args.time, args.geom, args.model, args.cooling, "meter"]
     
     # TODO: if HDG meter -> millimeter
@@ -139,19 +127,6 @@ def setup(args):
     mdict = {}
     mmat = {}
     mpost = {}
-
-    # Get Object
-    if args.datafile != None:
-        confdata = load_object(MyEnv, args.datafile, args.debug)
-        jsonfile = args.datafile.replace(".json","")
-
-    if args.magnet != None:
-        confdata = load_object_from_db(MyEnv, "magnet", args.magnet, args.debug)
-        jsonfile = args.magnet
-    
-    if args.msite != None:
-        confdata = load_object_from_db(MyEnv, "msite", args.msite, args.debug)
-        jsonfile = args.msite
 
     if "geom" in confdata:
         print("Load a magnet %s " % jsonfile, "debug:", args.debug)
@@ -200,10 +175,6 @@ def setup(args):
             
 
     # create cfg
-    if args.datafile: 
-        jsonfile = args.datafile.replace("-data.json","")
-    if args.magnet: 
-        jsonfile = args.magnet
     jsonfile += "-" + args.method
     jsonfile += "-" + args.model
     if args.nonlinear:

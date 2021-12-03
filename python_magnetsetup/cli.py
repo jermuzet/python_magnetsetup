@@ -3,6 +3,8 @@ import argparse
 import sys
 
 from .setup import setup
+from .objects import load_object, load_object_from_db
+from .config import appenv
 
 def main():
     # Manage Options
@@ -42,7 +44,25 @@ def main():
             print("cannot specify both datafile and magnet or msite")
             sys.exit(1)
 
-    setup(args)    
+    # load appenv
+    MyEnv = appenv()
+    if args.debug: print(MyEnv.template_path())
+
+    # Get Object
+    if args.datafile != None:
+        confdata = load_object(MyEnv, args.datafile, args.debug)
+        jsonfile = args.datafile.replace("-data.json","")
+
+    if args.magnet != None:
+        confdata = load_object_from_db(MyEnv, "magnet", args.magnet, args.debug)
+        jsonfile = args.magnet
+    
+    if args.msite != None:
+        confdata = load_object_from_db(MyEnv, "msite", args.msite, args.debug)
+        jsonfile = args.msite
+
+
+    setup(MyEnv, args, confdata, jsonfile)    
     return 0
 
 
