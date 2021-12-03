@@ -104,39 +104,10 @@ def magnet_setup(confdata: str, method_data: List, templates: dict, debug: bool=
         print("magnet_setup: mdict=", mdict)
     return (mdict, mmat, mpost)
 
-def main():
+def setup(args):
     """
     """
     print("setup/main")
-    import argparse
-
-    # Manage Options
-    command_line = None
-    parser = argparse.ArgumentParser(description="Create template json model files for Feelpp/HiFiMagnet simu")
-    parser.add_argument("--datafile", help="input data file (ex. HL-34-data.json)", default=None)
-    parser.add_argument("--wd", help="set a working directory", type=str, default="")
-    parser.add_argument("--magnet", help="Magnet name from magnetdb (ex. HL-34)", default=None)
-    parser.add_argument("--msite", help="MSite name from magnetdb (ex. HL-34)", default=None)
-
-    parser.add_argument("--method", help="choose method (default is cfpdes", type=str,
-                    choices=['cfpdes', 'CG', 'HDG', 'CRB'], default='cfpdes')
-    parser.add_argument("--time", help="choose time type", type=str,
-                    choices=['static', 'transient'], default='static')
-    parser.add_argument("--geom", help="choose geom type", type=str,
-                    choices=['Axi', '3D'], default='Axi')
-    parser.add_argument("--model", help="choose model type", type=str,
-                    choices=['thelec', 'mag', 'thmag', 'thmagel'], default='thmagel')
-    parser.add_argument("--nonlinear", help="force non-linear", action='store_true')
-    parser.add_argument("--cooling", help="choose cooling type", type=str,
-                    choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
-    parser.add_argument("--scale", help="scale of geometry", type=float, default=1e-3)
-
-    parser.add_argument("--debug", help="activate debug", action='store_true')
-    parser.add_argument("--verbose", help="activate verbose", action='store_true')
-    args = parser.parse_args()
-
-    if args.debug:
-        print(args)
     
     # make datafile/[magnet|msite] exclusive one or the other
     if args.magnet != None and args.msite:
@@ -161,6 +132,7 @@ def main():
     
     # load appropriate templates
     method_data = [args.method, args.time, args.geom, args.model, args.cooling, "meter"]
+    
     # TODO: if HDG meter -> millimeter
     templates = loadtemplates(MyEnv, AppCfg, method_data, (not args.nonlinear) )
 
@@ -318,5 +290,3 @@ def main():
     # TODO what about postprocess??
     pass
 
-if __name__ == "__main__":
-    main()

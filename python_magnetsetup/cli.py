@@ -2,16 +2,47 @@
 import argparse
 import sys
 
+from .setup import setup
 
 def main():
-    """Console script for python_magnetsetup."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument('_', nargs='*')
+    # Manage Options
+    command_line = None
+    parser = argparse.ArgumentParser(description="Create template json model files for Feelpp/HiFiMagnet simu")
+    parser.add_argument("--datafile", help="input data file (ex. HL-34-data.json)", default=None)
+    parser.add_argument("--wd", help="set a working directory", type=str, default="")
+    parser.add_argument("--magnet", help="Magnet name from magnetdb (ex. HL-34)", default=None)
+    parser.add_argument("--msite", help="MSite name from magnetdb (ex. HL-34)", default=None)
+
+    parser.add_argument("--method", help="choose method (default is cfpdes", type=str,
+                    choices=['cfpdes', 'CG', 'HDG', 'CRB'], default='cfpdes')
+    parser.add_argument("--time", help="choose time type", type=str,
+                    choices=['static', 'transient'], default='static')
+    parser.add_argument("--geom", help="choose geom type", type=str,
+                    choices=['Axi', '3D'], default='Axi')
+    parser.add_argument("--model", help="choose model type", type=str,
+                    choices=['thelec', 'mag', 'thmag', 'thmagel'], default='thmagel')
+    parser.add_argument("--nonlinear", help="force non-linear", action='store_true')
+    parser.add_argument("--cooling", help="choose cooling type", type=str,
+                    choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
+    parser.add_argument("--scale", help="scale of geometry", type=float, default=1e-3)
+
+    parser.add_argument("--debug", help="activate debug", action='store_true')
+    parser.add_argument("--verbose", help="activate verbose", action='store_true')
     args = parser.parse_args()
 
-    print("Arguments: " + str(args._))
-    print("Replace this message by putting your code into "
-          "python_magnetsetup.cli.main")
+    if args.debug:
+        print("Arguments: " + str(args._))
+    
+    # make datafile/[magnet|msite] exclusive one or the other
+    if args.magnet != None and args.msite:
+        print("cannot specify both magnet and msite")
+        sys.exit(1)
+    if args.datafile != None:
+        if args.magnet != None or args.msite != None:
+            print("cannot specify both datafile and magnet or msite")
+            sys.exit(1)
+
+    setup(args)    
     return 0
 
 
