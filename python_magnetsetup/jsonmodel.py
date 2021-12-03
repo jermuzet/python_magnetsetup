@@ -10,10 +10,68 @@ import math
 from .utils import Merge
 from .units import load_units, convert_data
 
-def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
+def create_params_supra(gdata: tuple, method_data: List[str], debug: bool=False) -> dict:
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
     """
+    print("create_params_supra")
+    
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = method_data[5] # "meter"
+    units = load_units(unit_Length)
+
+    # Tini, Aini for transient cases??
+    params_data = { 'Parameters': []}
+
+    if debug:
+        print(params_data)
+        
+    return params_data
+
+def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False):
+    """
+    Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
+    """
+    print("create_params_bitter for %s" % gdata[0])
+    
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = method_data[5] # "meter"
+    units = load_units(unit_Length)
+
+    # Tini, Aini for transient cases??
+    params_data = { 'Parameters': []}
+
+    # for cfpdes only
+    if method_data[0] == "cfpdes" and method_data[3] == "thmagel" :
+        params_data['Parameters'].append({"name":"bool_laplace", "value":"1"})
+        params_data['Parameters'].append({"name":"bool_dilatation", "value":"1"})
+
+    # TODO : initialization of parameters with cooling model
+
+    params_data['Parameters'].append({"name":"Tinit", "value":293})
+    
+    (name, snames, nturns) = gdata
+    for sname in snames:
+        params_data['Parameters'].append({"name":"%s_h" % sname, "value":convert_data(units, unit_Length, 58222.1, "h")})
+        params_data['Parameters'].append({"name":"%s_Tw" % sname, "value":290.671})
+        params_data['Parameters'].append({"name":"%s_dTw" % sname, "value":12.74})
+
+    # init values for U (Axi specific)
+    if method_data[2] == "Axi":
+        for i,sname in enumerate(snames):
+            params_data['Parameters'].append({"name":"U_%s" % sname, "value":"1"})
+            params_data['Parameters'].append({"name":"N_%s" % sname, "value":nturns[i]})
+
+    if debug:
+        print(params_data)
+        
+    return params_data
+
+def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False) -> dict:
+    """
+    Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
+    """
+    print("create_params_insert")
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5] # "meter"
@@ -21,13 +79,13 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
 
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
     
-    print("R1:", R1)
+    if debug: print("R1:", R1)
     for data in [R1, R2, Z1, Z2, Zmin, Zmax, Dh]:
         data = convert_data(units, unit_Length, data, "Length")
     Sh = convert_data(units, unit_Length, Sh, "Area")
 
     # chech dim
-    print("corrected R1:", R1)
+    if debug: print("corrected R1:", R1)
     
     # Tini, Aini for transient cases??
     params_data = { 'Parameters': []}
@@ -47,7 +105,6 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
     # params per cooling channels
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
 
-    # TODO: length data are written in mm should be in SI instead
     for i in range(NHelices+1):
         params_data['Parameters'].append({"name":"h%d" % i, "value":convert_data(units, unit_Length, 58222.1, "h")})
         params_data['Parameters'].append({"name":"Tw%d" % i, "value":290.671})
@@ -69,12 +126,57 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
     if "mag" in method_data[3] or "mqs" :
         params_data['Parameters'].append({"name":"mu0", "value":convert_data(units, unit_Length, 4*math.pi*1e-7, "mu0")})
     # TODO: CG: U_H%d%
-    # TODO: HDG: U_H%d% if no ibc
-
+    # TODO: HDG: U_H%d% if no ibc    # TODO: length data are written in mm should be in SI instead
+    
+    if debug:
+        print(params_data)
+        
     return params_data
 
 
-def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templates: dict, method_data: List[str], debug: bool = False):
+def create_materials_supra(gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False) -> dict:
+    materials_dict = {}
+
+    fconductor = templates["conductor"]
+    
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = method_data[5] # "meter"
+    units = load_units(unit_Length)
+    for prop in ["ThermalConductivity", "Young", "VolumicMass", "ElectricalConductivity"]:
+        confdata["material"][prop] = convert_data(units, unit_Length, confdata["material"][prop], prop)
+
+    if method_data[2] == "Axi":
+        pass
+    else:
+        pass
+
+    return materials_dict
+
+def create_materials_bitter(gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False) -> dict:
+    materials_dict = {}
+    if debug: print("create_material_bitter:", confdata)
+
+    fconductor = templates["conductor"]
+    
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = method_data[5] # "meter"
+    units = load_units(unit_Length)
+    
+    for prop in ["ThermalConductivity", "Young", "VolumicMass", "ElectricalConductivity"]:
+        confdata["material"][prop] = convert_data(units, unit_Length, confdata["material"][prop], prop)
+
+    (name, snames, turns) = gdata
+    for sname in snames:
+        if method_data[2] == "Axi":
+            if debug: print("create_material_bitter:", sname)
+            mdata = entry(fconductor, Merge({'name': "%s" % sname}, confdata["material"]) , debug)
+            materials_dict["%s" % sname] = mdata["%s" % sname]
+        else:
+            return {}
+
+    return materials_dict
+
+def create_materials_insert(gdata: tuple, idata: Optional[List], confdata: dict, templates: dict, method_data: List[str], debug: bool = False) -> dict:
     # TODO loop for Plateau (Axi specific)
     materials_dict = {}
 
@@ -87,9 +189,10 @@ def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templa
     unit_Length = method_data[5] # "meter"
     units = load_units(unit_Length)
     for mtype in ["Helix", "Ring", "Lead"]:
-        for i in range(len(confdata[mtype])):            
-            for prop in ["ThermalConductivity", "Young", "VolumicMass", "ElectricalConductivity"]:
-                confdata[mtype][i]["material"][prop] = convert_data(units, unit_Length, confdata[mtype][i]["material"][prop], prop)
+        if mtype in confdata:
+            for i in range(len(confdata[mtype])):            
+                for prop in ["ThermalConductivity", "Young", "VolumicMass", "ElectricalConductivity"]:
+                    confdata[mtype][i]["material"][prop] = convert_data(units, unit_Length, confdata[mtype][i]["material"][prop], prop)
             
     # Loop for Helix
     for i in range(NHelices):
@@ -114,7 +217,9 @@ def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templa
         
             # load conductor template
             for j in range(1,Nsections[i]+1):
+                # print("load conductor[%d]: mat:" % j, confdata["Helix"][i]["material"])
                 mdata = entry(fconductor, Merge({'name': "H%d_Cu%d" % (i+1, j)}, confdata["Helix"][i]["material"]), debug)
+                # print("load conductor[%d]:" % j, mdata)
                 materials_dict["H%d_Cu%d" % (i+1, j)] = mdata["H%d_Cu%d" % (i+1, j)]
 
             # section j==Nsections+1:  treated as insulator in Axi
@@ -140,10 +245,74 @@ def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templa
     return materials_dict
 
 
-def create_bcs(boundary_meca: List, 
+def create_bcs_supra(boundary_meca: List, 
                boundary_maxwell: List,
                boundary_electric: List,
-               gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False):
+               gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False) -> dict:
+
+    print("create_bcs_bitter from templates")
+    electric_bcs_dir = { 'boundary_Electric_Dir': []} # name, value, vol
+    electric_bcs_neu = { 'boundary_Electric_Neu': []} # name, value
+    thermic_bcs_rob = { 'boundary_Therm_Robin': []} # name, expr1, expr2
+    thermic_bcs_neu = { 'boundary_Therm_Neu': []} # name, value
+    meca_bcs_dir = { 'boundary_Meca_Dir': []} # name, value
+    maxwell_bcs_dir = { 'boundary_Maxwell_Dir': []} # name, value
+    
+    fcooling = templates["cooling"]
+    
+    return {}
+
+def create_bcs_bitter(boundary_meca: List, 
+               boundary_maxwell: List,
+               boundary_electric: List,
+               gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False) -> dict:
+
+    (name, snames, nturns) = gdata
+    print("create_bcs_bitter from templates for %s" % name)
+    # print("snames=", snames)
+    
+    electric_bcs_dir = { 'boundary_Electric_Dir': []} # name, value, vol
+    electric_bcs_neu = { 'boundary_Electric_Neu': []} # name, value
+    thermic_bcs_rob = { 'boundary_Therm_Robin': []} # name, expr1, expr2
+    thermic_bcs_neu = { 'boundary_Therm_Neu': []} # name, value
+    meca_bcs_dir = { 'boundary_Meca_Dir': []} # name, value
+    maxwell_bcs_dir = { 'boundary_Maxwell_Dir': []} # name, value
+    
+    fcooling = templates["robin"]
+
+    for sname in snames:
+        for thbc in ["rInt", "rExt"]:
+            bcname =  sname + "_" + thbc
+            mdata = entry(fcooling, {'name': bcname, 'h': '%s_h' % sname, 'Tw': '%s_Tw' % sname, 'dTw':'%s_dTw' % sname},  debug)
+            thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": bcname}, mdata[bcname]) )
+    
+    if method_data[3] == "thelec":
+        th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
+        if method_data[2] == "Axi":
+            return th_
+        else:
+            return {}
+    elif method_data[3] == 'mag':
+        return {}
+    elif method_data[3] == 'thmag':
+        th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
+        if method_data[2] == "Axi":
+            return Merge(maxwell_bcs_dir, th_)
+        else:
+            return {}
+    else:
+        th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
+        elec_ = Merge(electric_bcs_dir, electric_bcs_neu)
+        thelec_ = Merge(th_, elec_)
+        thelecmeca_ = Merge(thelec_, meca_bcs_dir)
+        return Merge(maxwell_bcs_dir, thelecmeca_)
+    
+    return {}
+
+def create_bcs_insert(boundary_meca: List, 
+               boundary_maxwell: List,
+               boundary_electric: List,
+               gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False) -> dict:
 
     print("create_bcs from templates")
     electric_bcs_dir = { 'boundary_Electric_Dir': []} # name, value, vol
@@ -198,14 +367,14 @@ def create_bcs(boundary_meca: List,
         thelecmeca_ = Merge(thelec_, meca_bcs_dir)
         return Merge(maxwell_bcs_dir, thelecmeca_)
             
-    pass
+    return {}
 
 def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: dict, method_data: List[str], debug: bool = False):
     """
     Create a json model file
     """
 
-    print("create_json=", jsonfile)
+    if debug: print("create_json=", jsonfile)
     data = entry(templates["model"], mdict, debug)
     
     # material section
@@ -217,11 +386,12 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     
     # postprocess
     if debug: print("flux")
-    flux_data = mpost["flux"]
-    add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
-    odata = entry(templates["flux"], flux_data, debug)
-    for md in odata["Flux"]:
-        data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Flux"][md]
+    if "flux" in mpost:
+        flux_data = mpost["flux"]
+        add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
+        odata = entry(templates["flux"], flux_data, debug)
+        for md in odata["Flux"]:
+            data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Flux"][md]
     
     if debug: print("meanT_H")
     meanT_data = mpost["meanT_H"] # { "meanT_H": [] }
@@ -247,7 +417,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
         out.write(mdata)
     pass
 
-def entry(template: str, rdata: dict, debug: bool = False):
+def entry(template: str, rdata: dict, debug: bool = False) -> str:
     import chevron
     import re
     
@@ -262,6 +432,7 @@ def entry(template: str, rdata: dict, debug: bool = False):
         print("corrected:", re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile))
 
     corrected = re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile)
+    corrected = corrected.replace("&quot;", "\"")
     try:
         mdata = json.loads(corrected)
     except json.decoder.JSONDecodeError:

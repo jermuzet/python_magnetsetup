@@ -5,7 +5,7 @@ import yaml
 from python_magnetgeo import Supra
 from python_magnetgeo import python_magnetgeo
 
-from .jsonmodel import create_params, create_bcs, create_materials
+from .jsonmodel import create_params_supra, create_bcs_supra, create_materials_supra
 from .utils import Merge
 
 def Supra_setup(confdata: dict, cad: Supra, method_data: List, templates: dict, debug: bool=False):

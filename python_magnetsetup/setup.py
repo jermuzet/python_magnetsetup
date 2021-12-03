@@ -36,7 +36,7 @@ from python_magnetgeo import python_magnetgeo
 
 from .config import appenv, loadconfig, loadtemplates
 from .objects import load_object, load_object_from_db
-from .utils import Merge
+from .utils import Merge, NMerge
 from .cfg import create_cfg
 from .jsonmodel import create_json
 
@@ -44,11 +44,13 @@ from .insert import Insert_setup
 from .bitter import Bitter_setup
 from .supra import Supra_setup
     
+
 def msite_setup(confdata: str, method_data: List, templates: dict, debug: bool=False):
     """
-    Creating dict for setup for magnet
+    Creating dict for setup for msite
     """
-
+    print("msite_setup:", "debug=", debug)
+    
     mdict = None
     mmat = None
     mpost = None
@@ -57,18 +59,24 @@ def msite_setup(confdata: str, method_data: List, templates: dict, debug: bool=F
         if mtype in confdata:
             if isinstance(confdata[mtype], List):
                 for object in confdata[mtype]:
-                    print("object[geom]:", object["geom"])
-                    magnet_setup(object, method_data, templates, debug)
+                    if debug:
+                        print("object[geom]:", object["geom"])
+                    (mdict, mmat, mpost) = magnet_setup(object, method_data, templates, debug)
+                    return (mdict, mmat, mpost)
             else:
-                print("object[geom]:", confdata[mtype]["geom"])
-                magnet_setup(confdata[mtype], method_data, templates, debug)
+                if debug:
+                    print("object[geom]:", confdata[mtype]["geom"])
+                (mdict, mmat, mpost) = magnet_setup(confdata[mtype], method_data, templates, debug)
+                return (mdict, mmat, mpost)
     
+    print("mdict:", mdict)
     return (mdict, mmat, mpost)
 
 def magnet_setup(confdata: str, method_data: List, templates: dict, debug: bool=False):
     """
     Creating dict for setup for magnet
     """
+    print("magnet_setup", "debug=", debug)
     
     mdict = None
     mmat = None
@@ -92,6 +100,8 @@ def magnet_setup(confdata: str, method_data: List, templates: dict, debug: bool=
         print("setup: unexpected cad type")
         sys.exit(1)
 
+    if debug:
+        print("magnet_setup: mdict=", mdict)
     return (mdict, mmat, mpost)
 
 def main():
@@ -154,6 +164,10 @@ def main():
     # TODO: if HDG meter -> millimeter
     templates = loadtemplates(MyEnv, AppCfg, method_data, (not args.nonlinear) )
 
+    mdict = {}
+    mmat = {}
+    mpost = {}
+
     # Get Object
     if args.datafile != None:
         confdata = load_object(MyEnv, args.datafile, args.debug)
@@ -168,17 +182,50 @@ def main():
         jsonfile = args.msite
 
     if "geom" in confdata:
-        print("Load a magnet %s " % jsonfile)
+        print("Load a magnet %s " % jsonfile, "debug:", args.debug)
         (mdict, mmat, mpost) = magnet_setup(confdata, method_data, templates, args.debug)
     else:
-        print("Load a msite %s" % confdata["name"])
+        print("Load a msite %s" % confdata["name"], "debug:", args.debug)
+        # print("confdata:", confdata)
+
+        # why do I need that???
+        with open(confdata["name"] + ".yaml", "x") as out:
+                out.write("!<MSite>\n")
+                yaml.dump(confdata, out)
+                
         for magnet in confdata["magnets"]:
-            print("magnet:", magnet)
-            mconfdata = load_object_from_db(MyEnv, "magnet", magnet, args.debug)
-            (mdict, mmat, mpost) = msite_setup(mconfdata, method_data, templates, args.debug)
-        print("msite not implemented")
-        sys.exit(1)
-    
+            print("magnet:", magnet, "debug=", args.debug)
+            try:
+                mconfdata = load_object(MyEnv, magnet + "-data.json", magnet, args.debug)
+            except:
+                print("setup: failed to load %s, look into magnetdb" % (magnet + "-data.json") )
+                try:
+                    mconfdata = load_object_from_db(MyEnv, "magnet", magnet, args.debug)
+                except:
+                    print("setup: failed to load %s from magnetdb" % magnet)
+                    sys.exit(1)
+                    
+            if 'Helix' in mconfdata:
+                print("Load an Insert")
+                (tdict, tmat, tpost) = magnet_setup(mconfdata, method_data, templates, args.debug)
+            else:
+                print("Load others")
+                (tdict, tmat, tpost) = msite_setup(mconfdata, method_data, templates, args.debug)
+            
+            # print("tdict:", tdict)
+            mdict = NMerge(tdict, mdict, args.debug)
+            # print("mdict:", mdict)
+            
+            # print("tmat:", tmat)
+            mmat = NMerge(tmat, mmat, args.debug)
+            # print("NewMerge:", NMerge(tmat, mmat))
+            # print("mmat:", mmat)
+            
+            # print("tpost:", tpost)
+            mpost = NMerge(tpost, mpost, args.debug)
+            # print("NewMerge:", NMerge(tpost, mpost))
+            # print("mpost:", mpost)
+            
 
     # create cfg
     if args.datafile: 
@@ -230,13 +277,13 @@ def main():
     partitioner = AppCfg["mesh"]["partitioner"]
     if "exec" in AppCfg[args.method]:
         exec = AppCfg[args.method]["exec"]
-    if "exec" in AppCfg[args.method][args.model]:
-        exec = AppCfg[args.method]["exec"]
+    if "exec" in AppCfg[args.method][args.time][args.geom][args.model]:
+        exec = AppCfg[args.method][args.time][args.geom][args.model]
     pyfeel = 'cfpdes_insert_fixcurrent.py'
 
     xaofile = confdata["name"] + "_withAir.xao"
     geocmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--air,2,2,--wd,$PWD" % (name)
-    meshcmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--air,2,2,mesh,--group,CoolingChannels,Isolants" % yamlfile
+    meshcmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--air,2,2,mesh,--group,CoolingChannels,Isolants" % (name)
     meshfile = xaofile.replace(".xao", ".med")
     
     if args.geom == "Axi" and args.method == "cfpdes" :
@@ -252,13 +299,13 @@ def main():
     feelcmd = "[mpirun -np NP] %s --config-file %s" % (exec, cfgfile)
     pyfeelcmd = "[mpirun -np NP] python %s" % pyfeel
     
-    print("Edit %s to fix the meshfile, scale, partition and solver props" % cfgfile))
+    print("Edit %s to fix the meshfile, scale, partition and solver props" % cfgfile)
     print("export HIFIMAGNET=%s" % hifimagnet)
     print("workingdir:", args.wd)
     print("CAD:", "singularity exec %s %s" % (simage_path + "/" + salome,geocmd) )
         
     # if gmsh
-    if args.geom = "Axi":
+    if args.geom == "Axi":
         print("Mesh:", meshcmd)
     else:
         print("Mesh:", "singularity exec -B /opt/DISTENE:/opt/DISTENE:ro %s %s" % (simage_path + "/" + salome,meshcmd))

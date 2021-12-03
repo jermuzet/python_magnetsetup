@@ -1,7 +1,7 @@
 {
 	"mesh":
 	{
-		"hfimagnet": "/opt/SALOME-9.7.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome",
+		"hifimagnet": "/opt/SALOME-9.7.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome",
 		"salome": "hifimagnet-salome-9.7.0.sif",
 		"partitioner": "feelpp_mesh_partitioner",
 		"3D": 
@@ -38,6 +38,7 @@
 					"insulator": "insulator-static.mustache",
 					"cooling":
 					{
+						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -81,6 +82,7 @@
 					"insulator": "insulator-static.mustache",
 					"cooling":
 					{
+						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -111,6 +113,7 @@
 					"insulator": "insulator-static.mustache",
 					"cooling":
 					{
+						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -144,6 +147,7 @@
 					"insulator": "insulator-static.mustache",
 					"cooling":
 					{
+						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",

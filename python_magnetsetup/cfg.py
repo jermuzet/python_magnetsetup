@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-def entry_cfg(template: str, rdata: dict, debug: bool = False):
+def entry_cfg(template: str, rdata: dict, debug: bool = False) -> str:
     import chevron
 
     if debug:

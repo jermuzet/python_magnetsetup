@@ -101,8 +101,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
         stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
 
         fcooling = os.path.join(template_path, cooling_model)
-        if debug:
-            print("fcooling:", fcooling, type(fcooling))
+        frobin = os.path.join(template_path, appcfg[method][time][geom][model]["cooling"]["robin"])
         fflux = os.path.join(template_path, flux_model)
         fstats_T = os.path.join(template_path, stats_T_model)
         fstats_Power = os.path.join(template_path, stats_Power_model)
@@ -117,6 +116,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
         "conductor": fconductor,
         "insulator": finsulator,
         "cooling": fcooling,
+        "robin": frobin,
         "flux": fflux,
         "stats": [fstats_T, fstats_Power],
         "material_def" : material_generic_def
