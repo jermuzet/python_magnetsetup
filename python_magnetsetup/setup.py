@@ -242,22 +242,24 @@ def setup(MyEnv, args, confdata, jsonfile):
     feelcmd = "[mpirun -np NP] %s --config-file %s" % (exec, cfgfile)
     pyfeelcmd = "[mpirun -np NP] python %s" % pyfeel
     
-    print("Edit %s to fix the meshfile, scale, partition and solver props" % cfgfile)
-    print("export HIFIMAGNET=%s" % hifimagnet)
-    print("workingdir:", args.wd)
-    print("CAD:", "singularity exec %s %s" % (simage_path + "/" + salome,geocmd) )
-        
+    # TODO what about postprocess??
+    cmds = {
+        "Pre": "export HIFIMAGNET=%s" % hifimagnet,
+        "CAD:": "singularity exec %s %s" % (simage_path + "/" + salome,geocmd),
+        "Mesh": meshcmd,
+        "Partition": "singularity exec %s %s" % (simage_path + "/" + feelpp, partcmd),
+        "Run": "singularity exec %s %s" % (simage_path + "/" + feelpp, feelcmd),
+        "Python": "singularity exec %s %s" % (simage_path + "/" + feelpp, pyfeel)
+    }
+
     # if gmsh
     if args.geom == "Axi":
-        print("Mesh:", meshcmd)
+        cmds["Mesh:"] = meshcmd
     else:
-        print("Mesh:", "singularity exec -B /opt/DISTENE:/opt/DISTENE:ro %s %s" % (simage_path + "/" + salome,meshcmd))
+        cmds["Mesh:"] = "singularity exec -B /opt/DISTENE:/opt/DISTENE:ro %s %s" % (simage_path + "/" + salome,meshcmd)
     
-    # eventually convertmeshcmd if feelpp since it is build without med support
-    print("Partition:", "singularity exec %s %s" % (simage_path + "/" + feelpp, partcmd) )
-    print("Feel:", "singularity exec %s %s" % (simage_path + "/" + feelpp, feelcmd) )
-    print("pyfeel:", "singularity exec %s %s" % (simage_path + "/" + feelpp, pyfeel))
-
-    # TODO what about postprocess??
+    return cmds
+    
+    
     pass
 
