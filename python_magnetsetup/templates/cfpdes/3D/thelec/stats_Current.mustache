@@ -1,0 +1,14 @@
+{
+    "Stats_Current":
+    {
+    {{#Current_H}}
+    "{{header}}": 
+    {
+        "type": "integrate",
+        "expr": "-materials_sigma*(electric_grad_V_0*nx+electric_grad_V_1*ny+electric_grad_V_2*nz):materials_sigma:electric_grad_V_0:electric_grad_V_1:electric_grad_V_2:nx:ny:nz",
+        "markers": {{markers}}
+    },
+    {{/Current_H}}
+    }
+}
+                    

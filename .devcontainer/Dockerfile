@@ -40,15 +40,10 @@ RUN apt-get update \
     && apt-get -y install python3-pandas python3-seaborn \
     && apt-get -y install python3-numpy python3-scipy \
     && apt-get -y install python3-ht python3-pyclaw \
-    && apt-get -y install python3-pip python-is-python3 sqlitebrowser \
+    && apt-get -y install python3-pip python-is-python3 \
     && apt-get -y install python3-pint \
-    && apt-get -y install python3-flask python3-flaskext.wtf \
-    && python -m pip install sqlmodel \
-    && python -m pip install fastapi "uvicorn[standard]" \
-    && export PATH=$PATH:$HOME/.local/bin \
     && apt-get -y install curl \
-    && apt-get -y install python3-requests \
-    && pip install chevron \
+    && apt-get -y install python3-decouple python3-requests python3-chevron \
     && apt-get -y install python3-python-magnetgeo \
     && apt-get -y install python3-gmsh \
     #\

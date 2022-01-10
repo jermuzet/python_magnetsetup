@@ -8,16 +8,18 @@ def Merge(dict1, dict2):
 
 def NMerge(dict1: dict, dict2: dict, debug: bool=False) -> dict:
     for key in dict1:
-        if key in dict2:
-            if debug:
-                print("%s already in res" % key, type(dict1[key]))
-            if isinstance(dict1[key], list):
-                for item in dict1[key]:
-                    if not item in dict2[key]:
-                        dict2[key].append(item)          
-
+        if not dict2:
+            dict2[key] = dict1[key]           
         else:
-            dict2[key] = dict1[key]
+            if key in dict2:
+                if debug:
+                    print("%s already in res" % key, type(dict1[key]))
+                if isinstance(dict1[key], list):
+                    for item in dict1[key]:
+                        if not item in dict2[key]:
+                            dict2[key].append(item)          
+            else:
+                dict2[key] = dict1[key]
     
     return dict2
 

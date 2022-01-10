@@ -107,10 +107,12 @@ def Insert_setup(confdata: dict, cad: Insert, method_data: List, templates: dict
     }
     mdict = Merge( Merge(main_data, params_data), bcs_data)
 
+    currentH_data = []
     powerH_data = []
     meanT_data = []
     if method_data[2] == "Axi":
         for i in range(NHelices) :
+            currentH_data.append( {"header": "Current_H{}".format(i+1), "markers": { "name:": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
             powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name:": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
             meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
     else:
@@ -118,21 +120,28 @@ def Insert_setup(confdata: dict, cad: Insert, method_data: List, templates: dict
             powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
             meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
 
+        if cad.CurrentLeads:
+            currentH_data.append( {"header": "Current_iL1", "markers": { "name:": "iL1_V0" } )
+            currentH_data.append( {"header": "Current_oL2", "markers": { "name:": "oL2_V0" } )
+            powerH_data.append( {"header": "Power_iL1", "markers": { "name": "iL1"} } )
+            powerH_data.append( {"header": "Power_oL2", "markers": { "name": "oL2"} } )
+            meanT_data.append( {"header": "MeanT_iL1", "markers": { "name": "iL1" } } )
+            meanT_data.append( {"header": "MeanT_oL2", "markers": { "name": "oL2" } } )
+        else:
+            currentH_data.append( {"header": "Current_H1", "markers": { "name:": "H1_V0" } )
+            currentH_data.append( {"header": "Current_H{}".format(NHelices), "markers": { "name:": "H{}_V0".format(NHelices) } )
+            
+
     for i in range(NRings) :
         powerH_data.append( {"header": "Power_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
         meanT_data.append( {"header": "MeanT_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
-
-    if method_data[2] == "3D" and cad.CurrentLeads:
-        powerH_data.append( {"header": "Power_iL1", "markers": { "name": "iL1"} } )
-        powerH_data.append( {"header": "Power_oL2", "markers": { "name": "oL2"} } )
-        meanT_data.append( {"header": "MeanT_iL1", "markers": { "name": "iL1" } } )
-        meanT_data.append( {"header": "MeanT_oL2", "markers": { "name": "oL2" } } )
 
     # print("meanT_data:", meanT_data)
     mpost = { 
         "flux": {'index_h': "0:%s" % str(NChannels)},
         "meanT_H": meanT_data ,
-        "power_H": powerH_data 
+        "power_H": powerH_data ,
+        "current_H": currentH_data
     }
     mmat = create_materials_insert(gdata, index_Insulators, confdata, templates, method_data, debug)
 

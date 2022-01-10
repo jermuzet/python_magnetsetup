@@ -71,30 +71,17 @@
 		    		"U":
 		    		{
 						"expr":"materials_U:materials_U",
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
-						}
+						"markers": {{part_electric}}
 		    		},
 		    		"Jth":
 		    		{
 						"expr":"-materials_sigma*materials_U/(2*pi*x):materials_sigma:materials_U:x",
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
-						}
+						"markers": {{part_electric}}
 		    		},
 		    		"Qth":
 		    		{
 						"expr":"materials_sigma*(materials_U/(2*pi*x))*(materials_U/(2*pi*x)):materials_sigma:materials_U:x",
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
-						}
-		    		}
+						"markers": {{part_electric}}
 				}
 	    	}
 		},

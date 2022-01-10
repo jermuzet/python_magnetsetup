@@ -32,8 +32,8 @@ def main():
     parser.add_argument("--verbose", help="activate verbose", action='store_true')
     args = parser.parse_args()
 
-    if args.debug:
-        print("Arguments: " + str(args._))
+    # if args.debug:
+    #    print("Arguments: " + str(args._))
     
     # make datafile/[magnet|msite] exclusive one or the other
     if args.magnet != None and args.msite:
@@ -62,7 +62,12 @@ def main():
         jsonfile = args.msite
 
 
-    setup(MyEnv, args, confdata, jsonfile)    
+    cmds = setup(MyEnv, args, confdata, jsonfile)
+    # Print command to run
+    print("\n\n=== Guidelines for running a simu ===")
+    for key in cmds:
+        print(key, ':', cmds[key])
+
     return 0
 
 

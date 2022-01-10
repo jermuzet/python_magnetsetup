@@ -99,12 +99,14 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
         flux_model = appcfg[method][time][geom][model]["cooling-post"][cooling]
         stats_T_model = appcfg[method][time][geom][model]["stats_T"]
         stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
+        stats_Current_model = appcfg[method][time][geom][model]["stats_Current"]
 
         fcooling = os.path.join(template_path, cooling_model)
         frobin = os.path.join(template_path, appcfg[method][time][geom][model]["cooling"]["robin"])
         fflux = os.path.join(template_path, flux_model)
         fstats_T = os.path.join(template_path, stats_T_model)
         fstats_Power = os.path.join(template_path, stats_Power_model)
+        fstats_Current = os.path.join(template_path, stats_Current_model)
 
     material_generic_def = ["conductor", "insulator"]
     if time == "transient":
@@ -118,7 +120,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
         "cooling": fcooling,
         "robin": frobin,
         "flux": fflux,
-        "stats": [fstats_T, fstats_Power],
+        "stats": [fstats_T, fstats_Power, fstats_Current],
         "material_def" : material_generic_def
     }
 

@@ -31,3 +31,6 @@ To run simulation with Feelpp, we still need to create:
 * a mesh file ( see magnetgeo)
 * a cfg file for
 ====
+
+python -m python_magnetsetup.cli --wd data --magnet HL-test --method cfpdes --time static --geom Axi --model thmagel  --cooling mean
+python -m python_magnetsetup.cli --wd data --magnet M9Bitters --method cfpdes --time static --geom Axi --model thmagel  --cooling mean

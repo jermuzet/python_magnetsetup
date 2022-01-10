@@ -136,6 +136,7 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
 
 def create_materials_supra(gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False) -> dict:
     materials_dict = {}
+    if debug: print("create_material_supra:", confdata)
 
     fconductor = templates["conductor"]
     
@@ -174,11 +175,14 @@ def create_materials_bitter(gdata: tuple, confdata: dict, templates: dict, metho
         else:
             return {}
 
+    if debug:
+        print(materials_dict)
     return materials_dict
 
 def create_materials_insert(gdata: tuple, idata: Optional[List], confdata: dict, templates: dict, method_data: List[str], debug: bool = False) -> dict:
     # TODO loop for Plateau (Axi specific)
     materials_dict = {}
+    if debug: print("create_material_insert:", confdata)
 
     fconductor = templates["conductor"]
     finsulator = templates["insulator"]
@@ -375,7 +379,9 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     """
 
     if debug: print("create_json=", jsonfile)
-    data = entry(templates["model"], mdict, debug)
+    print("create_json=", jsonfile)
+    data = entry(templates["model"], mdict, debug)   
+    print("create_json/data:", data)
     
     # material section
     if "Materials" in data:
@@ -383,7 +389,8 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
             data["Materials"][key] = mmat[key]
     else:
         data["Materials"] = mmat
-    
+    print("create_json/Materials data:", data)
+
     # postprocess
     if debug: print("flux")
     if "flux" in mpost:
@@ -400,14 +407,21 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     for md in odata["Stats_T"]:
         data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_T"][md]
 
-    if debug: print("power_H")
+    if debug: print("current_H")
     section = "electric"
+    currentH_data = mpost["current_H"] # { "Power_H": [] }
+    add = data["PostProcess"][section]["Measures"]["Statistics"]
+    odata = entry(templates["stats"][1], currentH_data, debug)
+    for md in odata["Stats_Current"]:
+        data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Current"][md]
+    
+    if debug: print("power_H")
     if method_data[0] == "cfpdes" and method_data[2] == "Axi": section = "heat" 
     powerH_data = mpost["power_H"] # { "Power_H": [] }
     add = data["PostProcess"][section]["Measures"]["Statistics"]
     odata = entry(templates["stats"][1], powerH_data, debug)
     for md in odata["Stats_Power"]:
-        data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
+        data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
     
     mdata = json.dumps(data, indent = 4)
 
