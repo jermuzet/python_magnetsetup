@@ -380,6 +380,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
 
     if debug: print("create_json=", jsonfile)
     print("create_json=", jsonfile)
+    print("create_json=", mdict)
     data = entry(templates["model"], mdict, debug)   
     print("create_json/data:", data)
     
@@ -409,9 +410,12 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
 
     if debug: print("current_H")
     section = "electric"
+    if method_data[0] == "cfpdes" and method_data[2] == "Axi": section = "heat" 
     currentH_data = mpost["current_H"] # { "Power_H": [] }
+    print("currentH_data:", currentH_data)
+    print("templates[stats]:", templates["stats"])
     add = data["PostProcess"][section]["Measures"]["Statistics"]
-    odata = entry(templates["stats"][1], currentH_data, debug)
+    odata = entry(templates["stats"][2], currentH_data, debug)
     for md in odata["Stats_Current"]:
         data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Current"][md]
     
@@ -423,6 +427,8 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     for md in odata["Stats_Power"]:
         data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
     
+    print("with currents:", data["PostProcess"][section]["Measures"]["Statistics"])
+
     mdata = json.dumps(data, indent = 4)
 
     # print("corrected data:", re.sub(r'},\n					    	}\n', '}\n}\n', data))

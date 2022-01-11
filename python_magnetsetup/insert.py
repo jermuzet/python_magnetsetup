@@ -121,15 +121,15 @@ def Insert_setup(confdata: dict, cad: Insert, method_data: List, templates: dict
             meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
 
         if cad.CurrentLeads:
-            currentH_data.append( {"header": "Current_iL1", "markers": { "name:": "iL1_V0" } )
-            currentH_data.append( {"header": "Current_oL2", "markers": { "name:": "oL2_V0" } )
+            currentH_data.append( {"header": "Current_iL1", "markers": { "name:": "iL1_V0" } } )
+            currentH_data.append( {"header": "Current_oL2", "markers": { "name:": "oL2_V0" } } )
             powerH_data.append( {"header": "Power_iL1", "markers": { "name": "iL1"} } )
             powerH_data.append( {"header": "Power_oL2", "markers": { "name": "oL2"} } )
             meanT_data.append( {"header": "MeanT_iL1", "markers": { "name": "iL1" } } )
             meanT_data.append( {"header": "MeanT_oL2", "markers": { "name": "oL2" } } )
         else:
-            currentH_data.append( {"header": "Current_H1", "markers": { "name:": "H1_V0" } )
-            currentH_data.append( {"header": "Current_H{}".format(NHelices), "markers": { "name:": "H{}_V0".format(NHelices) } )
+            currentH_data.append( {"header": "Current_H1", "markers": { "name:": "H1_V0" } } )
+            currentH_data.append( {"header": "Current_H{}".format(NHelices), "markers": { "name:": "H{}_V0".format(NHelices) } } )
             
 
     for i in range(NRings) :
