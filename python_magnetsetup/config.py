@@ -3,6 +3,7 @@ from typing import List, Optional
 import sys
 import os
 import json
+
 class appenv():
     
     def __init__(self, debug: bool = False):
@@ -23,6 +24,8 @@ class appenv():
             self.template_repo = data.get('TEMPLATE_REPO')
         if 'SIMAGE_REPO' in envdata:
             self.simage_repo = data.get('SIMAGE_REPO')
+        if 'DATA_REPO' in envdata:
+            self.yaml_repo = data.get('DATA_REPO') + "/geometries"
 
     def template_path(self, debug: bool = False):
         """

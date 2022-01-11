@@ -65,6 +65,7 @@ def main():
     cmds = setup(MyEnv, args, confdata, jsonfile)
     # Print command to run
     print("\n\n=== Guidelines for running a simu ===")
+    print("Edit %s to fix the meshfile, scale, partition and solver props" % cfgfile)
     for key in cmds:
         print(key, ':', cmds[key])
 

@@ -62,6 +62,7 @@ def load_object(appenv: appenv, datafile: str, debug: bool = False):
         print("Look for %s in %s" % (datafile, appenv.yaml_repo))
     else:
         print("Look for %s in workingdir %s" % (datafile, os.getcwd()))
+
     with open(datafile, 'r') as cfgdata:
             confdata = json.load(cfgdata)
     return confdata
