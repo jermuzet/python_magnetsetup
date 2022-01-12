@@ -46,6 +46,7 @@ RUN apt-get update \
     && apt-get -y install python3-decouple python3-requests python3-chevron \
     && apt-get -y install python3-python-magnetgeo \
     && apt-get -y install python3-gmsh \
+    && apt-get -y install python3-magnettools python3-yaml \
     #\
     # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.\
     && groupadd --gid $USER_GID $USERNAME \
