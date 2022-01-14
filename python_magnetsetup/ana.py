@@ -33,6 +33,11 @@ def HMagnet(struct: Insert, data: dict, debug: bool=False):
         geom = helix["geom"]
         with open(geom, 'r') as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+        nturns = len(struct.axi.nturns)
+        r1 = struct.r[0]
+        r2 = struct.r[1]
+        h = struct.axi.h
+        Tube(nturns, r1, r2, h)
         BMagnet(cad, material, debug)
 
 def BMagnet(struct: Bitter, material: dict, debug: bool=False):
