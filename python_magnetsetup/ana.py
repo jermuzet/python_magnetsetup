@@ -250,10 +250,22 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False):
                     
         if debug:
             print("mconfdata[geom]:", mconfdata["geom"])
-        (Tubes,Helices,OHelices,BMagnets,UMagnets,Shims) = magnet_setup(mconfdata, debug)
+        tmp = magnet_setup(mconfdata, debug)
         
         # pack magnets
-    
+        for item in tmp[0]:
+            Tubes.append(item)
+        for item in tmp[1]:
+            Helices.append(item)
+        for item in tmp[2]:
+            OHelices.append(item)
+        for item in tmp[3]:
+            BMagnets.append(item)
+        for item in tmp[4]:
+            UMagnets.append(item)
+        for item in tmp[5]:
+            Shims.append(item)
+
     # Bstacks = mt.VectorOfStacks()
     print("\nHelices:", len(Tubes))
     if len(BMagnets) != 0:
