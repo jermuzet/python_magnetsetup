@@ -28,17 +28,28 @@ def HMagnet(struct: Insert, data: dict, debug: bool=False):
     # how to create Tubes??
     #Tube(const int n= len(struct.axi.turns), const MyDouble r1 = struct.r[0], const MyDouble r2 = struct.r[1], const MyDouble l = struct.axi.h??)
 
+    Tubes = mt.VectorOfTubes()
+    Helices = mt.VectorOfBitters()
+    OHelices = mt.VectorOfBitters()
+
     for helix in data["Helix"]:
         material = helix["material"]
         geom = helix["geom"]
         with open(geom, 'r') as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
-        nturns = len(struct.axi.nturns)
-        r1 = struct.r[0]
-        r2 = struct.r[1]
-        h = struct.axi.h
-        Tube(nturns, r1, r2, h)
-        BMagnet(cad, material, debug)
+        nturns = len(cad.axi.turns)
+        print("nturns:", nturns)
+        r1 = cad.r[0]
+        r2 = cad.r[1]
+        h = cad.axi.h
+        Tubes.append( mt.Tube(nturns, r1, r2, h) )
+        tmp = BMagnet(cad, material, debug)
+        for item in tmp:
+            Helices.append(item)
+
+    print("HMagnet:", struct.name, "Tubes:", len(Tubes), "Helices:", len(Helices))
+    
+    return (Tubes, Helices, OHelices)
 
 def BMagnet(struct: Bitter, material: dict, debug: bool=False):
     """
@@ -46,7 +57,9 @@ def BMagnet(struct: Bitter, material: dict, debug: bool=False):
 
     b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, fillingfactor, rho)
     """
-
+    
+    BMagnets = mt.VectorOfBitters()
+    
     rho = 1/ material["ElectricalConductivity"]
     f = 1 # 1/struct.get_Nturns() # struct.getFillingFactor()
         
@@ -58,9 +71,12 @@ def BMagnet(struct: Bitter, material: dict, debug: bool=False):
         dz = n * pitch
         j = n / ( (r2-r1) * dz )
         z_offset = z + dz/2.
-        mt.BitterMagnet(r2, r1, dz/2., j, z_offset, f, rho)
+        BMagnets.append( mt.BitterMagnet(r2, r1, dz/2., j, z_offset, f, rho) )
                 
         z += dz
+
+    print("BMagnet:", struct.name, len(BMagnets))
+    return BMagnets
 
 def UMagnet(struct: SupraStructure.HTSinsert, debug: bool=False):
     """
@@ -76,6 +92,8 @@ def UMagnet(struct: SupraStructure.HTSinsert, debug: bool=False):
     for dp in struct.dblepancakes:
         nturns += 2 * dp.pancake.n
         j = nturns / struct.getArea()
+    
+    print("UMagnets:", struct.name, 1)
     return mt.UnifMagnet(struct.r1, struct.r0, struct.h, j, struct.z0, f, rho)
 
 
@@ -89,7 +107,8 @@ def UMagnets(struct: SupraStructure.HTSinsert, detail: str ="dblepancake", debug
     tape: each tape is a U Magnet
     """
     rho = 0
-    UMagnets = []
+    UMagnets = mt.VectorOfUnifs()
+
     for dp in struct.dblepancakes:
         h = dp.getH()
         zm = dp.getZ0()
@@ -129,6 +148,7 @@ def UMagnets(struct: SupraStructure.HTSinsert, detail: str ="dblepancake", debug
                 ro = ri + w
                 UMagnets.append( mt.UnifMagnet(ro, ri, h_t, j, zi+h_t/2., f, rho))
 
+    print("UMagnets:", struct.name, len(UMagnets))
     return UMagnets
 
 
@@ -141,7 +161,15 @@ def magnet_setup(confdata: str, debug: bool=False):
     yamlfile = confdata["geom"]
     if debug:
         print("magnet_setup:", yamlfile)
+
+    Tubes = mt.VectorOfTubes()
+    Helices = mt.VectorOfBitters()
+    OHelices = mt.VectorOfBitters()
+    UMagnets = mt.VectorOfUnifs()
+    BMagnets = mt.VectorOfBitters()
+    Shims = mt.VectorOfShims()
     
+
     if "Helix" in confdata:
         print("Load an insert")
         # Download or Load yaml file from data repository??
@@ -149,7 +177,13 @@ def magnet_setup(confdata: str, debug: bool=False):
         with open(yamlfile, 'r') as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         # if isinstance(cad, Insert):
-        HMagnet(cad, confdata, debug)
+        tmp = HMagnet(cad, confdata, debug)
+        for item in tmp[0]:
+            Tubes.append(item)
+        for item in tmp[1]:
+            Helices.append(item)
+        for item in tmp[2]:
+            OHelices.append(item)
 
     for mtype in ["Bitter", "Supra"]:
         if mtype in confdata:
@@ -163,12 +197,28 @@ def magnet_setup(confdata: str, debug: bool=False):
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
     
                 if isinstance(cad, Bitter.Bitter):
-                    BMagnet(cad, obj["material"], debug)
+                    tmp = BMagnet(cad, obj["material"], debug)
+                    for item in tmp:
+                        BMagnets.append(item)
                 elif isinstance(cad, Supra):
-                    UMagnet(cad, obj["material"], debug)
+                    tmp = UMagnet(cad, obj["material"], debug)
+                    for item in tmp:
+                        UMagnets.append(item)
                 else:
                     print("setup: unexpected cad type %s" % str(type(cad)))
                     sys.exit(1)
+
+    # Bstacks = mt.VectorOfStacks()
+    print("\nHelices:", len(Tubes))
+    if len(BMagnets) != 0:
+        Bstacks = mt.create_Bstack(BMagnets)
+        print("\nBstacks:", len(Bstacks))
+    if len(UMagnets) != 0:
+        Ustacks = mt.create_Ustack(UMagnets)
+        print("\nUStacks:", len(Ustacks))
+    print("\n")
+    
+    return (Tubes,Helices,OHelices,BMagnets,UMagnets,Shims)
 
 
 def msite_setup(MyEnv, confdata: str, debug: bool=False):
@@ -179,6 +229,13 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False):
     print("msite_setup:", "confdata=", confdata)
     print("miste_setup: confdata[magnets]=", confdata["magnets"])
     
+    Tubes = mt.VectorOfTubes()
+    Helices = mt.VectorOfBitters()
+    OHelices = mt.VectorOfBitters()
+    UMagnets = mt.VectorOfUnifs()
+    BMagnets = mt.VectorOfBitters()
+    Shims = mt.VectorOfShims()
+
     for magnet in confdata["magnets"]:
         print("magnet:", magnet, "type(magnet)=", type(magnet), "debug=", debug)
         try:
@@ -193,7 +250,21 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False):
                     
         if debug:
             print("mconfdata[geom]:", mconfdata["geom"])
-        magnet_setup(mconfdata, method_data, templates, debug)
+        (Tubes,Helices,OHelices,BMagnets,UMagnets,Shims) = magnet_setup(mconfdata, debug)
+        
+        # pack magnets
+    
+    # Bstacks = mt.VectorOfStacks()
+    print("\nHelices:", len(Tubes))
+    if len(BMagnets) != 0:
+        Bstacks = mt.create_Bstack(BMagnets)
+        print("\nBstacks:", len(Bstacks))
+    if len(UMagnets) != 0:
+        Ustacks = mt.create_Ustack(UMagnets)
+        print("\nUStacks:", len(Ustacks))
+    print("\n")
+    
+    return (Tubes,Helices,OHelices,BMagnets,UMagnets,Shims)
     
 
 def setup(MyEnv, args, confdata, jsonfile):
