@@ -10,7 +10,6 @@ import yaml
 import argparse
 from .objects import load_object, load_object_from_db
 from .config import appenv, loadconfig, loadtemplates
-from .objects import load_object, load_object_from_db
 
 from python_magnetgeo import Insert, MSite, Bitter, Supra, SupraStructure
 from python_magnetgeo import python_magnetgeo
@@ -294,7 +293,7 @@ def setup(MyEnv, args, confdata, jsonfile):
 
     if "geom" in confdata:
         print("Load a magnet %s " % jsonfile, "debug:", args.debug)
-        magnet_setup(confdata, args.debug or args.verbose)
+        return magnet_setup(confdata, args.debug or args.verbose)
     else:
         print("Load a msite %s" % confdata["name"], "debug:", args.debug)
         # print("confdata:", confdata)
@@ -303,8 +302,10 @@ def setup(MyEnv, args, confdata, jsonfile):
         with open(confdata["name"] + ".yaml", "x") as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)
-        msite_setup(MyEnv, confdata, args.debug or args.verbose)               
-                    
+        return msite_setup(MyEnv, confdata, args.debug or args.verbose)               
+
+    return 1
+     
 def main():
     # Manage Options
     command_line = None
