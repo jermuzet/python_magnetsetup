@@ -4,11 +4,8 @@
 
 from setuptools import setup, find_packages
 
-with open('README.rst') as readme_file:
+with open('README.md') as readme_file:
     readme = readme_file.read()
-
-with open('HISTORY.rst') as history_file:
-    history = history_file.read()
 
 requirements = [ ]
 
@@ -34,17 +31,16 @@ setup(
     description="Python Magnet SetUp to create json and cfg files for simulation",
     entry_points={
         'console_scripts': [
-            'python_magnetsetup=python_magnetsetup.python_magnetsetup:main',
+            'python_magnetsetup=python_magnetsetup:main',
         ],
     },
     install_requires=requirements,
     license="MIT license",
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
     include_package_data=True,
     keywords='python_magnetsetup',
     name='python_magnetsetup',
     packages=find_packages(include=['python_magnetsetup', 'python_magnetsetup.*']),
-    include_package_data=True,
     package_data={'': ['templates/cfpdes/Axi/*.mustache', 'templates/cfpdes/Axi/*.json']},
     setup_requires=setup_requirements,
     test_suite='tests',
