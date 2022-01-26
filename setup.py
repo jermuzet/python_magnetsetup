@@ -9,7 +9,7 @@ with open('README.md') as readme_file:
 
 requirements = [ ]
 
-setup_requirements = ['pytest-runner', ]
+setup_requirements = [ ]
 
 test_requirements = ['pytest>=3', ]
 
