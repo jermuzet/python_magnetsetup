@@ -31,7 +31,7 @@ setup(
     description="Python Magnet SetUp to create json and cfg files for simulation",
     entry_points={
         'console_scripts': [
-            'python_magnetsetup=python_magnetsetup:main',
+            'python_magnetsetup=python_magnetsetup.setup:main',
         ],
     },
     install_requires=requirements,
