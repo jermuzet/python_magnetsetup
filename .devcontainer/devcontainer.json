@@ -6,10 +6,11 @@
 	    "--security-opt", "seccomp=unconfined",
             "--net", "host", 
             "-e", "DISPLAY=${env:DISPLAY}",
-            "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
-	    "-v", "${env:PWD}/../python_magnetsetup/data:/data"
+            "-v", "/tmp/.X11-unix:/tmp/.X11-unix"
 	],
-
+	"mounts": [
+		"source=${localWorkspaceFolder}\\..\\python_magnetsetup\\data,target=/data,type=bind,consistency=cached",
+	],
 	// Use 'settings' to set *default* container specific settings.json values on container create. 
 	// You can edit these settings after create using File > Preferences > Settings > Remote.
 	"settings": { 
