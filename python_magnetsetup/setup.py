@@ -73,7 +73,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
         with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         # if isinstance(cad, Insert):
-        (mdict, mmat, mpost) = Insert_setup(confdata, cad, method_data, templates, debug)
+        (mdict, mmat, mpost) = Insert_setup(MyEnv, confdata, cad, method_data, templates, debug)
 
     for mtype in ["Bitter", "Supra"]:
         if mtype in confdata:
@@ -87,9 +87,9 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
     
                 if isinstance(cad, Bitter.Bitter):
-                    (tdict, tmat, tpost) = Bitter_setup(obj, cad, method_data, templates, debug)
+                    (tdict, tmat, tpost) = Bitter_setup(MyEnv, obj, cad, method_data, templates, debug)
                 elif isinstance(cad, Supra):
-                    (tdict, tmat, tpost) = Supra_setup(obj, cad, method_data, templates, debug)
+                    (tdict, tmat, tpost) = Supra_setup(MyEnv, obj, cad, method_data, templates, debug)
                 else:
                     print("setup: unexpected cad type %s" % str(type(cad)))
                     sys.exit(1)
