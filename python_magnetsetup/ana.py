@@ -304,7 +304,13 @@ def setup(MyEnv, args, confdata, jsonfile):
     """
     """
     print("ana/main")
-    
+    from .file_utils import findfile
+    default_pathes={
+        "geom" : MyEnv.yaml_repo,
+        "cad" : MyEnv.cad_repo,
+        "mesh" : MyEnv.mesh_repo
+    }
+
     # loadconfig
     AppCfg = loadconfig()
 
@@ -321,7 +327,8 @@ def setup(MyEnv, args, confdata, jsonfile):
         # print("confdata:", confdata)
 
         # why do I need that???
-        with open(confdata["name"] + ".yaml", "x") as out:
+        if not findfile(confdata["name"] + ".yaml", paths=[ os.getcwd(), default_pathes["geom"]]):
+            with open(confdata["name"] + ".yaml", "x") as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)
         return msite_setup(MyEnv, confdata, args.debug or args.verbose)               

@@ -159,7 +159,7 @@ def setup(MyEnv, args, confdata, jsonfile):
     """
     """
     print("setup/main")
-    
+        
     # loadconfig
     AppCfg = loadconfig()
 
@@ -194,7 +194,8 @@ def setup(MyEnv, args, confdata, jsonfile):
         # print("confdata:", confdata)
 
         # why do I need that???
-        with MyOpen(confdata["name"] + ".yaml", "x", paths=[ os.getcwd(), default_pathes["geom"]]) as out:
+        if not findfile(confdata["name"] + ".yaml", paths=[ os.getcwd(), default_pathes["geom"]]):
+            with MyOpen(confdata["name"] + ".yaml", "x", paths=[ os.getcwd(), default_pathes["geom"]]) as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)
         (tdict, tmat, tpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)        
