@@ -44,7 +44,7 @@ RUN apt-get update \
     && apt-get -y install python3-pint \
     && apt-get -y install curl \
     && apt-get -y install python3-decouple python3-requests python3-chevron \
-    && apt-get -y install python3-python-magnetgeo \
+    && apt-get -y install python3-magnetgeo \
     && apt-get -y install python3-gmsh \
     && apt-get -y install python3-magnettools python3-yaml \
     #\
