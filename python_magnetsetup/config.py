@@ -9,6 +9,7 @@ class appenv():
     def __init__(self, debug: bool = False):
         self.url_api: str = None
         self.yaml_repo: Optional[str] = None
+        self.cad_repo: Optional[str] = None
         self.mesh_repo: Optional[str] = None
         self.template_repo: Optional[str] = None
         self.simage_repo: Optional[str] = None
@@ -26,6 +27,8 @@ class appenv():
             self.simage_repo = data.get('SIMAGE_REPO')
         if 'DATA_REPO' in envdata:
             self.yaml_repo = data.get('DATA_REPO') + "/geometries"
+            self.cad_repo = data.get('DATA_REPO') + "/cad"
+            self.mesh_repo = data.get('DATA_REPO') + "/meshes"
 
     def template_path(self, debug: bool = False):
         """

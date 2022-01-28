@@ -1,3 +1,4 @@
+import os
 from typing import List, Optional
 
 import yaml
@@ -8,7 +9,9 @@ from python_magnetgeo import python_magnetgeo
 from .jsonmodel import create_params_insert, create_bcs_insert, create_materials_insert
 from .utils import Merge
 
-def Insert_setup(confdata: dict, cad: Insert, method_data: List, templates: dict, debug: bool=False):
+import os
+
+def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, templates: dict, debug: bool=False):
     print("Insert_setup: %s" % cad.name)
     part_thermic = []
     part_electric = []
@@ -19,7 +22,13 @@ def Insert_setup(confdata: dict, cad: Insert, method_data: List, templates: dict
     boundary_meca = []
     boundary_maxwell = []
     boundary_electric = []
-    
+
+    from .file_utils import MyOpen, findfile
+    default_pathes={
+        "geom" : MyEnv.yaml_repo,
+        "cad" : MyEnv.cad_repo,
+        "mesh" : MyEnv.mesh_repo
+    }
     gdata = python_magnetgeo.get_main_characteristics(cad)
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
 
@@ -35,8 +44,8 @@ def Insert_setup(confdata: dict, cad: Insert, method_data: List, templates: dict
                 index_Helices.append(["0:{}".format(Nsections[i]+2)])
                 
         else:
-            with open(cad.Helices[i]+".yaml", "r") as f:
-                hhelix = yaml.load(cad.Helices[i]+".yaml", Loader = yaml.FullLoader)
+            with MyOpen(cad.Helices[i]+".yaml", "r", paths=[ os.getcwd(), default_pathes["geom"]]) as f:
+                hhelix = yaml.load(f, Loader = yaml.FullLoader)
                 (insulator_name, insulator_number) = hhelix.insulators()
                 index_Insulators.append((insulator_name, insulator_number))
 

@@ -16,7 +16,7 @@ from python_magnetgeo import python_magnetgeo
 
 import MagnetTools.MagnetTools as mt
 
-def HMagnet(struct: Insert, data: dict, debug: bool=False):
+def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
     """
     create view of this insert as a Helices Magnet
 
@@ -30,11 +30,18 @@ def HMagnet(struct: Insert, data: dict, debug: bool=False):
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
     OHelices = mt.VectorOfBitters()
+    
+    from .file_utils import MyOpen
+    default_pathes={
+        "geom" : MyEnv.yaml_repo,
+        "cad" : MyEnv.cad_repo,
+        "mesh" : MyEnv.mesh_repo
+    }
 
     for helix in data["Helix"]:
         material = helix["material"]
         geom = helix["geom"]
-        with open(geom, 'r') as cfgdata:
+        with MyOpen(geom, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         nturns = len(cad.axi.turns)
         print("nturns:", nturns)
@@ -77,7 +84,7 @@ def BMagnet(struct: Bitter, material: dict, debug: bool=False):
     print("BMagnet:", struct.name, len(BMagnets))
     return BMagnets
 
-def UMagnet(struct: SupraStructure.HTSinsert, debug: bool=False):
+def UMagnet(struct: Supra, debug: bool=False):
     """
     create view of this insert as a Uniform Magnet
 
@@ -151,7 +158,7 @@ def UMagnets(struct: SupraStructure.HTSinsert, detail: str ="dblepancake", debug
     return UMagnets
 
 
-def magnet_setup(confdata: str, debug: bool=False):
+def magnet_setup(MyEnv, confdata: str, debug: bool=False):
     """
     Creating MagnetTools data struct for setup for magnet
     """
@@ -168,15 +175,22 @@ def magnet_setup(confdata: str, debug: bool=False):
     BMagnets = mt.VectorOfBitters()
     Shims = mt.VectorOfShims()
     
+    from .file_utils import MyOpen, findfile
+    default_pathes={
+        "geom" : MyEnv.yaml_repo,
+        "cad" : MyEnv.cad_repo,
+        "mesh" : MyEnv.mesh_repo
+    }
 
     if "Helix" in confdata:
         print("Load an insert")
         # Download or Load yaml file from data repository??
         cad = None
-        with open(yamlfile, 'r') as cfgdata:
+        # with open(yamlfile, 'r') as cfgdata:
+        with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         # if isinstance(cad, Insert):
-        tmp = HMagnet(cad, confdata, debug)
+        tmp = HMagnet(MyEnv, cad, confdata, debug)
         for item in tmp[0]:
             Tubes.append(item)
         for item in tmp[1]:
@@ -192,7 +206,7 @@ def magnet_setup(confdata: str, debug: bool=False):
             for obj in confdata[mtype]:
                 print("obj:", obj)
                 cad = None
-                with open(obj['geom'], 'r') as cfgdata:
+                with MyOpen(obj['geom'], 'r', paths=[ os.getcwd(), default_pathes["geom"]] ) as cfgdata:
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
     
                 if isinstance(cad, Bitter.Bitter):
@@ -200,9 +214,17 @@ def magnet_setup(confdata: str, debug: bool=False):
                     for item in tmp:
                         BMagnets.append(item)
                 elif isinstance(cad, Supra):
-                    tmp = UMagnet(cad, obj["material"], debug)
-                    for item in tmp:
-                        UMagnets.append(item)
+                    # get SupraStructure.HTSinsert from cad
+                    if cad.detail == None:
+                        tmp = UMagnet(cad, debug)
+                        UMagnets.append(tmp)
+                    else:
+                        sstruct = SupraStructure()
+                        fstruct = findfile(cad.struct, paths=[ os.getcwd(), default_pathes["geom"]])
+                        sstruct.loadCfg(fstruct)
+                        tmp = UMagnets(sstruct, cad.detail, debug)
+                        for item in tmp:
+                            UMagnets.append(item)
                 else:
                     print("setup: unexpected cad type %s" % str(type(cad)))
                     sys.exit(1)
@@ -249,7 +271,7 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False):
                     
         if debug:
             print("mconfdata[geom]:", mconfdata["geom"])
-        tmp = magnet_setup(mconfdata, debug)
+        tmp = magnet_setup(MyEnv, mconfdata, debug)
         
         # pack magnets
         for item in tmp[0]:
@@ -293,7 +315,7 @@ def setup(MyEnv, args, confdata, jsonfile):
 
     if "geom" in confdata:
         print("Load a magnet %s " % jsonfile, "debug:", args.debug)
-        return magnet_setup(confdata, args.debug or args.verbose)
+        return magnet_setup(MyEnv, confdata, args.debug or args.verbose)
     else:
         print("Load a msite %s" % confdata["name"], "debug:", args.debug)
         # print("confdata:", confdata)

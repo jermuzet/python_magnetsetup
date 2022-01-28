@@ -8,7 +8,9 @@ from python_magnetgeo import python_magnetgeo
 from .jsonmodel import create_params_bitter, create_bcs_bitter, create_materials_bitter
 from .utils import Merge
 
-def Bitter_setup(confdata: dict, cad: Bitter, method_data: List, templates: dict, debug: bool=False):
+import os
+
+def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, templates: dict, debug: bool=False):
     print("Bitter_setup: %s" % cad.name, "debug=", debug)
     if debug: print("Bitter_setup/Bitter confdata: %s" % confdata)
 
@@ -19,12 +21,20 @@ def Bitter_setup(confdata: dict, cad: Bitter, method_data: List, templates: dict
     boundary_meca = []
     boundary_maxwell = []
     boundary_electric = []
-    
+
+    from .file_utils import MyOpen, findfile
+    default_pathes={
+        "geom" : MyEnv.yaml_repo,
+        "cad" : MyEnv.cad_repo,
+        "mesh" : MyEnv.mesh_repo
+    }
+
     yamlfile = confdata["geom"]
     if debug: print("Bitter_setup/Bitter yamlfile: %s" % yamlfile)
+    
     name = ""
     snames = []
-    with open(yamlfile, "r") as cfgdata:
+    with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
         cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         if debug: print(cad)
 
