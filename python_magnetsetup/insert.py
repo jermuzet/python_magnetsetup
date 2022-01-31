@@ -24,12 +24,17 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     boundary_electric = []
 
     from .file_utils import MyOpen, findfile
-    default_pathes={
-        "geom" : MyEnv.yaml_repo,
-        "cad" : MyEnv.cad_repo,
-        "mesh" : MyEnv.mesh_repo
-    }
-    gdata = python_magnetgeo.get_main_characteristics(cad)
+    search_paths = [ os.getcwd() ]
+    if MyEnv:
+        default_paths={
+            "geom" : MyEnv.yaml_repo,
+            "cad" : MyEnv.cad_repo,
+            "mesh" : MyEnv.mesh_repo
+        }
+        search_paths.append( default_paths["geom"] )
+    
+    
+    gdata = python_magnetgeo.get_main_characteristics(cad, MyEnv)
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
 
     print("Insert: %s" % cad.name, "NHelices=%d NRings=%d NChannels=%d" % (NHelices, NRings, NChannels))
@@ -44,7 +49,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
                 index_Helices.append(["0:{}".format(Nsections[i]+2)])
                 
         else:
-            with MyOpen(cad.Helices[i]+".yaml", "r", paths=[ os.getcwd(), default_pathes["geom"]]) as f:
+            with MyOpen(cad.Helices[i]+".yaml", "r", paths=search_paths) as f:
                 hhelix = yaml.load(f, Loader = yaml.FullLoader)
                 (insulator_name, insulator_number) = hhelix.insulators()
                 index_Insulators.append((insulator_name, insulator_number))
