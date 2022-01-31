@@ -2,7 +2,7 @@
 file utils
 """
   
-def findfile(searchfile, search_pathes=None, mode=None):
+def findfile(searchfile, search_pathes=None):
     """
     Look for file in search_pathes
     """
@@ -11,9 +11,11 @@ def findfile(searchfile, search_pathes=None, mode=None):
     for path in search_pathes:
         filename = os.path.join(path, searchfile)
         if os.path.isfile(filename):
+            print(f"{filename} found in {path}")
             return filename
 
-    raise FileNotFoundError(errno.ENOENT, os.strerror(f"cannot find in {search_pathes}"), searchfile)
+    # raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), searchfile)
+    raise FileNotFoundError(errno.ENOENT, f"cannot find in {search_pathes}", searchfile)
 
 import os
 class MyOpen(object):
@@ -22,14 +24,11 @@ class MyOpen(object):
     A context manager.
     """
     def __init__(self, f, mode, paths):
-        for path in paths:
-            if isinstance(f, str):
-                self.file = open(os.path.join(path, f), mode)
-                break
-            else:
-                self.file = f
-        if self.file is f:
-            print(f"{f} not found in {paths}")
+        if isinstance(f, str):
+            self.file = open(findfile(f, paths), mode)
+        else:
+            self.file = f
+
         self.close_file = (self.file is not f)
     def __enter__(self):
         return self
