@@ -44,6 +44,7 @@ from .insert import Insert_setup
 from .bitter import Bitter_setup
 from .supra import Supra_setup
     
+from .file_utils import MyOpen, findfile, search_paths
 
 def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug: bool=False):
     """
@@ -59,18 +60,11 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
     mmat = {}
     mpost = {}
     
-    from .file_utils import MyOpen, findfile
-    default_pathes={
-        "geom" : MyEnv.yaml_repo,
-        "cad" : MyEnv.cad_repo,
-        "mesh" : MyEnv.mesh_repo
-    }
-
     if "Helix" in confdata:
         print("Load an insert")
         # Download or Load yaml file from data repository??
         cad = None
-        with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
+        with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         # if isinstance(cad, Insert):
         (mdict, mmat, mpost) = Insert_setup(MyEnv, confdata, cad, method_data, templates, debug)
@@ -83,7 +77,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
             for obj in confdata[mtype]:
                 print("obj:", obj)
                 cad = None
-                with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
+                with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
     
                 if isinstance(cad, Bitter.Bitter):
@@ -179,13 +173,6 @@ def setup(MyEnv, args, confdata, jsonfile):
     mmat = {}
     mpost = {}
 
-    from .file_utils import MyOpen, findfile
-    default_pathes={
-        "geom" : MyEnv.yaml_repo,
-        "cad" : MyEnv.cad_repo,
-        "mesh" : MyEnv.mesh_repo
-    }
-
     if "geom" in confdata:
         print("Load a magnet %s " % jsonfile, "debug:", args.debug)
         (mdict, mmat, mpost) = magnet_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)
@@ -194,8 +181,8 @@ def setup(MyEnv, args, confdata, jsonfile):
         # print("confdata:", confdata)
 
         # why do I need that???
-        if not findfile(confdata["name"] + ".yaml", paths=[ os.getcwd(), default_pathes["geom"]]):
-            with MyOpen(confdata["name"] + ".yaml", "x", paths=[ os.getcwd(), default_pathes["geom"]]) as out:
+        if not findfile(confdata["name"] + ".yaml", paths=search_paths(MyEnv, "geom")):
+            with MyOpen(confdata["name"] + ".yaml", "x", paths=search_paths(MyEnv, "geom")) as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)
         (tdict, tmat, tpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)        

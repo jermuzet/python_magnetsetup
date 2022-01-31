@@ -1,6 +1,18 @@
 """
 file utils
 """
+
+def search_paths(MyEnv=None, otype: str = "geom"):
+    paths = [ os.getcwd() ]
+    if MyEnv:
+        default_paths={
+            "geom" : MyEnv.yaml_repo,
+            "cad" : MyEnv.cad_repo,
+            "mesh" : MyEnv.mesh_repo
+        }
+        paths.append( default_paths[otype] )
+
+    return paths
   
 def findfile(searchfile, search_pathes=None):
     """
