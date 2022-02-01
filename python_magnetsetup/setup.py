@@ -50,7 +50,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
     """
     Creating dict for setup for magnet
     """
-    print("magnet_setup", "debug=", debug)
+    print("magnet_setup", "debug=", debug, confdata)
     
     yamlfile = confdata["geom"]
     if debug:
@@ -130,7 +130,7 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
                     
         if debug:
             print("mconfdata[geom]:", mconfdata["geom"])
-        (tdict, tmat, tpost) = magnet_setup(mconfdata, method_data, templates, debug)
+        (tdict, tmat, tpost) = magnet_setup(MyEnv, mconfdata, method_data, templates, debug)
             
         print("tdict:", tdict)
         mdict = NMerge(tdict, mdict, debug)
@@ -181,11 +181,11 @@ def setup(MyEnv, args, confdata, jsonfile):
         # print("confdata:", confdata)
 
         # why do I need that???
-        if not findfile(confdata["name"] + ".yaml", paths=search_paths(MyEnv, "geom")):
+        if not findfile(confdata["name"] + ".yaml", search_paths(MyEnv, "geom")):
             with MyOpen(confdata["name"] + ".yaml", "x", paths=search_paths(MyEnv, "geom")) as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)
-        (tdict, tmat, tpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)        
+        (mdict, mmat, mpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)        
         
     name = jsonfile
     if name in confdata:
@@ -273,7 +273,4 @@ def setup(MyEnv, args, confdata, jsonfile):
         cmds["Mesh:"] = "singularity exec -B /opt/DISTENE:/opt/DISTENE:ro %s %s" % (simage_path + "/" + salome,meshcmd)
     
     return (cfgfile, jsonfile, cmds)
-    
-    
-    pass
 

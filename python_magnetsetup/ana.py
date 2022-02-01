@@ -208,7 +208,7 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
                         UMagnets.append(tmp)
                     else:
                         sstruct = SupraStructure()
-                        fstruct = findfile(cad.struct, paths=[ os.getcwd(), default_pathes["geom"]])
+                        fstruct = findfile(cad.struct, paths=search_paths(MyEnv, "geom"))
                         sstruct.loadCfg(fstruct)
                         tmp = UMagnets(sstruct, cad.detail, debug)
                         for item in tmp:

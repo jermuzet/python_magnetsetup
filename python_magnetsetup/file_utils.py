@@ -14,13 +14,13 @@ def search_paths(MyEnv=None, otype: str = "geom"):
 
     return paths
   
-def findfile(searchfile, search_pathes=None):
+def findfile(searchfile, paths=None):
     """
     Look for file in search_pathes
     """
     import errno
 
-    for path in search_pathes:
+    for path in paths:
         filename = os.path.join(path, searchfile)
         if os.path.isfile(filename):
             print(f"{filename} found in {path}")
