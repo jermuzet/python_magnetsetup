@@ -14,6 +14,8 @@ from .config import appenv, loadconfig, loadtemplates
 from python_magnetgeo import Insert, MSite, Bitter, Supra, SupraStructure
 from python_magnetgeo import python_magnetgeo
 
+from .file_utils import MyOpen, find_files, search_paths
+
 import MagnetTools.MagnetTools as mt
 
 def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
@@ -31,17 +33,10 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
     Helices = mt.VectorOfBitters()
     OHelices = mt.VectorOfBitters()
     
-    from .file_utils import MyOpen
-    default_pathes={
-        "geom" : MyEnv.yaml_repo,
-        "cad" : MyEnv.cad_repo,
-        "mesh" : MyEnv.mesh_repo
-    }
-
     for helix in data["Helix"]:
         material = helix["material"]
         geom = helix["geom"]
-        with MyOpen(geom, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
+        with MyOpen(geom, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         nturns = len(cad.axi.turns)
         print("nturns:", nturns)
@@ -175,19 +170,12 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
     BMagnets = mt.VectorOfBitters()
     Shims = mt.VectorOfShims()
     
-    from .file_utils import MyOpen, findfile
-    default_pathes={
-        "geom" : MyEnv.yaml_repo,
-        "cad" : MyEnv.cad_repo,
-        "mesh" : MyEnv.mesh_repo
-    }
-
     if "Helix" in confdata:
         print("Load an insert")
         # Download or Load yaml file from data repository??
         cad = None
         # with open(yamlfile, 'r') as cfgdata:
-        with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
+        with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         # if isinstance(cad, Insert):
         tmp = HMagnet(MyEnv, cad, confdata, debug)
@@ -206,7 +194,7 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
             for obj in confdata[mtype]:
                 print("obj:", obj)
                 cad = None
-                with MyOpen(obj['geom'], 'r', paths=[ os.getcwd(), default_pathes["geom"]] ) as cfgdata:
+                with MyOpen(obj['geom'], 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
     
                 if isinstance(cad, Bitter.Bitter):
@@ -327,7 +315,8 @@ def setup(MyEnv, args, confdata, jsonfile):
         # print("confdata:", confdata)
 
         # why do I need that???
-        if not findfile(confdata["name"] + ".yaml", paths=[ os.getcwd(), default_pathes["geom"]]):
+        # would be better to do that when creating a msite in db
+        if not findfile(confdata["name"] + ".yaml", paths=search_paths(MyEnv, "geom")):
             with open(confdata["name"] + ".yaml", "x") as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)

@@ -108,19 +108,11 @@ def main():
 
     print("init:", confdata)
 
-    from .file_utils import MyOpen, findfile
-    search_paths = [ os.getcwd() ]
-    if MyEnv:
-        default_paths={
-            "geom" : MyEnv.yaml_repo,
-            "cad" : MyEnv.cad_repo,
-            "mesh" : MyEnv.mesh_repo
-        }
-        search_paths.append( default_paths["geom"] )
-
+    from .file_utils import MyOpen, findfile, search_paths
+    
     # select a default distance unit
     yamlfile = confdata["geom"]
-    with MyOpen(yamlfile, 'r', paths=search_paths) as cfgdata:
+    with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
         cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         if isinstance(cad, Insert):
             gdata = python_magnetgeo.get_main_characteristics(cad, MyEnv)

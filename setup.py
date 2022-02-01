@@ -42,6 +42,7 @@ setup(
     name='python_magnetsetup',
     packages=find_packages(include=['python_magnetsetup', 'python_magnetsetup.*']),
     package_data={'': [
+        'settings.env', 
         'magnetsetup.json', 
         'templates/cfpdes/Axi/thelec/*.mustache', 
         'templates/cfpdes/Axi/thelec/*.json',
