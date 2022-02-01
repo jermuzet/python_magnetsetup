@@ -62,10 +62,10 @@ def main():
         jsonfile = args.msite
 
 
-    cmds = setup(MyEnv, args, confdata, jsonfile)
+    (cfgfile, jsonfile, cmds) = setup(MyEnv, args, confdata, jsonfile)
     # Print command to run
     print("\n\n=== Guidelines for running a simu ===")
-    print("Edit %s to fix the meshfile, scale, partition and solver props" % cfgfile)
+    print(f"Edit {cfgfile} to fix the meshfile, scale, partition and solver props")
     for key in cmds:
         print(key, ':', cmds[key])
 

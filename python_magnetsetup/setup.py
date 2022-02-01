@@ -272,7 +272,7 @@ def setup(MyEnv, args, confdata, jsonfile):
     else:
         cmds["Mesh:"] = "singularity exec -B /opt/DISTENE:/opt/DISTENE:ro %s %s" % (simage_path + "/" + salome,meshcmd)
     
-    return cmds
+    return (cfgfile, jsonfile, cmds)
     
     
     pass
