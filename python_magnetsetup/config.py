@@ -13,6 +13,7 @@ class appenv():
         self.mesh_repo: Optional[str] = None
         self.template_repo: Optional[str] = None
         self.simage_repo: Optional[str] = None
+        self.mrecord_repo: Optional[str] = None
 
         from decouple import Config, RepositoryEnv
         envdata = RepositoryEnv("settings.env")
@@ -29,6 +30,7 @@ class appenv():
             self.yaml_repo = data.get('DATA_REPO') + "/geometries"
             self.cad_repo = data.get('DATA_REPO') + "/cad"
             self.mesh_repo = data.get('DATA_REPO') + "/meshes"
+            self.mrecord_repo = data.get('DATA_REPO') + "/mrecords"
 
     def template_path(self, debug: bool = False):
         """
