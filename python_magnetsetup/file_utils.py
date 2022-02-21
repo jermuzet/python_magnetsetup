@@ -42,8 +42,10 @@ class MyOpen(object):
             self.file = f
 
         self.close_file = (self.file is not f)
+
     def __enter__(self):
         return self
+
     def __exit__(self, *args, **kwargs):
         if (not self.close_file):
             return  # do nothing

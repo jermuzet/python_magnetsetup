@@ -104,7 +104,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
         print("magnet_setup: mdict=", mdict)
     return (mdict, mmat, mpost)
 
-def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug: bool=False):
+def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug: bool=False, session=None):
     """
     Creating dict for setup for msite
     """
@@ -119,11 +119,11 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
     for magnet in confdata["magnets"]:
         print("magnet:", magnet, "type(magnet)=", type(magnet), "debug=", debug)
         try:
-            mconfdata = load_object(MyEnv, magnet + "-data.json", magnet, debug)
+            mconfdata = load_object(MyEnv, magnet + "-data.json", debug)
         except:
             print("setup: failed to load %s, look into magnetdb" % (magnet + "-data.json") )
             try:
-                mconfdata = load_object_from_db(MyEnv, "magnet", magnet, debug)
+                mconfdata = load_object_from_db(MyEnv, "magnet", magnet, debug, session)
             except:
                 print("setup: failed to load %s from magnetdb" % magnet)
                 sys.exit(1)
@@ -149,7 +149,7 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
     print("mdict:", mdict)
     return (mdict, mmat, mpost)
 
-def setup(MyEnv, args, confdata, jsonfile):
+def setup(MyEnv, args, confdata, jsonfile, session=None):
     """
     """
     print("setup/main")
@@ -185,7 +185,7 @@ def setup(MyEnv, args, confdata, jsonfile):
             with MyOpen(confdata["name"] + ".yaml", "x", paths=search_paths(MyEnv, "geom")) as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)
-        (mdict, mmat, mpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)        
+        (mdict, mmat, mpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose, session)        
         
     name = jsonfile
     if name in confdata:
@@ -217,12 +217,12 @@ def setup(MyEnv, args, confdata, jsonfile):
     if args.method == "cfpdes":
         if args.debug: print("cwd=", cwd)
         from shutil import copyfile
-        for jsonfile in material_generic_def:
-            filename = AppCfg[args.method][args.time][args.geom][args.model]["filename"][jsonfile]
+        for jfile in material_generic_def:
+            filename = AppCfg[args.method][args.time][args.geom][args.model]["filename"][jfile]
             src = os.path.join(MyEnv.template_path(), args.method, args.geom, args.model, filename)
-            dst = os.path.join(jsonfile + "-" + args.method + "-" + args.model + "-" + args.geom + ".json")
+            dst = os.path.join(jfile + "-" + args.method + "-" + args.model + "-" + args.geom + ".json")
             if args.debug:
-                print(jsonfile, "filename=", filename, "src=%s" % src, "dst=%s" % dst)
+                print(jfile, "filename=", filename, "src=%s" % src, "dst=%s" % dst)
             copyfile(src, dst)
      
     # TODO prepare a directory that contains every files needed to run simulation ??

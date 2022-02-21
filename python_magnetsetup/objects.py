@@ -67,13 +67,27 @@ def load_object(appenv: appenv, datafile: str, debug: bool = False):
             confdata = json.load(cfgdata)
     return confdata
 
-def load_object_from_db(appenv: appenv, mtype: str, name: str, debug: bool = False):
+
+def load_object_from_db(appenv: appenv, mtype: str, name: str, debug: bool = False, session = None):
     """
     Load object props from db
     """
 
     if not mtype in ["msite", "magnet", "Helix", "Bitter", "Supra", "material"]:
         raise("query_bd: %s not supported" % mtype)
+
+    if session:
+        from python_magnetdb.crud import get_magnet_data, get_msite_data
+
+        mdata = None
+        if mtype.lower() == "magnet":
+            mdata = get_magnet_data(session, name)
+        if mtype.lower() == "msite":
+            mdata = get_msite_data(session, name)
+
+        print ("load_object_from_db: use direct call to db")
+        return mdata
     
+    print ("load_object_from_db: use request")
     return query_db(appenv, mtype, name, debug)
 

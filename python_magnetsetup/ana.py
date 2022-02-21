@@ -14,7 +14,7 @@ from .config import appenv, loadconfig, loadtemplates
 from python_magnetgeo import Insert, MSite, Bitter, Supra, SupraStructure
 from python_magnetgeo import python_magnetgeo
 
-from .file_utils import MyOpen, find_files, search_paths
+from .file_utils import MyOpen, findfile, search_paths
 
 import MagnetTools.MagnetTools as mt
 
@@ -292,7 +292,6 @@ def setup(MyEnv, args, confdata, jsonfile):
     """
     """
     print("ana/main")
-    from .file_utils import findfile
     default_pathes={
         "geom" : MyEnv.yaml_repo,
         "cad" : MyEnv.cad_repo,
