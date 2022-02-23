@@ -6,6 +6,7 @@ import sys
 import os
 import json
 import yaml
+import math
 
 import argparse
 from .objects import load_object, load_object_from_db
@@ -32,7 +33,8 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
     OHelices = mt.VectorOfBitters()
-    
+
+    index = 0
     for helix in data["Helix"]:
         material = helix["material"]
         geom = helix["geom"]
@@ -43,16 +45,26 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
         r1 = cad.r[0]
         r2 = cad.r[1]
         h = cad.axi.h
-        Tubes.append( mt.Tube(nturns, r1, r2, h) )
-        tmp = BMagnet(cad, material, debug)
+        print("h:", h)
+        Tube = mt.Tube(nturns, r1*1.e-3, r2*1.e-3, h*1.e-3)
+        Tube.set_index(index)
+        print("index:", index, Tube.get_index())
+        print("cad.axi:", cad.axi)
+        for (n, pitch) in zip(cad.axi.turns, cad.axi.pitch):
+            Tube.set_nturn(n)
+            Tube.set_pitch(pitch*1.e-3)
+
+        Tubes.append( Tube )
+        fillingfactor = 1
+        tmp = BMagnet(cad, material, fillingfactor, debug)
         for item in tmp:
             Helices.append(item)
+        index += Tube.get_n_elem()
 
     print("HMagnet:", struct.name, "Tubes:", len(Tubes), "Helices:", len(Helices))
-    
     return (Tubes, Helices, OHelices)
 
-def BMagnet(struct: Bitter, material: dict, debug: bool=False):
+def BMagnet(struct: Bitter, material: dict, fillingfactor: Optional[float]=None, debug: bool=False):
     """
     create view of this insert as a Bitter Magnet
 
@@ -62,17 +74,22 @@ def BMagnet(struct: Bitter, material: dict, debug: bool=False):
     BMagnets = mt.VectorOfBitters()
     
     rho = 1/ material["ElectricalConductivity"]
-    f = 1 # 1/struct.get_Nturns() # struct.getFillingFactor()
-        
-    r1 = struct.r[0]
-    r2 = struct.r[1]
-    z = -struct.axi.h
+   
+    r1 = struct.r[0]*1.e-3
+    r2 = struct.r[1]*1.e-3
+    z = -struct.axi.h*1.e-3
+    print("BMagnet:", struct.axi)
 
     for (n, pitch) in zip(struct.axi.turns, struct.axi.pitch):
-        dz = n * pitch
-        j = n / ( (r2-r1) * dz )
+        dz = n * pitch*1.e-3
+        if fillingfactor:
+            j = n / (r1 * math.log(r2/r1) * dz)
+        else:
+            j = 1 / (r1 * math.log(r2/r1) * dz)
+        f = 1/float(n)
         z_offset = z + dz/2.
-        BMagnets.append( mt.BitterMagnet(r2, r1, dz/2., j, z_offset, f, rho) )
+        print("BMagnets:", r1, r2, z, z+dz, j, f, n)
+        BMagnets.append( mt.BitterMagnet(r2, r1, dz, j, z_offset, f, rho) )
                 
         z += dz
 
@@ -92,10 +109,10 @@ def UMagnet(struct: Supra, debug: bool=False):
     S = 0
     for dp in struct.dblepancakes:
         nturns += 2 * dp.pancake.n
-        j = nturns / struct.getArea()
+        j = nturns / struct.getArea()*1.e-6
     
     print("UMagnets:", struct.name, 1)
-    return mt.UnifMagnet(struct.r1, struct.r0, struct.h, j, struct.z0, f, rho)
+    return mt.UnifMagnet(struct.r1*1.e-3, struct.r0*1.e-3, struct.h*1.e-3, j, struct.z0, f, rho)
 
 
 def UMagnets(struct: SupraStructure.HTSinsert, detail: str ="dblepancake", debug: bool=False):
@@ -198,7 +215,7 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
     
                 if isinstance(cad, Bitter.Bitter):
-                    tmp = BMagnet(cad, obj["material"], debug)
+                    tmp = BMagnet(cad, obj["material"], None, debug)
                     for item in tmp:
                         BMagnets.append(item)
                 elif isinstance(cad, Supra):
@@ -218,19 +235,19 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
                     sys.exit(1)
 
     # Bstacks = mt.VectorOfStacks()
-    print("\nHelices:", len(Tubes))
+    print("Helices:", len(Tubes))
     if len(BMagnets) != 0:
         Bstacks = mt.create_Bstack(BMagnets)
-        print("\nBstacks:", len(Bstacks))
+        print("Bstacks:", len(Bstacks))
     if len(UMagnets) != 0:
         Ustacks = mt.create_Ustack(UMagnets)
-        print("\nUStacks:", len(Ustacks))
-    print("\n")
+        print("UStacks:", len(Ustacks))
+    # print("\n")
     
     return (Tubes,Helices,OHelices,BMagnets,UMagnets,Shims)
 
 
-def msite_setup(MyEnv, confdata: str, debug: bool=False):
+def msite_setup(MyEnv, confdata: str, debug: bool=False, session=None):
     """
     Creating MagnetTools data struct for setup for msite
     """
@@ -252,7 +269,7 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False):
         except:
             print("setup: failed to load %s, look into magnetdb" % (magnet + "-data.json") )
             try:
-                mconfdata = load_object_from_db(MyEnv, "magnet", magnet, debug)
+                mconfdata = load_object_from_db(MyEnv, "magnet", magnet, debug, session)
             except:
                 print("setup: failed to load %s from magnetdb" % magnet)
                 sys.exit(1)
@@ -288,7 +305,7 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False):
     return (Tubes,Helices,OHelices,BMagnets,UMagnets,Shims)
     
 
-def setup(MyEnv, args, confdata, jsonfile):
+def setup(MyEnv, args, confdata, jsonfile, session=None):
     """
     """
     print("ana/main")
@@ -319,7 +336,7 @@ def setup(MyEnv, args, confdata, jsonfile):
             with open(confdata["name"] + ".yaml", "x") as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)
-        return msite_setup(MyEnv, confdata, args.debug or args.verbose)               
+        return msite_setup(MyEnv, confdata, args.debug or args.verbose, session)               
 
     return 1
      

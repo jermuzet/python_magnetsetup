@@ -239,38 +239,37 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     pyfeel = 'cfpdes_insert_fixcurrent.py'
 
     xaofile = name + "_withAir.xao"
-    geocmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--air,2,2,--wd,$PWD" % (name)
-    meshcmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--air,2,2,mesh,--group,CoolingChannels,Isolants" % (name)
+    geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--air,2,2,--wd,$PWD {name}"
+    meshcmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--air,2,2,mesh,--group,CoolingChannels,Isolants {name}"
     meshfile = xaofile.replace(".xao", ".med")
     
     if args.geom == "Axi" and args.method == "cfpdes" :
         xaofile = name + "-Axi_withAir.xao"
-        geocmd = "salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--axi,--air,2,2,--wd,$PWD" % (name)
+        geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--axi,--air,2,2,--wd,$PWD {name}"
         
         # if gmsh:
-        meshcmd = "python3 -m python_magnetgeo.xao %s --wd $PWD mesh --group CoolingChannels --geo %s --lc=1" % (xaofile, name)
+        meshcmd = f"python3 -m python_magnetgeo.xao {xaofile} --wd $PWD mesh --group CoolingChannels --geo {name} --lc=1"
         meshfile = xaofile.replace(".xao", ".msh")
         
     h5file = xaofile.replace(".xao", "_p.json")
-    partcmd = "%s --ifile %s --ofile %s [--part NP] [--mesh.scale=0.001]" % (partitioner, meshfile, h5file)
-    feelcmd = "[mpirun -np NP] %s --config-file %s" % (exec, cfgfile)
-    pyfeelcmd = "[mpirun -np NP] python %s" % pyfeel
+    partcmd = f"{partitioner} --ifile {meshfile} --ofile {h5file} [--part NP] [--mesh.scale=0.001]"
+    feelcmd = f"[mpirun -np NP] {exec} --config-file {cfgfile}"
+    pyfeelcmd = f"[mpirun -np NP] python {pyfeel}"
     
     # TODO what about postprocess??
     cmds = {
-        "Pre": "export HIFIMAGNET=%s" % hifimagnet,
-        "CAD:": "singularity exec %s %s" % (simage_path + "/" + salome,geocmd),
-        "Mesh": meshcmd,
-        "Partition": "singularity exec %s %s" % (simage_path + "/" + feelpp, partcmd),
-        "Run": "singularity exec %s %s" % (simage_path + "/" + feelpp, feelcmd),
-        "Python": "singularity exec %s %s" % (simage_path + "/" + feelpp, pyfeel)
+        "Pre": f"export HIFIMAGNET={hifimagnet}",
+        "CAD": f"singularity exec {simage_path}/{salome} {geocmd}",
+        "Partition": f"singularity exec {simage_path}/{feelpp} {partcmd}",
+        "Run": "singularity exec {simage_path}/{feelpp} {feelcmd}",
+        "Python": f"singularity exec {simage_path}/{feelpp} {pyfeel}"
     }
 
     # if gmsh
     if args.geom == "Axi":
-        cmds["Mesh:"] = meshcmd
+        cmds["Mesh"] = meshcmd
     else:
-        cmds["Mesh:"] = "singularity exec -B /opt/DISTENE:/opt/DISTENE:ro %s %s" % (simage_path + "/" + salome,meshcmd)
+        cmds["Mesh"] = f"singularity exec -B /opt/DISTENE:/opt/DISTENE:ro {simage_path}/{salome} {meshcmd}"
     
     return (cfgfile, jsonfile, cmds)
 
