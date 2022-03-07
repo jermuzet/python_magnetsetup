@@ -1,0 +1,24 @@
+{
+    "kelvin":{
+	"type": "compute", //????
+	"smp": "True",
+	"dns": "kelvin.grenoble.lncmi.local",
+	"jobmanager":{
+	    "type":"none",
+	    "queues":{}
+	},
+	"cores":"64",
+	"multithreading": "True"
+    },
+    "stokes":{
+	"type": "compute", //????
+	"smp": "True",
+	"dns": "stokes.grenoble.lncmi.local",
+	"jobmanager":{
+	    "type":"slurm",
+	    "queues":{}
+	},
+	"cores":"64",
+	"multithreading": "True"
+    }
+}

@@ -4,6 +4,8 @@ import sys
 import os
 import json
 
+from .machines import loadmachine
+
 class appenv():
     
     def __init__(self, debug: bool = False):
@@ -14,6 +16,7 @@ class appenv():
         self.template_repo: Optional[str] = None
         self.simage_repo: Optional[str] = None
         self.mrecord_repo: Optional[str] = None
+        self.optim_repo: Optional[str] = None
 
         from decouple import Config, RepositoryEnv
         envdata = RepositoryEnv("settings.env")
@@ -22,6 +25,8 @@ class appenv():
             print("appenv:", RepositoryEnv("settings.env").data)
 
         self.url_api = data.get('URL_API')
+        self.compute_server = data.get('COMPUTE_SERVER')
+        self.visu_server = data.get('VISU_SERVER')
         if 'TEMPLATE_REPO' in envdata:
             self.template_repo = data.get('TEMPLATE_REPO')
         if 'SIMAGE_REPO' in envdata:
@@ -31,6 +36,7 @@ class appenv():
             self.cad_repo = data.get('DATA_REPO') + "/cad"
             self.mesh_repo = data.get('DATA_REPO') + "/meshes"
             self.mrecord_repo = data.get('DATA_REPO') + "/mrecords"
+            self.optim_repo = data.get('DATA_REPO') + "/optim"
 
     def template_path(self, debug: bool = False):
         """
@@ -69,6 +75,18 @@ def loadconfig():
     with open(os.path.join(default_path, 'magnetsetup.json'), 'r') as appcfg:
         magnetsetup = json.load(appcfg)
     return magnetsetup
+
+def loadmachine(server: str):
+    """
+    Load app server config (aka machines.json)
+    """
+
+    server_defs = load_machines()
+    if server in server_defs:
+        return server_defs[server]
+    else:
+        raise(f"loadmachine: {server} no such server defined")
+    pass
 
 def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear: bool=True, debug: bool=False):
     """
