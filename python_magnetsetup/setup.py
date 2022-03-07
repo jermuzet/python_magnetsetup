@@ -40,11 +40,51 @@ from .utils import Merge, NMerge
 from .cfg import create_cfg
 from .jsonmodel import create_json
 
-from .insert import Insert_setup
-from .bitter import Bitter_setup
-from .supra import Supra_setup
+from .insert import Insert_setup, Insert_simfile
+from .bitter import Bitter_setup, Bitter_simfile
+from .supra import Supra_setup, Supra_simfile
     
 from .file_utils import MyOpen, findfile, search_paths
+
+def magnet_simfile(MyEnv, confdata: str):
+    """
+    """
+    files = []
+    yamlfile = confdata["geom"]
+    if "Helix" in confdata:
+        print("Load an insert")
+        # Download or Load yaml file from data repository??
+        cad = None
+        with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
+            cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+            files.append(cfgdata)
+        tmp_files = Insert_simfile(MyEnv, confdata, cad)
+        for tmp_f in tmp_files:
+            files.append(tmp_f)
+
+    for mtype in ["Bitter", "Supra"]:
+        if mtype in confdata:
+            print("load a %s insert" % mtype)
+
+            # loop on mtype
+            for obj in confdata[mtype]:
+                print("obj:", obj)
+                cad = None
+                with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
+                    cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+    
+                if isinstance(cad, Bitter.Bitter):
+                    files.append(cfgdata)
+                elif isinstance(cad, Supra):
+                    files.append(cfgdata)
+                    struct = Supra_simfile(MyEnv, obj, cad)
+                    if struct:
+                        files.append(struct)
+                else:
+                    print("setup: unexpected cad type %s" % str(type(cad)))
+                    sys.exit(1)
+
+    return files
 
 def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug: bool=False):
     """
@@ -103,6 +143,26 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
     if debug:
         print("magnet_setup: mdict=", mdict)
     return (mdict, mmat, mpost)
+
+def msite_simfile(MyEnv, confdata: str, session=None):
+    """
+    Creating list of simulation files for msite
+    """
+
+    files = []
+    for magnet in confdata["magnets"]:
+        try:
+            mconfdata = load_object(MyEnv, magnet + "-data.json")
+        except:
+            try:
+                mconfdata = load_object_from_db(MyEnv, "magnet", magnet, False, session)
+            except:
+                print("msite_simfile: failed to load %s from magnetdb" % magnet)
+                sys.exit(1)
+
+        files += magnet_simfile(MyEnv, mconfdata)
+    
+    return files
 
 def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug: bool=False, session=None):
     """
@@ -214,6 +274,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     if args.time == "transient":
         material_generic_def.append("conductor-nosource") # only for transient with mqs
 
+    sim_files = []
     if args.method == "cfpdes":
         if args.debug: print("cwd=", cwd)
         from shutil import copyfile
@@ -224,9 +285,17 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
             if args.debug:
                 print(jfile, "filename=", filename, "src=%s" % src, "dst=%s" % dst)
             copyfile(src, dst)
+            sim_files.append(src)
      
     # TODO prepare a directory that contains every files needed to run simulation ??
 
+    return (cfgfile, jsonfile, sim_files)
+
+def setup_cmds(MyEnv, cfgfile, jsonfile, sim_files, session=None):
+    """
+    create cmds 
+    """
+    
     simage_path = MyEnv.simage_path()
     hifimagnet = AppCfg["mesh"]["hifimagnet"]
     salome = AppCfg["mesh"]["salome"]
@@ -253,6 +322,13 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
         
     h5file = xaofile.replace(".xao", "_p.json")
     partcmd = f"{partitioner} --ifile {meshfile} --ofile {h5file} [--part NP] [--mesh.scale=0.001]"
+
+    # TODO
+    # get server from MyEnv,
+    # get NP from server (with an heuristic from meshsize)
+    # if server is SMP mpirun outside otherwise inside singularity
+    # create script for jobmanager
+    
     feelcmd = f"[mpirun -np NP] {exec} --config-file {cfgfile}"
     pyfeelcmd = f"[mpirun -np NP] python {pyfeel}"
     
@@ -264,12 +340,32 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
         "Run": "singularity exec {simage_path}/{feelpp} {feelcmd}",
         "Python": f"singularity exec {simage_path}/{feelpp} {pyfeel}"
     }
-
-    # if gmsh
-    if args.geom == "Axi":
-        cmds["Mesh"] = meshcmd
-    else:
-        cmds["Mesh"] = f"singularity exec -B /opt/DISTENE:/opt/DISTENE:ro {simage_path}/{salome} {meshcmd}"
     
-    return (cfgfile, jsonfile, cmds)
+    # create list of files to be archived
+    sim_files += [cfgfile, jsonfile]
+    try:
+        mesh = findfile(meshfile, search_paths(MyEnv, "mesh"))
+        sim_files.append(mesh)
+    except:
+
+        # if gmsh
+        if args.geom == "Axi":
+            cmds["Mesh"] = meshcmd
+        else:
+            # TODO change for latest MeshGems with license in shared lib
+            cmds["Mesh"] = f"singularity exec -B /opt/DISTENE:/opt/DISTENE:ro {simage_path}/{salome} {meshcmd}"
+        
+        # Add convert med mesh to gmsh?
+
+        if "geom" in confdata:
+            print("geo:", confdata["geom"])
+            sim_files += magnet_simfile(MyEnv, confdata)
+        else:
+            # get geom yml file
+            sim_files.append(confdata["name"] + ".yaml") # change list if method_data[2] == "Axi"
+            sim_files += msite_simfile(MyEnv, confdata, session)
+
+    print("List of simulations files:", sim_files)
+
+    return (cmds)
 

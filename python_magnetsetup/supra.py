@@ -23,3 +23,9 @@ def Supra_setup(confdata: dict, cad: Supra, method_data: List, templates: dict, 
     mpost = {}
 
     return (mdict, mmat, mpost)
+
+def Supra_simfile(confdata: dict, cad: Supra):
+    print("Supra_simfile: %s" % cad.name)
+    if cad.struct:
+        return cad.struct
+    return None

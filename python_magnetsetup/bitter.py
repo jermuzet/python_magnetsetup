@@ -10,6 +10,23 @@ from .utils import Merge
 
 import os
 
+def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter):
+    print("Bitter_simfile: %s" % cad.name)
+
+    from .file_utils import MyOpen, findfile
+    default_pathes={
+        "geom" : MyEnv.yaml_repo,
+        "cad" : MyEnv.cad_repo,
+        "mesh" : MyEnv.mesh_repo
+    }
+
+    yamlfile = confdata["geom"]
+    
+    name = ""
+    snames = []
+    with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
+        return cfgdata
+
 def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, templates: dict, debug: bool=False):
     print("Bitter_setup: %s" % cad.name, "debug=", debug)
     if debug: print("Bitter_setup/Bitter confdata: %s" % confdata)

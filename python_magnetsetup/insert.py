@@ -12,6 +12,28 @@ from .file_utils import MyOpen, findfile, search_paths
 
 import os
 
+def Insert_simfile(MyEnv, confdata: dict, cad: Insert):
+    print("Insert_setup: %s" % cad.name)
+
+    files = []
+    for helix in cad.Helices:
+        with MyOpen(helix+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
+            hhelix = yaml.load(f, Loader = yaml.FullLoader)
+            files.append(f)
+
+            # files.append(hhelix.shape.profile) # is this really neeaded 
+
+    for ring in cad.Rings:
+        with MyOpen(ring+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
+            files.append(f)
+
+    if cad.CurrentLeads:
+        for lead in cad.CurrentLeads:
+            with MyOpen(lead+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
+                files.append(f)
+
+    return files
+
 def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, templates: dict, debug: bool=False):
     print("Insert_setup: %s" % cad.name)
     part_thermic = []
