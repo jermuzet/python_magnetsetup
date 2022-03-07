@@ -16,7 +16,7 @@ def search_paths(MyEnv=None, otype: str = "geom"):
   
 def findfile(searchfile, paths=None):
     """
-    Look for file in search_pathes
+    Look for file in search_paths
     """
     import errno
 
@@ -27,7 +27,7 @@ def findfile(searchfile, paths=None):
             return filename
 
     # raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), searchfile)
-    raise FileNotFoundError(errno.ENOENT, f"cannot find in {search_pathes}", searchfile)
+    raise FileNotFoundError(errno.ENOENT, f"cannot find in {search_paths}", searchfile)
 
 import os
 class MyOpen(object):
