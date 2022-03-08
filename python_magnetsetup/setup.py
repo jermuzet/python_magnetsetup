@@ -57,10 +57,10 @@ def magnet_simfile(MyEnv, confdata: str):
         cad = None
         with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
-            files.append(cfgdata)
+            files.append(cfgdata.name)
         tmp_files = Insert_simfile(MyEnv, confdata, cad)
         for tmp_f in tmp_files:
-            files.append(tmp_f)
+            files.append(tmp_f.name)
 
     for mtype in ["Bitter", "Supra"]:
         if mtype in confdata:
@@ -74,9 +74,9 @@ def magnet_simfile(MyEnv, confdata: str):
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
     
                 if isinstance(cad, Bitter.Bitter):
-                    files.append(cfgdata)
+                    files.append(cfgdata.name)
                 elif isinstance(cad, Supra):
-                    files.append(cfgdata)
+                    files.append(cfgdata.name)
                     struct = Supra_simfile(MyEnv, obj, cad)
                     if struct:
                         files.append(struct)
@@ -270,11 +270,11 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
 
     # copy some additional json file 
     material_generic_def = ["conductor", "insulator"]
-
     if args.time == "transient":
         material_generic_def.append("conductor-nosource") # only for transient with mqs
 
-    sim_files = []
+    # create list of files to be archived
+    sim_files = [cfgfile, jsonfile]
     if args.method == "cfpdes":
         if args.debug: print("cwd=", cwd)
         from shutil import copyfile
@@ -285,17 +285,82 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
             if args.debug:
                 print(jfile, "filename=", filename, "src=%s" % src, "dst=%s" % dst)
             copyfile(src, dst)
-            sim_files.append(src)
-     
-    # TODO prepare a directory that contains every files needed to run simulation ??
+            sim_files.append(dst)
 
-    return (cfgfile, jsonfile, sim_files)
+    # list files to be archived
+    xaofile = name + ".xao"
+    if "mqs" in args.model or "mag" in args.model:
+        xaofile = name + "_withAir.xao"
+    meshfile = xaofile.replace(".xao", ".med")
+    
+    if args.geom == "Axi" and args.method == "cfpdes" :
+        xaofile = name + "-Axi_withAir.xao"
+        if "mqs" in args.model or "mag" in args.model:
+            xaofile = name + "-Axi.xao"
+        
+        # if gmsh:
+        meshfile = xaofile.replace(".xao", ".msh")
+        
+    try:
+        mesh = findfile(meshfile, search_paths(MyEnv, "mesh"))
+        sim_files.append(mesh)
 
-def setup_cmds(MyEnv, cfgfile, jsonfile, sim_files, session=None):
+        #?? replace geo by med/msh in cfg ?? if 3D#
+    except:
+        if "geom" in confdata:
+            print("geo:", name)
+            yamlfile = confdata["name"]
+            sim_files += magnet_simfile(MyEnv, confdata)
+        else:
+            yamlfile = confdata["name"] + ".yaml"
+            sim_files += msite_simfile(MyEnv, confdata, session)
+
+    print("List of simulations files:", sim_files)
+    import tarfile
+    tarfilename = cfgfile.replace('cfg','tgz')
+    if os.path.isfile(os.path.join(cwd, tarfilename)):
+        raise(f"{tarfilename} already exists")
+    else:
+        tar = tarfile.open(tarfilename, "w:gz")
+        for filename in sim_files:
+            print(f"add {filename} to {tarfilename}")  
+            tar.add(filename)
+            for mname in material_generic_def:
+                if mname in filename:
+                    print(f"remove {filename}")
+                    os.unlink(filename)
+        tar.close()
+
+    return (yamlfile, cfgfile, jsonfile, xaofile, meshfile, tarfilename)
+
+def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     """
     create cmds 
     """
+
+    # loadconfig
+    AppCfg = loadconfig()
+
+    # Get current dir
+    cwd = os.getcwd()
+    if args.wd:
+        os.chdir(args.wd)
     
+    # get server from MyEnv,
+    # get NP from server (with an heuristic from meshsize)
+    # TODO adapt NP to the size of the problem
+    # if server is SMP mpirun outside otherwise inside singularity
+    from .machines import load_machines
+
+    machines = load_machines()
+    print(f"machines: {machines} type={type(machines)}")
+    print(f"machine={MyEnv.compute_server} type={type(MyEnv.compute_server)}")
+    server = machines[MyEnv.compute_server]
+    NP = server.cores
+    if server.multithreading:
+        NP = int(NP/2)
+    print(f"NP={NP} {type(NP)}")
+
     simage_path = MyEnv.simage_path()
     hifimagnet = AppCfg["mesh"]["hifimagnet"]
     salome = AppCfg["mesh"]["salome"]
@@ -305,67 +370,66 @@ def setup_cmds(MyEnv, cfgfile, jsonfile, sim_files, session=None):
         exec = AppCfg[args.method]["exec"]
     if "exec" in AppCfg[args.method][args.time][args.geom][args.model]:
         exec = AppCfg[args.method][args.time][args.geom][args.model]
-    pyfeel = 'cfpdes_insert_fixcurrent.py'
+    pyfeel = 'cfpdes_insert_fixcurrent.py' # commisioning, fixcooling
 
-    xaofile = name + "_withAir.xao"
-    geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--air,2,2,--wd,$PWD {name}"
-    meshcmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--air,2,2,mesh,--group,CoolingChannels,Isolants {name}"
-    meshfile = xaofile.replace(".xao", ".med")
-    
+    if "mqs" in args.model or "mag" in args.model:
+        geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--air,2,2,--wd,data/geometries"
+        meshcmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--air,2,2,--wd,$PWD,mesh,--group,CoolingChannels,Isolants"
+    else:
+        geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},2,2,--wd,data/geometries"
+        meshcmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},2,2,--wd,$PWD,mesh,--group,CoolingChannels,Isolants"
+
+    gmshfile = meshfile.replace(".med", ".msh")
+    meshconvert = ""
+
+    print(f"args.geom={args.geom} args.method={args.geom}")
     if args.geom == "Axi" and args.method == "cfpdes" :
-        xaofile = name + "-Axi_withAir.xao"
-        geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:%s,--axi,--air,2,2,--wd,$PWD {name}"
+        if "mqs" in args.model or "mag" in args.model:
+            geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--air,2,2,--wd,data/geometries"
+        else:
+            geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--axi,--air,2,2,--wd,data/geometries"
         
         # if gmsh:
-        meshcmd = f"python3 -m python_magnetgeo.xao {xaofile} --wd $PWD mesh --group CoolingChannels --geo {name} --lc=1"
-        meshfile = xaofile.replace(".xao", ".msh")
+        meshcmd = f"python3 -m python_magnetgeo.xao {xaofile} --wd data/geometries mesh --group CoolingChannels --geo {name} --lc=1"
+    else:
+        gmshfile = meshfile.replace(".med", ".msh")
+        meshconvert = f"gmsh -0 {meshfile} -bin -o {gmshfile}"
+
+    # ?? if meshcmd need to replace geo by med/msh in cfg ??
         
     h5file = xaofile.replace(".xao", "_p.json")
-    partcmd = f"{partitioner} --ifile {meshfile} --ofile {h5file} [--part NP] [--mesh.scale=0.001]"
+    partcmd = f"{partitioner} --ifile {gmshfile} --ofile {h5file} --part {NP} [--mesh.scale=0.001]"
 
-    # TODO
-    # get server from MyEnv,
-    # get NP from server (with an heuristic from meshsize)
-    # if server is SMP mpirun outside otherwise inside singularity
-    # create script for jobmanager
-    
-    feelcmd = f"[mpirun -np NP] {exec} --config-file {cfgfile}"
-    pyfeelcmd = f"[mpirun -np NP] python {pyfeel}"
-    
-    # TODO what about postprocess??
+    # ?? if partition need to replace geo by h5 in cfg ??
+    tarfile = cfgfile.replace("cfg", "tgz")
     cmds = {
         "Pre": f"export HIFIMAGNET={hifimagnet}",
-        "CAD": f"singularity exec {simage_path}/{salome} {geocmd}",
-        "Partition": f"singularity exec {simage_path}/{feelpp} {partcmd}",
-        "Run": "singularity exec {simage_path}/{feelpp} {feelcmd}",
-        "Python": f"singularity exec {simage_path}/{feelpp} {pyfeel}"
+        "Unpack": f"tar zxvf {tarfile}",
+        "CAD": f"singularity exec {simage_path}/{salome} {geocmd}"
     }
     
-    # create list of files to be archived
-    sim_files += [cfgfile, jsonfile]
-    try:
-        mesh = findfile(meshfile, search_paths(MyEnv, "mesh"))
-        sim_files.append(mesh)
-    except:
-
-        # if gmsh
-        if args.geom == "Axi":
-            cmds["Mesh"] = meshcmd
-        else:
-            # TODO change for latest MeshGems with license in shared lib
-            cmds["Mesh"] = f"singularity exec -B /opt/DISTENE:/opt/DISTENE:ro {simage_path}/{salome} {meshcmd}"
-        
-        # Add convert med mesh to gmsh?
-
-        if "geom" in confdata:
-            print("geo:", confdata["geom"])
-            sim_files += magnet_simfile(MyEnv, confdata)
-        else:
-            # get geom yml file
-            sim_files.append(confdata["name"] + ".yaml") # change list if method_data[2] == "Axi"
-            sim_files += msite_simfile(MyEnv, confdata, session)
-
-    print("List of simulations files:", sim_files)
-
-    return (cmds)
+    cmds["Mesh"] = f"singularity exec {simage_path}/{salome} {meshcmd}"
+    if meshconvert:
+        cmds["Convert"] = f"singularity exec {simage_path}/{salome} {meshconvert}",
+    cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
+    
+    if server.smp:
+        feelcmd = f"{exec} --config-file {cfgfile}"
+        pyfeelcmd = f"python {pyfeel}"
+        cmds["Run"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {feelcmd}"
+        cmds["Python"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeel}"
+    
+    else:
+        feelcmd = f"mpirun -np {NP} {exec} --config-file {cfgfile}"
+        pyfeelcmd = f"mpirun -np {NP} python {pyfeel}"
+        cmds["Run"] = f"singularity exec {simage_path}/{feelpp} {feelcmd}"
+        cmds["Python"] = f"singularity exec {simage_path}/{feelpp} {pyfeel}"
+    
+    # TODO jobmanager if server.manager != JobManagerType.none
+    # Need user email at this point
+    # Template for oar and slurm
+    
+    # TODO what about postprocess??
+    
+    return cmds
 

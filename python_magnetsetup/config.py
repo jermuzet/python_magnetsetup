@@ -4,7 +4,7 @@ import sys
 import os
 import json
 
-from .machines import loadmachine
+from .machines import load_machines
 
 class appenv():
     
@@ -36,7 +36,7 @@ class appenv():
             self.cad_repo = data.get('DATA_REPO') + "/cad"
             self.mesh_repo = data.get('DATA_REPO') + "/meshes"
             self.mrecord_repo = data.get('DATA_REPO') + "/mrecords"
-            self.optim_repo = data.get('DATA_REPO') + "/optim"
+            self.optim_repo = data.get('DATA_REPO') + "/optims"
 
     def template_path(self, debug: bool = False):
         """

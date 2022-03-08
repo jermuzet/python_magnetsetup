@@ -44,6 +44,7 @@ setup(
     package_data={'': [
         'settings.env', 
         'magnetsetup.json', 
+        'machines.json', 
         'templates/cfpdes/Axi/thelec/*.mustache', 
         'templates/cfpdes/Axi/thelec/*.json',
         'templates/cfpdes/Axi/thmag/*.mustache', 

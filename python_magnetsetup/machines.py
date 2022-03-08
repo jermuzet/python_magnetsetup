@@ -22,48 +22,52 @@ class jobmanager():
     """
     jobmanager definition
     """
-    otype: Enum(JobManagerType),
-    queues: optional[list] = None
+    otype: JobManagerType = JobManagerType.none
+    queues: Optional[list] = None
     
 @dataclass
 class machine():
     """
     machine definition
     """
-    name: str,
-    otype: Enum(MachineType),
-    dns: str,
-    smp: bool = True,
-    jobmanager:,
-    cores: int = 2,
+    name: str
+    dns: str
+    otype: MachineType = MachineType.compute
+    smp: bool = True
+    manager: jobmanager = jobmanager(JobManagerType.none)
+    cores: int = 2
     multithreading: bool = True
 
 
 def load_machines():
     """
-    load machines definition
+    load machines definition as a dict
     """
-    
-    default_path = os.path.dirname(os.path.abspath(__file__))
-    with os.path.join(default_path, 'machines.json'), 'r') as cfg:
-        data = json.load(cfg)
+    print("load_machines")
 
-    machines = []
+    default_path = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(default_path, 'machines.json'), 'r') as cfg:
+        print(f"load_machines from: {cfg.name}")
+        data = json.load(cfg)
+        print(f"data={data}")
+
+    machines = {}
     for item in data:
+        print(f"server: {item} type={data[item]['type']}")
         server = machine(
-            name=item
-            otype=item['type'],
-            smp=item['smp'],
-            dns=item['dns'],
-            cores=item['cores'],
-            multithreading=item['multithreading'],
-            jobmanager=(otype=item['jobmanager']['type'], queues=item['jobmanager']['queues'])
+            name=item,
+            otype=MachineType[data[item]['type']],
+            smp=data[item]['smp'],
+            dns=data[item]['dns'],
+            cores=data[item]['cores'],
+            multithreading=data[item]['multithreading'],
+            manager=jobmanager(otype=JobManagerType[data[item]['jobmanager']['type']], queues=data[item]['jobmanager']['queues'])
         )
-        machines.append(server)
+        machines[item]=server
                 
     return machines
 
-def dump_machines(data: list[machine]):
+def dump_machines(data: List[machine]):
     with open('machines.json', 'w') as outfile:
         json.dump(data, outfile)
     pass
@@ -73,3 +77,5 @@ def mod_machine():
 
 def add_machine():
     pass
+
+
