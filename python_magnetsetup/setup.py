@@ -309,7 +309,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     except:
         if "geom" in confdata:
             print("geo:", name)
-            yamlfile = confdata["name"]
+            yamlfile = confdata["geom"]
             sim_files += magnet_simfile(MyEnv, confdata)
         else:
             yamlfile = confdata["name"] + ".yaml"
@@ -410,7 +410,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     
     cmds["Mesh"] = f"singularity exec {simage_path}/{salome} {meshcmd}"
     if meshconvert:
-        cmds["Convert"] = f"singularity exec {simage_path}/{salome} {meshconvert}",
+        cmds["Convert"] = f"singularity exec {simage_path}/{salome} {meshconvert}"
     cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
     
     if server.smp:
