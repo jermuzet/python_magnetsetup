@@ -60,7 +60,7 @@ def magnet_simfile(MyEnv, confdata: str):
             files.append(cfgdata.name)
         tmp_files = Insert_simfile(MyEnv, confdata, cad)
         for tmp_f in tmp_files:
-            files.append(tmp_f.name)
+            files.append(tmp_f)
 
     for mtype in ["Bitter", "Supra"]:
         if mtype in confdata:

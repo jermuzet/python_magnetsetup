@@ -19,18 +19,27 @@ def Insert_simfile(MyEnv, confdata: dict, cad: Insert):
     for helix in cad.Helices:
         with MyOpen(helix+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
             hhelix = yaml.load(f, Loader = yaml.FullLoader)
-            files.append(f)
+            files.append(f.name)
 
-            # files.append(hhelix.shape.profile) # is this really neeaded 
+            # TODO: get _salome.data
+            # files.append(hhelix.shape.profile) # is this really needed
+            if hhelix.m3d.with_shapes:
+                with MyOpen(hhelix.name + str("_cut_with_shapes_salome.dat"), "r", paths=search_paths(MyEnv, "geom")) as fcut:
+                    files.append(fcut.name)
+                with MyOpen(hhelix.shape.profile, "r", paths=search_paths(MyEnv, "geom")) as fshape:
+                    files.append(fshape.name)
+            else:
+                with MyOpen(hhelix.name + str("_cut_salome.dat"), "r", paths=search_paths(MyEnv, "geom")) as fcut:
+                    files.append(fcut.name)
 
     for ring in cad.Rings:
         with MyOpen(ring+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
-            files.append(f)
+            files.append(f.name)
 
     if cad.CurrentLeads:
         for lead in cad.CurrentLeads:
             with MyOpen(lead+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
-                files.append(f)
+                files.append(f.name)
 
     return files
 
