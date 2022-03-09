@@ -128,7 +128,9 @@ def main():
             for data in [R1, R2, Z1, Z2, Zmin, Zmax, Dh]:
                 _convert = convert_data(units, distance_unit, R1, "Length")
             Sh_convert = convert_data(units, distance_unit, Sh, "Area")
-    
+
+            Ssections_convert = convert_data(units, distance_unit, Ssections, "Area")
+
             # MagnetPermeability of vacuum : H/m --> H/distance_unit
             # mu0_convert = convert_data(distance_unit, mu0, "mu0")
 

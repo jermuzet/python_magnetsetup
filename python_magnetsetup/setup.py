@@ -116,6 +116,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
             # loop on mtype
             for obj in confdata[mtype]:
                 print("obj:", obj)
+                yamlfile = obj["geom"]
                 cad = None
                 with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
@@ -319,7 +320,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     import tarfile
     tarfilename = cfgfile.replace('cfg','tgz')
     if os.path.isfile(os.path.join(cwd, tarfilename)):
-        raise(f"{tarfilename} already exists")
+        raise FileExistError(f"{tarfilename} already exists")
     else:
         tar = tarfile.open(tarfilename, "w:gz")
         for filename in sim_files:

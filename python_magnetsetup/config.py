@@ -85,7 +85,7 @@ def loadmachine(server: str):
     if server in server_defs:
         return server_defs[server]
     else:
-        raise(f"loadmachine: {server} no such server defined")
+        raise ValueError(f"loadmachine: {server} no such server defined")
     pass
 
 def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear: bool=True, debug: bool=False):

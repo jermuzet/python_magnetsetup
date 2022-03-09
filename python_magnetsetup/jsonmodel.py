@@ -61,6 +61,7 @@ def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False
         for i,sname in enumerate(snames):
             params_data['Parameters'].append({"name":"U_%s" % sname, "value":"1"})
             params_data['Parameters'].append({"name":"N_%s" % sname, "value":nturns[i]})
+            # params_data['Parameters'].append({"name":"S_%s" % sname, "value":convert_data(units, distance_unit, Ssections[i], "Area")})
 
     if debug:
         print(params_data)
@@ -98,7 +99,8 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
     # TODO : initialization of parameters with cooling model
 
     params_data['Parameters'].append({"name":"Tinit", "value":293})
-    params_data['Parameters'].append({"name":"h", "value":convert_data(units, unit_Length, 58222.1, "h")})
+    # get value from coolingmethod and Flow(I) value
+    params_data['Parameters'].append({"name":"hw", "value":convert_data(units, unit_Length, 58222.1, "h")})
     params_data['Parameters'].append({"name":"Tw", "value":290.671})
     params_data['Parameters'].append({"name":"dTw", "value":12.74})
     
@@ -106,13 +108,14 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
 
     for i in range(NHelices+1):
+        # get value from coolingmethod and Flow(I) value
         params_data['Parameters'].append({"name":"h%d" % i, "value":convert_data(units, unit_Length, 58222.1, "h")})
         params_data['Parameters'].append({"name":"Tw%d" % i, "value":290.671})
         params_data['Parameters'].append({"name":"dTw%d" % i, "value":12.74})
-        params_data['Parameters'].append({"name":"Zmin%d" % i, "value":Zmin[i]})
-        params_data['Parameters'].append({"name":"Zmax%d" % i, "value":Zmax[i]})
-        params_data['Parameters'].append({"name":"Sh%d" % i, "value":Sh[i]})
-        params_data['Parameters'].append({"name":"Dh%d" % i, "value":Dh[i]})
+        params_data['Parameters'].append({"name":"Zmin%d" % i, "value":convert_data(units, distance_unit, Zmin[i]*1.e-3, "Length")})
+        params_data['Parameters'].append({"name":"Zmax%d" % i, "value":convert_data(units, distance_unit, Zmax[i]*1.e-3, "Length")})
+        params_data['Parameters'].append({"name":"Sh%d" % i, "value":convert_data(units, distance_unit, Sh[i]*1.e-6, "Area")})
+        params_data['Parameters'].append({"name":"Dh%d" % i, "value":convert_data(units, distance_unit, Dh[i]*1.e-3, "Length")})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
@@ -122,6 +125,9 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
         for i in range(NHelices):
             for j in range(Nsections[i]):
                 params_data['Parameters'].append({"name":"N_H%d_Cu%d" % (i+1, j+1), "value":Nsections[i]})
+        # for i in range(NHelices):
+        #     for j in range(Nsections[i]):
+        #         params_data['Parameters'].append({"name":"S_H%d_Cu%d" % (i+1, j+1), "value":convert_data(units, distance_unit, Ssections[i], "Area")})
     
     if "mag" in method_data[3] or "mqs" :
         params_data['Parameters'].append({"name":"mu0", "value":convert_data(units, unit_Length, 4*math.pi*1e-7, "mu0")})
@@ -287,7 +293,7 @@ def create_bcs_bitter(boundary_meca: List,
     for sname in snames:
         for thbc in ["rInt", "rExt"]:
             bcname =  sname + "_" + thbc
-            mdata = entry(fcooling, {'name': bcname, 'h': '%s_h' % sname, 'Tw': '%s_Tw' % sname, 'dTw':'%s_dTw' % sname},  debug)
+            mdata = entry(fcooling, {'name': bcname, 'hw': '%s_h' % sname, 'Tw': '%s_Tw' % sname, 'dTw':'%s_dTw' % sname},  debug)
             thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": bcname}, mdata[bcname]) )
     
     if method_data[3] == "thelec":
