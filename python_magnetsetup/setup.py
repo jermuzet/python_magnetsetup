@@ -113,6 +113,8 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
         if mtype in confdata:
             print("load a %s insert" % mtype)
 
+            # TODO check case with only 1 Bitter???
+            
             # loop on mtype
             for obj in confdata[mtype]:
                 print("obj:", obj)
@@ -320,7 +322,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     import tarfile
     tarfilename = cfgfile.replace('cfg','tgz')
     if os.path.isfile(os.path.join(cwd, tarfilename)):
-        raise FileExistError(f"{tarfilename} already exists")
+        raise FileExistsError(f"{tarfilename} already exists")
     else:
         tar = tarfile.open(tarfilename, "w:gz")
         for filename in sim_files:
