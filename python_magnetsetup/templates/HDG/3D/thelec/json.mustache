@@ -1,0 +1,96 @@
+{
+    "Name":"3D ThermoElectric model",
+    "ShortName":"ThermoElec3D",
+    "Model":"hdg",
+    "Parameters":
+    {
+        "T0":"293",
+	    "Tin":"293",
+        "V0":"1000",
+
+        {{#Parameters}}
+		"{{name}}": "{{value}}",
+		{{/Parameters}}
+    },
+    "Materials":
+    {
+    },
+    "BoundaryConditions":
+    {
+        "electric-potential":
+        {
+            "Dirichlet":
+            {
+                {{#boundary_Electric_Dir}}
+				"{{name}}":
+				{
+					"expr": "{{value}}"
+				},
+				{{/boundary_Electric_Dir}}
+            },
+            "Neumann":
+            {
+                {{#boundary_Electric_Neu}}
+				"{{name}}":
+				{
+					"expr": "{{value}}"
+				},
+				{{/boundary_Electric_Neu}}
+            }
+        },
+        "temperature":
+        {
+            "Robin":
+            {
+                {{#boundary_Therm_Robin}}
+				"{{name}}":
+				{
+					"expr1": "{{expr1}}",
+					"expr2": "{{expr2}}"
+				},
+				{{/boundary_Therm_Robin}}
+            },
+            "Neumann":
+            {
+                {{#boundary_Therm_Neu}}
+				"{{name}}":
+				{
+					"expr": "{{value}}"
+				},
+				{{/boundary_Therm_Neu}}
+            }
+        }
+    },
+    "InitialConditions":
+    {
+        "temperature":
+        {
+            "Expression":
+            {
+                "myic":
+                {
+                    "markers": {{part_thermic}},
+                    "expr":"Tinit:Tinit"
+                }
+            }
+        }
+    },
+    "PostProcess":
+    {
+        "use-model-name":1,
+        "electric":
+        {
+            "Exports":
+            {
+                "fields":"all"
+            }
+        },
+        "heat":
+        {
+            "Exports":
+            {
+                "fields":"all"
+            }
+        }
+    }
+}
