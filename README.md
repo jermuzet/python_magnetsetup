@@ -32,5 +32,14 @@ To run simulation with Feelpp, we still need to create:
 * a cfg file for
 ====
 
+You can also use directly the magnetdb. To do so:
+
+```
 python -m python_magnetsetup.cli --wd data --magnet HL-test --method cfpdes --time static --geom Axi --model thmagel  --cooling mean
 python -m python_magnetsetup.cli --wd data --magnet M9Bitters --method cfpdes --time static --geom Axi --model thmagel  --cooling mean
+```
+
+[NOTE]:
+====
+To use the magnetdb directly, you shall update environment variables in `settings.env` to reflect your configuration.
+====

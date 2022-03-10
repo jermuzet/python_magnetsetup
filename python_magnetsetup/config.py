@@ -37,6 +37,7 @@ class appenv():
             self.mesh_repo = data.get('DATA_REPO') + "/meshes"
             self.mrecord_repo = data.get('DATA_REPO') + "/mrecords"
             self.optim_repo = data.get('DATA_REPO') + "/optims"
+        print(f"DATA: {self.yaml_repo}")
 
     def template_path(self, debug: bool = False):
         """

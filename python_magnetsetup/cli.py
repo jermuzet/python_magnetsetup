@@ -4,7 +4,7 @@ from argparse import RawTextHelpFormatter
 
 import sys
 
-from .setup import setup
+from .setup import setup, setup_cmds
 from .objects import load_object, load_object_from_db
 from .config import appenv
 
@@ -32,7 +32,7 @@ def main():
     parser.add_argument("--geom", help="choose geom type", type=str,
                     choices=['Axi', '3D'], default='Axi')
     parser.add_argument("--model", help="choose model type", type=str,
-                    choices=['thelec', 'mag', 'thmag_hcurl', 'thmagel_hcurl', 'mag_hcurl', 'thmag_hcurl', 'thmagel_hcurl'], default='thmagel')
+                    choices=['thelec', 'mag', 'thmag', 'thmagel', 'mag_hcurl', 'thmag_hcurl', 'thmagel_hcurl'], default='thmagel')
     parser.add_argument("--nonlinear", help="force non-linear", action='store_true')
     parser.add_argument("--cooling", help="choose cooling type", type=str,
                     choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
@@ -58,6 +58,7 @@ def main():
     MyEnv = appenv()
     if args.debug: print(MyEnv.template_path())
 
+    name = ""
     # Get Object
     if args.datafile != None:
         confdata = load_object(MyEnv, args.datafile, args.debug)
@@ -66,19 +67,28 @@ def main():
     if args.magnet != None:
         confdata = load_object_from_db(MyEnv, "magnet", args.magnet, args.debug)
         jsonfile = args.magnet
-    
+
     if args.msite != None:
         confdata = load_object_from_db(MyEnv, "msite", args.msite, args.debug)
         jsonfile = args.msite
 
-
-    (cfgfile, jsonfile, cmds) = setup(MyEnv, args, confdata, jsonfile)
+    (yamlfile, cfgfile, jsonfile, xaofile, meshfile, tarfilename) = setup(MyEnv, args, confdata, jsonfile)
+    cmds = setup_cmds(MyEnv, args, yamlfile, cfgfile, jsonfile, xaofile, meshfile)
+    
     # Print command to run
-    print("\n\n=== Guidelines for running a simu ===")
+    machine = MyEnv.compute_server
+    workingdir = name
+
+    print("\n\n=== Guidelines for running a simu on {machine} ===")
     print(f"Edit {cfgfile} to fix the meshfile, scale, partition and solver props")
+    # TODO re-create a tgz archive if you modify cfgfile or jsonfile
+    print(f"Connect to {machine}: ssh -Y {machine}")
+    print(f"Create a {workingdir} directory on {machine}: mkdir -p {workingdir}")
+    print(f"Transfert {tarfilename} to {machine}: scp {tarfilename} {machine}:./{workingdir}")
+    # print(f"Untar {tarfilename} on {machine}: cd {workingdir}; tar zxvf {tarfilename}")
     for key in cmds:
         print(key, ':', cmds[key])
-
+    # post-processing
     return 0
 
 

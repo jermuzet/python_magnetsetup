@@ -26,8 +26,7 @@ def findfile(searchfile, paths=None):
             print(f"{filename} found in {path}")
             return filename
 
-    # raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), searchfile)
-    raise FileNotFoundError(errno.ENOENT, f"cannot find in {search_paths}", searchfile)
+    raise FileNotFoundError(errno.ENOENT, f"cannot find {searchfile} in paths:{paths}")
 
 import os
 class MyOpen(object):

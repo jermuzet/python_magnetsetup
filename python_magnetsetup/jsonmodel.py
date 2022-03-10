@@ -112,10 +112,10 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
         params_data['Parameters'].append({"name":"h%d" % i, "value":convert_data(units, unit_Length, 58222.1, "h")})
         params_data['Parameters'].append({"name":"Tw%d" % i, "value":290.671})
         params_data['Parameters'].append({"name":"dTw%d" % i, "value":12.74})
-        params_data['Parameters'].append({"name":"Zmin%d" % i, "value":convert_data(units, distance_unit, Zmin[i]*1.e-3, "Length")})
-        params_data['Parameters'].append({"name":"Zmax%d" % i, "value":convert_data(units, distance_unit, Zmax[i]*1.e-3, "Length")})
-        params_data['Parameters'].append({"name":"Sh%d" % i, "value":convert_data(units, distance_unit, Sh[i]*1.e-6, "Area")})
-        params_data['Parameters'].append({"name":"Dh%d" % i, "value":convert_data(units, distance_unit, Dh[i]*1.e-3, "Length")})
+        params_data['Parameters'].append({"name":"Zmin%d" % i, "value":convert_data(units, unit_Length, Zmin[i]*1.e-3, "Length")})
+        params_data['Parameters'].append({"name":"Zmax%d" % i, "value":convert_data(units, unit_Length, Zmax[i]*1.e-3, "Length")})
+        params_data['Parameters'].append({"name":"Sh%d" % i, "value":convert_data(units, unit_Length, Sh[i]*1.e-6, "Area")})
+        params_data['Parameters'].append({"name":"Dh%d" % i, "value":convert_data(units, unit_Length, Dh[i]*1.e-3, "Length")})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":

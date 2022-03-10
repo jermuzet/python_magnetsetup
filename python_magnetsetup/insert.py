@@ -56,7 +56,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     boundary_electric = []
 
     gdata = python_magnetgeo.get_main_characteristics(cad, MyEnv)
-    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh, Ssections) = gdata
+    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
 
     print("Insert: %s" % cad.name, "NHelices=%d NRings=%d NChannels=%d" % (NHelices, NRings, NChannels))
 
