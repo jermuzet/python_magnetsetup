@@ -1,5 +1,7 @@
 """Console script for python_magnetsetup."""
 import argparse
+from argparse import RawTextHelpFormatter
+
 import sys
 
 from .setup import setup
@@ -7,9 +9,17 @@ from .objects import load_object, load_object_from_db
 from .config import appenv
 
 def main():
+
+    epilog = "The choice of model is actually linked with the choosen method following this table\n" \
+             "cfpes: thelec, mag, thmag_hcurl, thmagel_hcurl, mag_hcurl, thmag_hcurl, thmagel_hcurl\n" \
+             "CG (3D only): thelec\n" \
+             "HDG (3D only): thelec\n"
+
     # Manage Options
     command_line = None
-    parser = argparse.ArgumentParser(description="Create template json model files for Feelpp/HiFiMagnet simu")
+    parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter,
+                                     description="Create json modelfiles for Feelpp/HiFiMagnet simu from templates",
+                                     epilog=epilog)
     parser.add_argument("--datafile", help="input data file (ex. HL-34-data.json)", default=None)
     parser.add_argument("--wd", help="set a working directory", type=str, default="")
     parser.add_argument("--magnet", help="Magnet name from magnetdb (ex. HL-34)", default=None)
@@ -22,7 +32,7 @@ def main():
     parser.add_argument("--geom", help="choose geom type", type=str,
                     choices=['Axi', '3D'], default='Axi')
     parser.add_argument("--model", help="choose model type", type=str,
-                    choices=['thelec', 'mag', 'thmag', 'thmagel'], default='thmagel')
+                    choices=['thelec', 'mag', 'thmag_hcurl', 'thmagel_hcurl', 'mag_hcurl', 'thmag_hcurl', 'thmagel_hcurl'], default='thmagel')
     parser.add_argument("--nonlinear", help="force non-linear", action='store_true')
     parser.add_argument("--cooling", help="choose cooling type", type=str,
                     choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
