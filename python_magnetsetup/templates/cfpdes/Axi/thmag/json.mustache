@@ -62,9 +62,9 @@
 				{{#boundary_Therm_Robin}}
 				"{{name}}": 
 				{ 
-					expr1: "{{expr1}}",
-					expr2: "{{expr2}}"
-				}
+					"expr1": "{{expr1}}",
+					"expr2": "{{expr2}}"
+				},
 				{{/boundary_Therm_Robin}}
 	    	}
 		}
@@ -77,7 +77,7 @@
             {
                 "myic":
                 {
-                    "markers": {{part_temperature}},
+                    "markers": {{part_thermic}},
                     "expr":"Tinit:Tinit"
                 }
             }
