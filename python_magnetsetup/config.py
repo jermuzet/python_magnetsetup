@@ -121,17 +121,20 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     fmodel = os.path.join(template_path, json_model)
     fconductor = os.path.join(template_path, conductor_model)
     finsulator = os.path.join(template_path, insulator_model)
-    if model != 'mag':
+    if 'th' in model:
         cooling_model = appcfg[method][time][geom][model]["cooling"][cooling]
         flux_model = appcfg[method][time][geom][model]["cooling-post"][cooling]
         stats_T_model = appcfg[method][time][geom][model]["stats_T"]
-        stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
-        stats_Current_model = appcfg[method][time][geom][model]["stats_Current"]
-
+    
         fcooling = os.path.join(template_path, cooling_model)
         frobin = os.path.join(template_path, appcfg[method][time][geom][model]["cooling"]["robin"])
         fflux = os.path.join(template_path, flux_model)
         fstats_T = os.path.join(template_path, stats_T_model)
+
+    if model != 'mag' and model != 'mag_hcurl':
+        stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
+        stats_Current_model = appcfg[method][time][geom][model]["stats_Current"]
+
         fstats_Power = os.path.join(template_path, stats_Power_model)
         fstats_Current = os.path.join(template_path, stats_Current_model)
 
@@ -144,12 +147,18 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
         "model": fmodel,
         "conductor": fconductor,
         "insulator": finsulator,
-        "cooling": fcooling,
-        "robin": frobin,
-        "flux": fflux,
-        "stats": [fstats_T, fstats_Power, fstats_Current],
+        "stats": [],
         "material_def" : material_generic_def
     }
+
+    if 'th' in model:
+        dict["cooling"] = fcooling
+        dict["robin"] = frobin
+        dict["flux"] = fflux
+        dict["stats"].append(fstats_T)
+    if model != 'mag' and model != 'mag_hcurl':
+        dict["stats"].append(fstats_Power)
+        dict["stats"].append(fstats_Current)
 
     if check_templates(dict):
         pass

@@ -46,11 +46,12 @@ from .supra import Supra_setup, Supra_simfile
     
 from .file_utils import MyOpen, findfile, search_paths
 
-def magnet_simfile(MyEnv, confdata: str):
+def magnet_simfile(MyEnv, confdata: str, addAir: bool = False):
     """
     """
     files = []
     yamlfile = confdata["geom"]
+
     if "Helix" in confdata:
         print("Load an insert")
         # Download or Load yaml file from data repository??
@@ -58,7 +59,7 @@ def magnet_simfile(MyEnv, confdata: str):
         with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
             files.append(cfgdata.name)
-        tmp_files = Insert_simfile(MyEnv, confdata, cad)
+        tmp_files = Insert_simfile(MyEnv, confdata, cad, addAir)
         for tmp_f in tmp_files:
             files.append(tmp_f)
 
@@ -81,8 +82,7 @@ def magnet_simfile(MyEnv, confdata: str):
                     if struct:
                         files.append(struct)
                 else:
-                    print("setup: unexpected cad type %s" % str(type(cad)))
-                    sys.exit(1)
+                    raise Exception(f"setup: unexpected cad type {type(cad)}")
 
     return files
 
@@ -128,8 +128,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
                 elif isinstance(cad, Supra):
                     (tdict, tmat, tpost) = Supra_setup(MyEnv, obj, cad, method_data, templates, debug)
                 else:
-                    print("setup: unexpected cad type %s" % str(type(cad)))
-                    sys.exit(1)
+                    raise Exception(f"setup: unexpected cad type {str(type(cad))}")
 
                 print("tdict:", tdict)
                 mdict = NMerge(tdict, mdict, debug)
@@ -147,23 +146,38 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
         print("magnet_setup: mdict=", mdict)
     return (mdict, mmat, mpost)
 
-def msite_simfile(MyEnv, confdata: str, session=None):
+def msite_simfile(MyEnv, confdata: str, session=None, addAir: bool = False):
     """
     Creating list of simulation files for msite
     """
 
     files = []
-    for magnet in confdata["magnets"]:
-        try:
-            mconfdata = load_object(MyEnv, magnet + "-data.json")
-        except:
-            try:
-                mconfdata = load_object_from_db(MyEnv, "magnet", magnet, False, session)
-            except:
-                print("msite_simfile: failed to load %s from magnetdb" % magnet)
-                sys.exit(1)
 
-        files += magnet_simfile(MyEnv, mconfdata)
+    # TODO: get xao and brep if they exist, otherwise go on
+    # TODO: add suffix _Air if needed ??
+    try:
+        xaofile = confdata["name"] + ".xao"
+        if addAir:
+            xaofile = confdata["name"] + "_withAir.xao"
+        f =findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
+        files.append(f)
+
+        brepfile = confdata["name"] + ".brep"
+        if addAir:
+            brepfile = confdata["name"] + "_withAir.brep"
+        f = findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
+        files.append(f)
+    except:
+        for magnet in confdata["magnets"]:
+            try:
+                mconfdata = load_object(MyEnv, magnet + "-data.json")
+            except:
+                try:
+                    mconfdata = load_object_from_db(MyEnv, "magnet", magnet, False, session)
+                except:
+                    raise Exception(f"msite_simfile: failed to load {magnet} from magnetdb")
+
+            files += magnet_simfile(MyEnv, mconfdata)
     
     return files
 
@@ -184,12 +198,11 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
         try:
             mconfdata = load_object(MyEnv, magnet + "-data.json", debug)
         except:
-            print("setup: failed to load %s, look into magnetdb" % (magnet + "-data.json") )
+            print(f"setup: failed to load {magnet}-data.json look into magnetdb")
             try:
                 mconfdata = load_object_from_db(MyEnv, "magnet", magnet, debug, session)
             except:
-                print("setup: failed to load %s from magnetdb" % magnet)
-                sys.exit(1)
+                raise Exception(f"setup: failed to load {magnet} from magnetdb")
                     
         if debug:
             print("mconfdata[geom]:", mconfdata["geom"])
@@ -236,12 +249,17 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     mmat = {}
     mpost = {}
 
+    cad_basename = ""
     if "geom" in confdata:
-        print("Load a magnet %s " % jsonfile, "debug:", args.debug)
+        print(f"Load a magnet {jsonfile} ", f"debug: {args.debug}")
+        with MyOpen(confdata["geom"], "r", paths=search_paths(MyEnv, "geom")) as f:
+            cad = yaml.load(f, Loader = yaml.FullLoader)
+            cad_basename = cad.name
         (mdict, mmat, mpost) = magnet_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)
     else:
         print("Load a msite %s" % confdata["name"], "debug:", args.debug)
         # print("confdata:", confdata)
+        cad_basename = name
 
         # why do I need that???
         if not findfile(confdata["name"] + ".yaml", search_paths(MyEnv, "geom")):
@@ -253,7 +271,9 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     name = jsonfile
     if name in confdata:
         name = confdata["name"]
-    
+        print(f"name={name} from confdata")
+    print(f"name={name}")
+
     # create cfg
     jsonfile += "-" + args.method
     jsonfile += "-" + args.model
@@ -266,6 +286,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     # TODO create_mesh() or load_mesh()
     # generate properly meshfile for cfg
     # generate solver section for cfg
+    # here name is from args (aka name of magnet and/or msite if from db)
     create_cfg(cfgfile, name, args.nonlinear, jsonfile, templates["cfg"], method_data, args.debug)
             
     # create json
@@ -291,19 +312,24 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
             sim_files.append(dst)
 
     # list files to be archived
-    xaofile = name + ".xao"
+    # TODO here name is entry name from yamlfile
+    xaofile = cad_basename + ".xao"
     if "mqs" in args.model or "mag" in args.model:
-        xaofile = name + "_withAir.xao"
+        xaofile = cad_basename + "_withAir.xao"
     meshfile = xaofile.replace(".xao", ".med")
     
     if args.geom == "Axi" and args.method == "cfpdes" :
-        xaofile = name + "-Axi_withAir.xao"
+        xaofile = cad_basename + "-Axi.xao"
         if "mqs" in args.model or "mag" in args.model:
-            xaofile = name + "-Axi.xao"
+            xaofile = cad_basename + "-Axi_withAir.xao"
         
         # if gmsh:
         meshfile = xaofile.replace(".xao", ".msh")
         
+    addAir = False
+    if 'mag' in args.model or 'mqs' in args.model:
+        addAir = True
+
     try:
         mesh = findfile(meshfile, search_paths(MyEnv, "mesh"))
         sim_files.append(mesh)
@@ -313,10 +339,10 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
         if "geom" in confdata:
             print("geo:", name)
             yamlfile = confdata["geom"]
-            sim_files += magnet_simfile(MyEnv, confdata)
+            sim_files += magnet_simfile(MyEnv, confdata, addAir)
         else:
             yamlfile = confdata["name"] + ".yaml"
-            sim_files += msite_simfile(MyEnv, confdata, session)
+            sim_files += msite_simfile(MyEnv, confdata, session, addAir)
 
     print("List of simulations files:", sim_files)
     import tarfile
@@ -403,18 +429,22 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     h5file = xaofile.replace(".xao", "_p.json")
     partcmd = f"{partitioner} --ifile {gmshfile} --ofile {h5file} --part {NP} [--mesh.scale=0.001]"
 
-    # ?? if partition need to replace geo by h5 in cfg ??
     tarfile = cfgfile.replace("cfg", "tgz")
+    # TODO if cad exist do not print CAD command
     cmds = {
         "Pre": f"export HIFIMAGNET={hifimagnet}",
         "Unpack": f"tar zxvf {tarfile}",
         "CAD": f"singularity exec {simage_path}/{salome} {geocmd}"
     }
     
+    # TODO add mount point for MeshGems if 3D otherwise use gmsh for Axi 
+    # to be changed in the future by using an entry from magnetsetup.conf MeshGems or gmsh
     cmds["Mesh"] = f"singularity exec {simage_path}/{salome} {meshcmd}"
     if meshconvert:
         cmds["Convert"] = f"singularity exec {simage_path}/{salome} {meshconvert}"
-    cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
+    
+    if args.geom == "3D":
+        cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
     
     if server.smp:
         feelcmd = f"{exec} --config-file {cfgfile}"

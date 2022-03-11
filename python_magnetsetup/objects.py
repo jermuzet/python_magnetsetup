@@ -25,10 +25,8 @@ def query_db(appenv: appenv, mtype: str, name: str, debug: bool = False):
         # confdata = ast.literal_eval(r.text)
         return mdata
     else:
-        print("failed to retreive %s from db" % name)
-        list_mtype_db(appenv, mtype)
-        print("available requested mtype in db are: ", list_mtype_db(appenv, mtype))
-        sys.exit(1)
+        available_objs = list_mtype_db(appenv, mtype)
+        raise Exception(f"failed to retreive {name} from db: available requested mtype in db are: {available_objs}")
 
 def list_mtype_db(appenv: appenv, mtype: str, debug: bool = False):
     """

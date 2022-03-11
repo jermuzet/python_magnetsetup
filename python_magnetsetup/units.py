@@ -61,8 +61,7 @@ def convert_data(units: dict, length_unit: str, quantity: Union[float, List[floa
     elif isinstance(quantity, list):
         data = Quantity(quantity, units[qtype][0]).to(units[qtype][1]).magnitude.tolist()
     else:
-        print("convert_data/quantity: unsupported type %s for %s quantity" % (str(type(quantity)), qtype) )
-        sys.exit(1)
+        raise Exception(f"convert_data/quantity: unsupported type {type(quantity)} for {qtype}")
 
     return data
 
@@ -129,7 +128,7 @@ def main():
                 _convert = convert_data(units, distance_unit, R1, "Length")
             Sh_convert = convert_data(units, distance_unit, Sh, "Area")
 
-            Ssections_convert = convert_data(units, distance_unit, Ssections, "Area")
+            # Ssections_convert = convert_data(units, distance_unit, Ssections, "Area")
 
             # MagnetPermeability of vacuum : H/m --> H/distance_unit
             # mu0_convert = convert_data(distance_unit, mu0, "mu0")

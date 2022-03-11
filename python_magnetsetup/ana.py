@@ -229,8 +229,7 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
                         for item in tmp:
                             UMagnets.append(item)
                 else:
-                    print("setup: unexpected cad type %s" % str(type(cad)))
-                    sys.exit(1)
+                    raise Exception(f"setup: unexpected cad type {str(type(cad))}")
 
     # Bstacks = mt.VectorOfStacks()
     print("Helices:", len(Tubes))
@@ -269,8 +268,7 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False, session=None):
             try:
                 mconfdata = load_object_from_db(MyEnv, "magnet", magnet, debug, session)
             except:
-                print("setup: failed to load %s from magnetdb" % magnet)
-                sys.exit(1)
+                raise Exception(f"setup: failed to load {magnet} from magnetdb")
                     
         if debug:
             print("mconfdata[geom]:", mconfdata["geom"])
@@ -356,12 +354,10 @@ def main():
     
     # make datafile/[magnet|msite] exclusive one or the other
     if args.magnet != None and args.msite:
-        print("cannot specify both magnet and msite")
-        sys.exit(1)
+        raise Exception("cannot specify both magnet and msite")
     if args.datafile != None:
         if args.magnet != None or args.msite != None:
-            print("cannot specify both datafile and magnet or msite")
-            sys.exit(1)
+            raise Exception("cannot specify both datafile and magnet or msite")
 
     # load appenv
     MyEnv = appenv()

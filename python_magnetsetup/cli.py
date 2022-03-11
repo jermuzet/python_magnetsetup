@@ -81,6 +81,7 @@ def main():
 
     print("\n\n=== Guidelines for running a simu on {machine} ===")
     print(f"Edit {cfgfile} to fix the meshfile, scale, partition and solver props")
+    print(f"If you do change {cfgfile}, remenber to include the new file in {tarfilename}")
     # TODO re-create a tgz archive if you modify cfgfile or jsonfile
     print(f"Connect to {machine}: ssh -Y {machine}")
     print(f"Create a {workingdir} directory on {machine}: mkdir -p {workingdir}")
@@ -88,7 +89,19 @@ def main():
     # print(f"Untar {tarfilename} on {machine}: cd {workingdir}; tar zxvf {tarfilename}")
     for key in cmds:
         print(key, ':', cmds[key])
+    print("\n\n==================================================")
+
     # post-processing
+    print("\n\n=== Guidelines for postprocessing a simu on your host ===")
+    print(f"Start pvdataserver on {machine}")
+    print(f"Connect on {machine}: ssh -Y -L 11111:{machine}:11111")
+    print(f"Start Paraview dataserver in {machine}: pvdataserver")
+    print("In a new terminal on your host, start Paraview render server: pvrenderserver")
+    print("In a new terminal on your host, start Paraview: paraview")
+    print("\n\n==================================================")
+
+
+    
     return 0
 
 

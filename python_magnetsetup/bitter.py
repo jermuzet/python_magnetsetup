@@ -64,14 +64,15 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     gdata = (name, snames, cad.axi.turns)
 
     for sname in snames:
-        part_thermic.append(sname)
+        if 'th' in method_data[3]:
+            part_thermic.append(sname)
         part_electric.append(sname)
 
     if debug:
         print("part_thermic:", part_thermic)
         print("part_electric:", part_electric)
         
-    if  method_data[2] == "Axi":
+    if  method_data[2] == "Axi" and ('el' in method_data[3] and  method_data[3] != 'thelec'):
         boundary_meca.append("{}_V0".format(name))
         boundary_meca.append("{}_V1".format(name))    
                 
@@ -108,7 +109,8 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
         for sname in snames :
             currentH_data.append( {"header": "Current_{}".format(sname), "markers": sname} )
             powerH_data.append( {"header": "Power_{}".format(sname), "markers": sname} )
-            meanT_data.append( {"header": "MeanT_{}".format(sname), "markers": sname} )
+            if 'th' in method_data[3]:
+                meanT_data.append( {"header": "MeanT_{}".format(sname), "markers": sname} )
     if debug: print("meanT_data:", meanT_data)
     mpost = { 
         "meanT_H": meanT_data ,
