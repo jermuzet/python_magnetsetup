@@ -90,11 +90,14 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
     """
     Creating dict for setup for magnet
     """
-    print("magnet_setup", "debug=", debug, confdata)
+    
+    print("magnet_setup")
+    if debug:
+        print(f"magnet_setup: confdata: {confdata}"),
     
     yamlfile = confdata["geom"]
     if debug:
-        print("magnet_setup:", yamlfile)
+        print(f"magnet_setup: yamfile: {yamlfile}")
     
     mdict = {}
     mmat = {}
@@ -130,17 +133,14 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
                 else:
                     raise Exception(f"setup: unexpected cad type {str(type(cad))}")
 
-                print("tdict:", tdict)
+                if debug: print("tdict:", tdict)
                 mdict = NMerge(tdict, mdict, debug)
-                # print("mdict:", mdict)
             
-                print("tmat:", tmat)
+                if debug: print("tmat:", tmat)
                 mmat = NMerge(tmat, mmat, debug)
-                # print("mmat:", mmat)
             
-                print("tpost:", tpost)
+                if debug: print("tpost:", tpost)
                 mpost = NMerge(tpost, mpost, debug)
-                # print("mpost:", mpost)
 
     if debug:
         print("magnet_setup: mdict=", mdict)
@@ -159,13 +159,13 @@ def msite_simfile(MyEnv, confdata: str, session=None, addAir: bool = False):
         xaofile = confdata["name"] + ".xao"
         if addAir:
             xaofile = confdata["name"] + "_withAir.xao"
-        f =findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
+        f =findfile(xaofile, paths=search_paths(MyEnv, "cad"))
         files.append(f)
 
         brepfile = confdata["name"] + ".brep"
         if addAir:
             brepfile = confdata["name"] + "_withAir.brep"
-        f = findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
+        f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
         files.append(f)
     except:
         for magnet in confdata["magnets"]:
@@ -259,7 +259,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     else:
         print("Load a msite %s" % confdata["name"], "debug:", args.debug)
         # print("confdata:", confdata)
-        cad_basename = name
+        cad_basename = confdata["name"]
 
         # why do I need that???
         if not findfile(confdata["name"] + ".yaml", search_paths(MyEnv, "geom")):
@@ -344,7 +344,8 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
             yamlfile = confdata["name"] + ".yaml"
             sim_files += msite_simfile(MyEnv, confdata, session, addAir)
 
-    print("List of simulations files:", sim_files)
+    if args.debug:
+        print("List of simulations files:", sim_files)
     import tarfile
     tarfilename = cfgfile.replace('cfg','tgz')
     if os.path.isfile(os.path.join(cwd, tarfilename)):
@@ -352,11 +353,12 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     else:
         tar = tarfile.open(tarfilename, "w:gz")
         for filename in sim_files:
-            print(f"add {filename} to {tarfilename}")  
+            if args.debug:
+                print(f"add {filename} to {tarfilename}")  
             tar.add(filename)
             for mname in material_generic_def:
                 if mname in filename:
-                    print(f"remove {filename}")
+                    if args.debug: print(f"remove {filename}")
                     os.unlink(filename)
         tar.close()
 
@@ -382,13 +384,14 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     from .machines import load_machines
 
     machines = load_machines()
-    print(f"machines: {machines} type={type(machines)}")
-    print(f"machine={MyEnv.compute_server} type={type(MyEnv.compute_server)}")
+    if args.debug:
+        print(f"machine={MyEnv.compute_server} type={type(MyEnv.compute_server)}")
     server = machines[MyEnv.compute_server]
     NP = server.cores
     if server.multithreading:
         NP = int(NP/2)
-    print(f"NP={NP} {type(NP)}")
+    if args.debug:
+        print(f"NP={NP} {type(NP)}")
 
     simage_path = MyEnv.simage_path()
     hifimagnet = AppCfg["mesh"]["hifimagnet"]
@@ -411,7 +414,6 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     gmshfile = meshfile.replace(".med", ".msh")
     meshconvert = ""
 
-    print(f"args.geom={args.geom} args.method={args.geom}")
     if args.geom == "Axi" and args.method == "cfpdes" :
         if "mqs" in args.model or "mag" in args.model:
             geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--axi,--air,2,2,--wd,data/geometries"

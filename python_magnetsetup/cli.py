@@ -89,7 +89,7 @@ def main():
     # print(f"Untar {tarfilename} on {machine}: cd {workingdir}; tar zxvf {tarfilename}")
     for key in cmds:
         print(key, ':', cmds[key])
-    print("\n\n==================================================")
+    print("==================================================")
 
     # post-processing
     print("\n\n=== Guidelines for postprocessing a simu on your host ===")
@@ -98,7 +98,7 @@ def main():
     print(f"Start Paraview dataserver in {machine}: pvdataserver")
     print("In a new terminal on your host, start Paraview render server: pvrenderserver")
     print("In a new terminal on your host, start Paraview: paraview")
-    print("\n\n==================================================")
+    print("==================================================")
 
 
     

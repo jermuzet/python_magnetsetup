@@ -212,7 +212,7 @@ def create_materials_insert(gdata: tuple, idata: Optional[List], confdata: dict,
 
             if idata:
                 for item in idata:
-                    if item(0) == "Glue":
+                    if item[0] == "Glue":
                         name = "Isolant%d" % (i+1)
                         mdata = entry(finsulator, Merge({'name': name, 'marker': "H%d_Isolant" % (i+1)}, confdata["Helix"][i]["insulator"]), debug)
                     else:
@@ -245,7 +245,7 @@ def create_materials_insert(gdata: tuple, idata: Optional[List], confdata: dict,
         materials_dict["R%d" % (i+1)] = mdata["R%d" % (i+1)]
         
     # Leads: 
-    if method_data[2] == "3D" and confdata["Lead"]:
+    if method_data[2] == "3D" and "Lead" in confdata:
         mdata = entry(fconductor, Merge({'name': "iL1"}, confdata["Lead"][0]["material"]), debug)
         materials_dict["iL1"] = mdata["iL1"]
 
@@ -391,11 +391,11 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     Create a json model file
     """
 
-    if debug: print("create_json=", jsonfile)
-    print("create_json=", jsonfile)
-    print("create_json=", mdict)
+    if debug: 
+        print("create_json jsonfile=", jsonfile)
+        print("create_json mdict=", mdict)
     data = entry(templates["model"], mdict, debug)   
-    print("create_json/data:", data)
+    if debug: print("create_json/data model:", data)
     
     # material section
     if "Materials" in data:
@@ -403,7 +403,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
             data["Materials"][key] = mmat[key]
     else:
         data["Materials"] = mmat
-    print("create_json/Materials data:", data)
+    if debug: print("create_json/Materials data:", data)
 
     # postprocess
     if debug: print("flux")
@@ -430,8 +430,9 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
         if method_data[0] == "cfpdes" and method_data[2] == "Axi" and 'th' in method_data[3]: 
             section = "heat" 
         currentH_data = mpost["current_H"] # { "Power_H": [] }
-        print("currentH_data:", currentH_data)
-        print("templates[stats]:", templates["stats"])
+        if debug:
+            print("currentH_data:", currentH_data)
+            print("templates[stats]:", templates["stats"])
         add = data["PostProcess"][section]["Measures"]["Statistics"]
         odata = entry(templates["stats"][2], currentH_data, debug)
         for md in odata["Stats_Current"]:
@@ -450,8 +451,6 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
 
     mdata = json.dumps(data, indent = 4)
 
-    # print("corrected data:", re.sub(r'},\n					    	}\n', '}\n}\n', data))
-    # data = re.sub(r'},\n					    	}\n', '}\n}\n', data)
     with open(jsonfile, "x") as out:
         out.write(mdata)
     pass
@@ -466,12 +465,12 @@ def entry(template: str, rdata: dict, debug: bool = False) -> str:
     with open(template, "r") as f:
         jsonfile = chevron.render(f, rdata)
     jsonfile = jsonfile.replace("\'", "\"")
-    if debug:
-        print("entry/jsonfile:", jsonfile)
-        print("corrected:", re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile))
 
-    corrected = re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile)
+    corrected = re.sub(r'},\n\s+},\n', '}\n},\n', jsonfile)
     corrected = corrected.replace("&quot;", "\"")
+    if debug:
+        print(f"entry/jsonfile: {jsonfile}")
+        print(f"corrected: {corrected}")
     try:
         mdata = json.loads(corrected)
     except json.decoder.JSONDecodeError:

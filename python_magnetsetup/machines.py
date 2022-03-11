@@ -39,21 +39,21 @@ class machine():
     multithreading: bool = True
 
 
-def load_machines():
+def load_machines(debug: bool = False):
     """
     load machines definition as a dict
     """
-    print("load_machines")
+    if debug: print("load_machines")
 
     default_path = os.path.dirname(os.path.abspath(__file__))
     with open(os.path.join(default_path, 'machines.json'), 'r') as cfg:
-        print(f"load_machines from: {cfg.name}")
+        if debug: print(f"load_machines from: {cfg.name}")
         data = json.load(cfg)
-        print(f"data={data}")
+        if debug: print(f"data={data}")
 
     machines = {}
     for item in data:
-        print(f"server: {item} type={data[item]['type']}")
+        if debug: print(f"server: {item} type={data[item]['type']}")
         server = machine(
             name=item,
             otype=MachineType[data[item]['type']],

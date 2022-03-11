@@ -24,13 +24,13 @@ def Insert_simfile(MyEnv, confdata: dict, cad: Insert, addAir: bool = False):
         xaofile = cad.name + ".xao"
         if addAir:
             xaofile = cad.name + "_withAir.xao"
-        f = findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
+        f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
         files.append(f)
 
         brepfile = cad.name + ".brep"
         if addAir:
             brepfile = cad.name + "_withAir.brep"
-        f = findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
+        f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
         files.append(f)
     except:
         for helix in cad.Helices:
@@ -41,10 +41,13 @@ def Insert_simfile(MyEnv, confdata: dict, cad: Insert, addAir: bool = False):
             # TODO: get xao and brep if they exist otherwise _salome.data
             try:
                 xaofile = hhelix.name + ".xao"
-                findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
-
+                f = findfile(xaofile, paths=search_paths(MyEnv, 'cad'))
+                files.append(f)
+                
                 brepfile = hhelix.name + ".brep"
-                findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
+                f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
+                files.append(f)
+
             except:
                 if hhelix.m3d.with_shapes:
                     with MyOpen(hhelix.name + str("_cut_with_shapes_salome.dat"), "r", paths=search_paths(MyEnv, "geom")) as fcut:
@@ -58,10 +61,13 @@ def Insert_simfile(MyEnv, confdata: dict, cad: Insert, addAir: bool = False):
             for ring in cad.Rings:
                 try:
                     xaofile = ring.name + ".xao"
-                    findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
-
+                    f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
+                    files.append(f)
+                
                     brepfile = ring.name + ".brep"
-                    findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
+                    f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
+                    files.append(f)
+
                 except:
                     with MyOpen(ring+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
                         files.append(f.name)
@@ -70,10 +76,13 @@ def Insert_simfile(MyEnv, confdata: dict, cad: Insert, addAir: bool = False):
             for lead in cad.CurrentLeads:
                 try:
                     xaofile = lead.name + ".xao"
-                    findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
+                    f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
+                    files.append(f)
 
                     brepfile = lead.name + ".brep"
-                    findfile(xaofile, "r", paths=search_paths(MyEnv, "cad"))
+                    f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
+                    files.append(f)
+
                 except:
                     with MyOpen(lead+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
                         files.append(f.name)
