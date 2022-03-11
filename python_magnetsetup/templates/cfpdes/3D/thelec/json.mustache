@@ -43,39 +43,42 @@
 		"electric":
 		{
 			"Dirichlet":
-	    		{
+	    	{
 				{{#boundary_Electric_Dir}}
-				"{{name}}": { expr: "{{value}}"}
+				"{{name}}": 
+				{
+					"expr": "{{value}}"
+				},
 				{{/boundary_Electric_Dir}}
-	    		},
+			},
 			"Neumann":
 			{
 				{{#boundary_Electric_Neu}}
-				"{{name}}": { expr: "{{value}}"}
+				"{{name}}": { "expr": "{{value}}"},
 				{{/boundary_Electric_Neu}}
 			}
 		},
 		"heat":
 		{
 			"Robin":
-	    		{
+	    	{
 				{{#boundary_Therm_Robin}}
 				"{{name}}": 
 				{ 
-					expr1: "{{expr1}}",
-					expr2: "{{expr2}}"
-				}
+					"expr1": "{{expr1}}",
+					"expr2": "{{expr2}}"
+				},
 				{{/boundary_Therm_Robin}}
-	    		}
-	    		"Neumann":
-	    		{
+	    	},
+	    	"Neumann":
+	    	{
 				{{#boundary_Therm_Neu}}
 				"{{name}}": 
 				{ 
-					expr: "{{value}}"
-				}
+					"expr": "{{value}}"
+				},
 				{{/boundary_Therm_Neu}}
-	    		}
+	    	}
 		}
     },
     "InitialConditions":
@@ -86,7 +89,7 @@
             {
                 "myic":
                 {
-                    "markers": {{part_temperature}},
+                    "markers": {{part_thermic}},
                     "expr":"Tinit:Tinit"
                 }
             }
