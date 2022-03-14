@@ -441,7 +441,8 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     
     # TODO add mount point for MeshGems if 3D otherwise use gmsh for Axi 
     # to be changed in the future by using an entry from magnetsetup.conf MeshGems or gmsh
-    cmds["Mesh"] = f"singularity exec -B /opt/MeshGems:/opt/DISTENE/license:ro {simage_path}/{salome} {meshcmd}"
+    MeshGems_licdir = server.mgkeydir
+    cmds["Mesh"] = f"singularity exec -B {MeshGems_licdir}:/opt/DISTENE/license:ro {simage_path}/{salome} {meshcmd}"
     # if gmsh:
     #    cmds["Mesh"] = f"singularity exec -B /opt/MeshGems:/opt/DISTENE/license:ro {simage_path}/{salome} {meshcmd}"
         
