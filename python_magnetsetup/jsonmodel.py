@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Union, Optional
 
 import sys
 import os
@@ -326,7 +326,7 @@ def create_bcs_insert(boundary_meca: List,
                boundary_electric: List,
                gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False) -> dict:
 
-    print("create_bcs from templates")
+    print("create_bcs_insert from templates")
     electric_bcs_dir = { 'boundary_Electric_Dir': []} # name, value, vol
     electric_bcs_neu = { 'boundary_Electric_Neu': []} # name, value
     thermic_bcs_rob = { 'boundary_Therm_Robin': []} # name, expr1, expr2
@@ -377,6 +377,14 @@ def create_bcs_insert(boundary_meca: List,
             elec_ = Merge(electric_bcs_dir, electric_bcs_neu)
             thelec_ = Merge(th_, elec_)
             return Merge(maxwell_bcs_dir, thelec_)
+    elif method_data[3] == 'thmqs' or method_data[3] == 'thmqs_hcurl':
+        th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
+        if method_data[2] == "Axi":
+            return Merge(maxwell_bcs_dir, th_)
+        else:
+            elec_ = Merge(electric_bcs_dir, electric_bcs_neu)
+            thelec_ = Merge(th_, elec_)
+            return Merge(maxwell_bcs_dir, thelec_)
     else:
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
         elec_ = Merge(electric_bcs_dir, electric_bcs_neu)
@@ -406,56 +414,67 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     if debug: print("create_json/Materials data:", data)
 
     # postprocess
-    if debug: print("flux")
+    # print("=== FORCE DEBUG to True ===")
+    # debug = True
     if "flux" in mpost:
         if "heat" in data["PostProcess"]:
             flux_data = mpost["flux"]
+            if debug: 
+                print("flux", type(flux_data))
             add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
             odata = entry(templates["flux"], flux_data, debug)
+            if debug: print(odata)
             for md in odata["Flux"]:
                 data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Flux"][md]
     
-    if debug: print("meanT_H")
     if "meanT_H" in mpost:
-        meanT_data = mpost["meanT_H"] # { "meanT_H": [] }
         if "heat" in data["PostProcess"]:
+            meanT_data = mpost["meanT_H"]
+            if debug: 
+                print("meanT_H", type(meanT_data))
             add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
-            odata = entry(templates["stats"][0], meanT_data, debug)
+            odata = entry(templates["stats"][0], {'meanT_H': meanT_data}, debug)
+            if debug: print("odata:", odata)
             for md in odata["Stats_T"]:
                 data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_T"][md]
 
-    if method_data[3] != 'mag' and method_data[3] != 'mag_hcurl':
-        if debug: print("current_H")
-        section = "electric"
-        if method_data[0] == "cfpdes" and method_data[2] == "Axi" and 'th' in method_data[3]: 
-            section = "heat" 
-        currentH_data = mpost["current_H"] # { "Power_H": [] }
+    section = "electric"
+    if method_data[0] == "cfpdes" and method_data[2] == "Axi" and 'th' in method_data[3]: 
+        section = "heat" 
+
+    if "current_H" in mpost:
         if debug:
-            print("currentH_data:", currentH_data)
+            print("current_H")
+            print("section:", section)
             print("templates[stats]:", templates["stats"])
+        currentH_data = mpost["current_H"]
         add = data["PostProcess"][section]["Measures"]["Statistics"]
-        odata = entry(templates["stats"][2], currentH_data, debug)
+        odata = entry(templates["stats"][2], {'Current_H': currentH_data}, debug)
+        if debug: print(odata)
         for md in odata["Stats_Current"]:
             data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Current"][md]
     
-        if debug: print("power_H")
-        if method_data[0] == "cfpdes" and method_data[2] == "Axi" and 'th' in method_data[3]: 
-            section = "heat" 
-        powerH_data = mpost["power_H"] # { "Power_H": [] }
+    if "power_H" in mpost:
+        if debug:
+            print("power_H")
+            print("section:", section)
+            print("templates[stats]:", templates["stats"])
+        powerH_data = mpost["power_H"]
         add = data["PostProcess"][section]["Measures"]["Statistics"]
-        odata = entry(templates["stats"][1], powerH_data, debug)
+        odata = entry(templates["stats"][1], {'Power_H': powerH_data}, debug)
+        if debug: print(odata)
         for md in odata["Stats_Power"]:
             data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
     
-        print("with currents:", data["PostProcess"][section]["Measures"]["Statistics"])
+    print(f"post-processing {section}/Measures/Statistics: {data['PostProcess'][section]['Measures']['Statistics']}")
 
     mdata = json.dumps(data, indent = 4)
 
     with open(jsonfile, "x") as out:
         out.write(mdata)
-    pass
+    return
 
-def entry(template: str, rdata: dict, debug: bool = False) -> str:
+def entry(template: str, rdata: List, debug: bool = False) -> str:
     import chevron
     import re
     
@@ -465,8 +484,11 @@ def entry(template: str, rdata: dict, debug: bool = False) -> str:
     with open(template, "r") as f:
         jsonfile = chevron.render(f, rdata)
     jsonfile = jsonfile.replace("\'", "\"")
+    # print("jsonfile:", jsonfile)
 
-    corrected = re.sub(r'},\n\s+},\n', '}\n},\n', jsonfile)
+    corrected = re.sub(r'},\s+},\n', '}\n},\n', jsonfile)
+    corrected = re.sub(r'},\s+}\n', '}\n}\n', corrected)
+    # corrected = re.sub(r'},\s+}\n', '}\n}\n', corrected)
     corrected = corrected.replace("&quot;", "\"")
     if debug:
         print(f"entry/jsonfile: {jsonfile}")
@@ -474,6 +496,8 @@ def entry(template: str, rdata: dict, debug: bool = False) -> str:
     try:
         mdata = json.loads(corrected)
     except json.decoder.JSONDecodeError:
+        # ??how to have more info on the pb??
+        # save corrected to tmp file and run jsonlint-php tmp?? 
         raise Exception(f"entry: json.decoder.JSONDecodeError in {corrected}")
 
     if debug:
