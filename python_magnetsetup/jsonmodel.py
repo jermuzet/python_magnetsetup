@@ -260,7 +260,7 @@ def create_bcs_supra(boundary_meca: List,
                boundary_electric: List,
                gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False) -> dict:
 
-    print("create_bcs_bitter from templates")
+    print("create_bcs_supra from templates")
     electric_bcs_dir = { 'boundary_Electric_Dir': []} # name, value, vol
     electric_bcs_neu = { 'boundary_Electric_Neu': []} # name, value
     thermic_bcs_rob = { 'boundary_Therm_Robin': []} # name, expr1, expr2

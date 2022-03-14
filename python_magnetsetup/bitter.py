@@ -107,18 +107,23 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     
     if method_data[2] == "Axi":
         for sname in snames :
-            currentH_data.append( {"header": "Current_{}".format(sname), "markers": sname} )
-            powerH_data.append( {"header": "Power_{}".format(sname), "markers": sname} )
+            currentH_data.append( {"header": "Current_{}".format(sname), "markers": "\"{}\"".format(sname)} )
+            powerH_data.append( {"header": "Power_{}".format(sname), "markers": "\"{}\"".format(sname)} )
             if 'th' in method_data[3]:
-                meanT_data.append( {"header": "MeanT_{}".format(sname), "markers": sname} )
+                meanT_data.append( {"header": "MeanT_{}".format(sname), "markers": "\"{}\"".format(sname)} )
     if debug: print("meanT_data:", meanT_data)
-    mpost = { 
-        "meanT_H": meanT_data ,
-        "power_H": powerH_data  ,
-        "current_H": currentH_data
-    }
     
+    mpost = { } 
+    if 'th' in method_data[3]:
+        print("affect meanT_data:", meanT_data)
+        mpost = {  
+            "meanT_H": meanT_data ,
+            "power_H": powerH_data ,
+            "current_H": currentH_data
+        }
         
+    # check mpost output
+    print(f"bitter: mpost={mpost}")
     mmat = create_materials_bitter(gdata, confdata, templates, method_data, debug)
 
     return (mdict, mmat, mpost)
