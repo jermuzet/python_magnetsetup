@@ -37,6 +37,7 @@ class machine():
     manager: jobmanager = jobmanager(JobManagerType.none)
     cores: int = 2
     multithreading: bool = True
+    mgkeydir: str = r"/opt/MeshGems"
 
 
 def load_machines(debug: bool = False):
@@ -61,7 +62,8 @@ def load_machines(debug: bool = False):
             dns=data[item]['dns'],
             cores=data[item]['cores'],
             multithreading=data[item]['multithreading'],
-            manager=jobmanager(otype=JobManagerType[data[item]['jobmanager']['type']], queues=data[item]['jobmanager']['queues'])
+            manager=jobmanager(otype=JobManagerType[data[item]['jobmanager']['type']], queues=data[item]['jobmanager']['queues']),
+            mgkeydir=data[item]['mgkeydir']
         )
         machines[item]=server
                 
