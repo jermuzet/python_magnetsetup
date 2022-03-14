@@ -32,7 +32,7 @@ def main():
     parser.add_argument("--geom", help="choose geom type", type=str,
                     choices=['Axi', '3D'], default='Axi')
     parser.add_argument("--model", help="choose model type", type=str,
-                    choices=['thelec', 'mag', 'thmag', 'thmagel', 'mag_hcurl', 'thmag_hcurl', 'thmagel_hcurl'], default='thmagel')
+                    choices=['thelec', 'mag', 'thmag', 'thmagel', 'thmqs', 'mag_hcurl', 'thmag_hcurl', 'thmagel_hcurl', 'thmqs_hcurl'], default='thmagel')
     parser.add_argument("--nonlinear", help="force non-linear", action='store_true')
     parser.add_argument("--cooling", help="choose cooling type", type=str,
                     choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
@@ -58,7 +58,6 @@ def main():
     MyEnv = appenv()
     if args.debug: print(MyEnv.template_path())
 
-    name = ""
     # Get Object
     if args.datafile != None:
         confdata = load_object(MyEnv, args.datafile, args.debug)
@@ -77,15 +76,18 @@ def main():
     
     # Print command to run
     machine = MyEnv.compute_server
-    workingdir = name
+    workingdir = cfgfile.replace(".cfg","")
 
     print("\n\n=== Guidelines for running a simu on {machine} ===")
     print(f"Edit {cfgfile} to fix the meshfile, scale, partition and solver props")
-    print(f"If you do change {cfgfile}, remenber to include the new file in {tarfilename}")
+    print(f"If you do change {cfgfile}, remember to include the new file in {tarfilename}")
     # TODO re-create a tgz archive if you modify cfgfile or jsonfile
     print(f"Connect to {machine}: ssh -Y {machine}")
     print(f"Create a {workingdir} directory on {machine}: mkdir -p {workingdir}")
+    print(f"Return to your host : exit")
     print(f"Transfert {tarfilename} to {machine}: scp {tarfilename} {machine}:./{workingdir}")
+    print(f"Connect once more to {machine}: ssh -Y {machine}")
+    print(f"Go to {workingdir} directory on {machine}: cd {workingdir}")
     # print(f"Untar {tarfilename} on {machine}: cd {workingdir}; tar zxvf {tarfilename}")
     for key in cmds:
         print(key, ':', cmds[key])

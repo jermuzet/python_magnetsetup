@@ -466,7 +466,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
         for md in odata["Stats_Power"]:
             data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
     
-    print(f"post-processing {section}/Measures/Statistics: {data['PostProcess'][section]['Measures']['Statistics']}")
+    #print(f"post-processing {section}/Measures/Statistics: {data['PostProcess'][section]['Measures']['Statistics']}")
 
     mdata = json.dumps(data, indent = 4)
 
