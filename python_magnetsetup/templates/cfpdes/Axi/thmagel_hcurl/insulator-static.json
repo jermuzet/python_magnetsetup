@@ -1,0 +1,16 @@
+{
+    "heat_c":"k*x:k:x",
+
+    "magnetic_c":"x/mu:x:mu",
+    "magnetic_a":"1/mu/x:x:mu",
+    
+    "Lame_lambda":"E*nu/(1-2*nu)/(1+nu):E:nu",
+    "Lame_mu":"E/(2*(1+nu)):E:nu",
+
+    "sigma_T":"-(3*Lame_lambda+2*Lame_mu)*alphaT*(heat_T-T0):Lame_lambda:Lame_mu:alphaT:heat_T:T0",
+
+    "elastic_c":"x*Lame_mu:x:Lame_mu",
+    "elastic_gamma":"{-Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*Lame_mu*elastic_grad_u_00-bool_dilatation*x*sigma_T, -x*Lame_mu*elastic_grad_u_10, -x*Lame_mu*elastic_grad_u_01, -Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*Lame_mu*elastic_grad_u_11-bool_dilatation*x*sigma_T}:bool_dilatation:x:Lame_lambda:Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11:sigma_T",
+    "elastic_f":"{-Lame_lambda*elastic_grad_u_00-(Lame_lambda+2*Lame_mu)*elastic_u_0/x-Lame_lambda*elastic_grad_u_11-bool_dilatation*sigma_T, 0}:bool_dilatation:x:Lame_mu:Lame_lambda:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_11:sigma_T"
+}
+
