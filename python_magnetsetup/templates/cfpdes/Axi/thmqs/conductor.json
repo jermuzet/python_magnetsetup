@@ -1,3 +1,4 @@
+{
     "heat_c":"k*x:k:x",
     "heat_f":"sigma*(U/(2*pi)+magnetic_dphi_dt)*(U/(2*pi)+magnetic_dphi_dt)/x:sigma:U:magnetic_dphi_dt:x",
     "heat_d":"rho*Cp*x:rho:Cp:x",

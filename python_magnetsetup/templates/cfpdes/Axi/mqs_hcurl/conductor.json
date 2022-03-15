@@ -3,5 +3,6 @@
     
     "magnetic_c":"x/mu:x:mu",
     "magnetic_a":"1/mu/x:x:mu",
-    "magnetic_f":"j_th*x:j_th:x"
+    "magnetic_f":"j_th*x:j_th:x",
+    "magnetic_d":"sigma*x:sigma:x"
 }

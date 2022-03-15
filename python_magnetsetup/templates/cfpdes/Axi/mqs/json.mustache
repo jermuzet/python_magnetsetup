@@ -64,29 +64,17 @@
 					"U":
 		    		{
 						"expr":"materials_U:materials_U",
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
-						}
+						"markers": {{part_electric}}
 		    		},
 		    		"Jth":
 		    		{
 						"expr":"-materials_sigma*(materials_U/(2*pi)+magnetic_dphi_dt)/x:magnetic_dphi_dt:materials_sigma:materials_U:x",
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
-						}
+						"markers": {{part_electric}}
 		    		},
 		    		"Qth":
 		    		{
-						"expr":"materials_sigma*(materials_U/(2*pi*x))*(materials_U/(2*pi*x)):materials_sigma:materials_U:x",
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
-						}
+						"expr":"materials_sigma*(materials_U/(2*pi*x)+magnetic_dphi_dt/x)*(materials_U/(2*pi*x)+magnetic_dphi_dt/x):materials_sigma:materials_U:x:magnetic_dphi_dt",
+						"markers": {{part_electric}}
 		    		}
 				}
 	    	}
@@ -100,20 +88,9 @@
 		    		"MagneticEnergy":
 		    		{
 						"type":"integrate",
-						"expr":"-2*pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi):magnetic_phi:materials_sigma:materials_U:x",
-						"markers":
-						{
-			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_electric}}
-						}
-		    		},
-                    "Intensity_H%1_1%_Cu%1_2%":
-					{
-    					"type":"integrate",
-    					"expr":"-materials_H%1_1%_Cu%1_2%_sigma*materials_H%1_1%_Cu%1_2%_U/2/pi/x:materials_H%1_1%_Cu%1_2%_sigma:materials_H%1_1%_Cu%1_2%_U:x",
-    					"markers": "H%1_1%_Cu%1_2%",
-			    		"index1": {{index_electric}}
-					}
+						"expr":"-2*pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi+magnetic_dphi_dt):magnetic_phi:magnetic_dphi_dt:materials_sigma:materials_U:x",
+						"markers": {{part_electric}}
+		    		}
 				}
 	    	}
 		}
