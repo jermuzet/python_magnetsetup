@@ -51,6 +51,8 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     
     name = ""
     snames = []
+
+    
     with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
         cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         NSections = len(cad.axi.turns)
@@ -131,5 +133,28 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     # check mpost output
     # print(f"bitter {name}: mpost={mpost}")
     mmat = create_materials_bitter(gdata, confdata, templates, method_data, debug)
-
+    
+    # update U and hw, dTw param
+    print("Update U for I0=31kA")
+    # print(f"insert: mmat: {mmat}")
+    # print(f"insert: mdict['Parameters']: {mdict['Parameters']}")
+    I0 = 31.e+3
+    if method_data[2] == "Axi":
+        import math
+        params = params_data['Parameters']
+        for j in range(len(cad.axi.turns)):
+            marker = name + "_B%d" % (i+1)
+            item = {"name": "U_" + marker, "value":"1"}
+            index = params.index(item)
+            mat = mmat[marker]
+            # print("U=", params[index], mat['sigma'], R1[i], pitch_h[i][j])
+            sigma = float(mat['sigma'])
+            I_s = I0 * cad.axi.turns[i]
+            j1 = I_s / (math.log(cad.r[1]/cad.r[1]) * (cad.axi.pitch[i]*1.e-3) * cad.axi.turns[i] )
+            U_s = 2 * math.pi * (cad.r[0] * 1.e-3) * j1 / sigma
+            print("U=", params[index]['name'], cad.r[0], cad.axi.pitch[i], mat['sigma'], "U_s=", U_s, "j1=", j1)
+            item = {"name": "U_" + marker, "value":str(U_s)}
+            params[index] = item
+                
+    
     return (mdict, mmat, mpost)
