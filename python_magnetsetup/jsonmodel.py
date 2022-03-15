@@ -52,7 +52,7 @@ def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False
     
     (name, snames, nturns) = gdata
     for sname in snames:
-        params_data['Parameters'].append({"name":"%s_h" % sname, "value":convert_data(units, unit_Length, 58222.1, "h")})
+        params_data['Parameters'].append({"name":"%s_hw" % sname, "value":convert_data(units, unit_Length, 58222.1, "h")})
         params_data['Parameters'].append({"name":"%s_Tw" % sname, "value":290.671})
         params_data['Parameters'].append({"name":"%s_dTw" % sname, "value":12.74})
 
@@ -291,11 +291,12 @@ def create_bcs_bitter(boundary_meca: List,
     if 'th' in method_data[3]:
         fcooling = templates["robin"]
 
-        for sname in snames:
-            for thbc in ["rInt", "rExt"]:
-                bcname =  sname + "_" + thbc
-                mdata = entry(fcooling, {'name': bcname, 'hw': '%s_h' % sname, 'Tw': '%s_Tw' % sname, 'dTw':'%s_dTw' % sname},  debug)
-                thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": bcname}, mdata[bcname]) )
+        # TODO make only one Bc for rInt and on for RExt
+        for thbc in ["rInt", "rExt"]:
+            bcname =  name + "_" + thbc
+            # Add markers list
+            mdata = entry(fcooling, {'name': bcname, "markers": snames, 'hw': '%s_hw' % name, 'Tw': '%s_Tw' % name, 'dTw':'%s_dTw' % name},  debug)
+            thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": bcname}, mdata[bcname]) )
     
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
 
@@ -466,8 +467,6 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
         for md in odata["Stats_Power"]:
             data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
     
-    #print(f"post-processing {section}/Measures/Statistics: {data['PostProcess'][section]['Measures']['Statistics']}")
-
     mdata = json.dumps(data, indent = 4)
 
     with open(jsonfile, "x") as out:

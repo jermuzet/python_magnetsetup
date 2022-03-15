@@ -8,7 +8,7 @@ from python_magnetgeo import Insert
 from python_magnetgeo import python_magnetgeo
 
 from .jsonmodel import create_params_insert, create_bcs_insert, create_materials_insert
-from .utils import Merge
+from .utils import Merge, NMerge
 from .file_utils import MyOpen, findfile, search_paths
 
 import os
@@ -93,7 +93,6 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     print("Insert_setup: %s" % cad.name)
     part_thermic = []
     part_electric = []
-    index_electric = []
     index_Helices = []
     index_Insulators = []
     
@@ -107,16 +106,17 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     print("Insert: %s" % cad.name, "NHelices=%d NRings=%d NChannels=%d" % (NHelices, NRings, NChannels))
 
     for i in range(NHelices):
-        part_electric.append("H{}".format(i+1))
         if method_data[2] == "Axi":
+            for j in range(1, Nsections[i]+1):
+                part_electric.append("H{}_Cu{}".format(i+1,j))
             if 'th' in method_data[3]:
                 for j in range(Nsections[i]+2):
                     part_thermic.append("H{}_Cu{}".format(i+1,j))
             for j in range(Nsections[i]):
-                index_electric.append( [str(i+1),str(j+1)] )
                 index_Helices.append(["0:{}".format(Nsections[i]+2)])
                 
         else:
+            part_electric.append("H{}".format(i+1))
             if 'th' in method_data[3]:
                 part_thermic.append("H{}".format(i+1))
 
@@ -175,8 +175,8 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
                 boundary_meca.append("R{}_HP".format(i))
 
     if debug:
-        print("part_electric:", part_electric)
-        print("part_thermic:", part_thermic)
+        print("insert part_electric:", part_electric)
+        print("insert part_thermic:", part_thermic)
 
     # params section
     params_data = create_params_insert(gdata, method_data, debug)
@@ -194,41 +194,34 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     main_data = {
         "part_thermic": part_thermic,
         "part_electric": part_electric,
-        "index_electric": index_electric,
         "index_V0": boundary_electric,
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5"
     }
-    mdict = Merge( Merge(main_data, params_data), bcs_data)
+    mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "insert_setup mdict")
 
     print("insert_setup: post-processing section")
     currentH_data = []
     powerH_data = []
     meanT_data = []
 
-    print(f"insert: method={method_data[3]} geo={method_data[2]} model={method_data[0]}")
+    currentH_data.append( {"part_electric": part_electric } )
+        
     # if method_data[3] != 'mag' and method_data[3] != 'mag_hcurl':
     if method_data[2] == "Axi":
-        print(f"insert: Axi currentH, powerH, meanT for {NHelices} helices")
         for i in range(NHelices) :
-            currentH_data.append( {"header": "Current_H{}".format(i+1), "markers": { "name:": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
-            powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name:": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
-            if 'th' in method_data[3]:
-                meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
-        print("meanT_data:", meanT_data)
+            meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
+            powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
         
-        print(f"insert: Axi meanT for {NRings} rings")
         for i in range(NRings) :
-            if 'th' in method_data[3]:
-                meanT_data.append( {"header": "MeanT_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
+            meanT_data.append( {"header": "MeanT_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
 
     else:
-        print(f"insert: 3D powerH, meanT for {NHelices} helices")
         for i in range(NHelices) :
             powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
-            if 'th' in method_data[3]:
-                meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
+            meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
 
+        """
         if cad.CurrentLeads:
             print("insert: 3D currentH, powerH, meanT for leads")
             currentH_data.append( {"header": "Current_iL1", "markers": { "name:": "iL1_V0" } } )
@@ -241,16 +234,15 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
             else:
                 currentH_data.append( {"header": "Current_H1", "markers": { "name:": "H1_V0" } } )
                 currentH_data.append( {"header": "Current_H{}".format(NHelices), "markers": { "name:": "H{}_V0".format(NHelices) } } )
-            
+        """
+
         print(f"insert: 3D powerH for {NRings} rings")
         for i in range(NRings) :
             powerH_data.append( {"header": "Power_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
-            if 'th' in method_data[3]:
-                meanT_data.append( {"header": "MeanT_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
+            meanT_data.append( {"header": "MeanT_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
 
     mpost = { } 
     if 'th' in method_data[3]:
-        print("affect meanT_data:", meanT_data)
         mpost = {  
             "flux": {'index_h': "0:%s" % str(NChannels)},
             "meanT_H": meanT_data ,
@@ -259,7 +251,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
         }
         
     # check mpost output
-    print(f"insert: mpost={mpost}")
+    # print(f"insert: mpost={mpost}")
     mmat = create_materials_insert(gdata, index_Insulators, confdata, templates, method_data, debug)
 
     return (mdict, mmat, mpost)
