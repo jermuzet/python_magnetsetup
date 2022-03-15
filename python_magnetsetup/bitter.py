@@ -6,7 +6,7 @@ from python_magnetgeo import Bitter
 from python_magnetgeo import python_magnetgeo
 
 from .jsonmodel import create_params_bitter, create_bcs_bitter, create_materials_bitter
-from .utils import Merge
+from .utils import Merge, NMerge
 
 import os
 
@@ -33,7 +33,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
 
     part_thermic = []
     part_electric = []
-    index_electric = []
+    index_Bitters = ""
 
     boundary_meca = []
     boundary_maxwell = []
@@ -53,24 +53,28 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     snames = []
     with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
         cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+        NSections = len(cad.axi.turns)
         if debug: print(cad)
 
         name = cad.name.replace('Bitter_','')
-        for i in range(len(cad.axi.turns)):
-            snames.append(cad.name + "_B%d" % (i+1))
-            
-        if debug: print("sname:", snames)
-    
+        if method_data[2] == "Axi":
+            for i in range(len(cad.axi.turns)):
+                snames.append(name + "_B%d" % (i+1))
+                part_electric.append(snames[-1])
+                if 'th' in method_data[3]:
+                    part_thermic.append(snames[-1])
+            index_Bitters = f"1:{NSections}"
+            if debug: print("sname:", snames)
+        else:
+            part_electric.append(cad.name)
+            if 'th' in method_data[3]:
+                part_thermic.append(cad.name)
+
     gdata = (name, snames, cad.axi.turns)
 
-    for sname in snames:
-        if 'th' in method_data[3]:
-            part_thermic.append(sname)
-        part_electric.append(sname)
-
     if debug:
-        print("part_thermic:", part_thermic)
-        print("part_electric:", part_electric)
+        print("bitter part_thermic:", part_thermic)
+        print("bitter part_electric:", part_electric)
         
     if  method_data[2] == "Axi" and ('el' in method_data[3] and  method_data[3] != 'thelec'):
         boundary_meca.append("{}_V0".format(name))
@@ -99,23 +103,25 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5"
     }
-    mdict = Merge( Merge(main_data, params_data), bcs_data)
+    mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "bitter_setup mdict")
 
+    print("bitter_setup: post-processing section")
     currentH_data = []
     powerH_data = []
     meanT_data = []
     
+    currentH_data.append( {"part_electric": part_electric } )
+        
     if method_data[2] == "Axi":
-        for sname in snames :
-            currentH_data.append( {"header": "Current_{}".format(sname), "markers": "\"{}\"".format(sname)} )
-            powerH_data.append( {"header": "Power_{}".format(sname), "markers": "\"{}\"".format(sname)} )
-            if 'th' in method_data[3]:
-                meanT_data.append( {"header": "MeanT_{}".format(sname), "markers": "\"{}\"".format(sname)} )
+        powerH_data.append( {f"header": f"Power_{name}", "markers": { "name": f"{name}_B%1%", "index1": index_Bitters}} )
+        meanT_data.append( {f"header": f"MeanT_{name}", "markers":  { "name": f"{name}_B%1%", "index1": index_Bitters}} )
+    else:
+        print("bitter3D post not implemented")
+        
     if debug: print("meanT_data:", meanT_data)
     
     mpost = { } 
     if 'th' in method_data[3]:
-        print("affect meanT_data:", meanT_data)
         mpost = {  
             "meanT_H": meanT_data ,
             "power_H": powerH_data ,
@@ -123,7 +129,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
         }
         
     # check mpost output
-    print(f"bitter: mpost={mpost}")
+    # print(f"bitter {name}: mpost={mpost}")
     mmat = create_materials_bitter(gdata, confdata, templates, method_data, debug)
 
     return (mdict, mmat, mpost)

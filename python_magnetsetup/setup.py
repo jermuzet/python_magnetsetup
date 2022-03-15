@@ -115,34 +115,36 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
 
     for mtype in ["Bitter", "Supra"]:
         if mtype in confdata:
-            print("load a %s insert" % mtype)
 
             # TODO check case with only 1 Bitter???
             
             # loop on mtype
             for obj in confdata[mtype]:
-                print("obj:", obj)
+                if debug: print("obj:", obj)
                 yamlfile = obj["geom"]
                 cad = None
                 with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+                print(f"load a {mtype} insert: {cad.name} ****")
     
                 if isinstance(cad, Bitter.Bitter):
                     (tdict, tmat, tpost) = Bitter_setup(MyEnv, obj, cad, method_data, templates, debug)
-                    print("Bitter tpost:", tpost)
+                    # print("Bitter tpost:", tpost)
                 elif isinstance(cad, Supra):
                     (tdict, tmat, tpost) = Supra_setup(MyEnv, obj, cad, method_data, templates, debug)
                 else:
                     raise Exception(f"setup: unexpected cad type {str(type(cad))}")
 
                 if debug: print("tdict:", tdict)
-                mdict = NMerge(tdict, mdict, debug)
+                mdict = NMerge(tdict, mdict, debug, "magnet_setup Bitter/Supra mdict")
             
                 if debug: print("tmat:", tmat)
-                mmat = NMerge(tmat, mmat, debug)
+                mmat = NMerge(tmat, mmat, debug, "magnet_setup Bitter/Supra mmat")
             
                 if debug: print("tpost:", tpost)
-                mpost = NMerge(tpost, mpost, debug)
+                # print(f"magnet_setup {cad.name}: tpost[current_H]={tpost['current_H']}")
+                mpost = NMerge(tpost, mpost, debug, "magnet_setup Bitter/Supra mpost") # debug)
+                # print(f"magnet_setup {cad.name}: mpost[current_H]={mpost['current_H']}")
 
     if debug:
         print("magnet_setup: mdict=", mdict)
@@ -189,14 +191,14 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
     """
     print("msite_setup:", "debug=", debug)
     print("msite_setup:", "confdata=", confdata)
-    print("miste_setup: confdata[magnets]=", confdata["magnets"])
+    print("msite_setup: confdata[magnets]=", confdata["magnets"])
     
     mdict = {}
     mmat = {}
     mpost = {}
 
     for magnet in confdata["magnets"]:
-        print("magnet:", magnet, "type(magnet)=", type(magnet), "debug=", debug)
+        print(f"magnet:  {magnet}, type={type(magnet)}, debug={debug}")
         try:
             mconfdata = load_object(MyEnv, magnet + "-data.json", debug)
         except:
@@ -208,23 +210,25 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
                     
         if debug:
             print("mconfdata[geom]:", mconfdata["geom"])
+
         (tdict, tmat, tpost) = magnet_setup(MyEnv, mconfdata, method_data, templates, debug)
             
-        print("tdict:", tdict)
-        mdict = NMerge(tdict, mdict, debug)
-        # print("mdict:", mdict)
+        # print("tdict[part_electric]:", tdict['part_electric'])
+        # print("tdict[part_thermic]:", tdict['part_thermic'])
+        mdict = NMerge(tdict, mdict, debug, "msite_setup/tdict")
+        # print("mdict[part_electric]:", mdict['part_electric'])
+        # print("mdict[part_thermic]:", mdict['part_thermic'])
             
-        print("tmat:", tmat)
-        mmat = NMerge(tmat, mmat, debug)
+        # print("tmat:", tmat)
+        mmat = NMerge(tmat, mmat, debug, "msite_setup/tmat")
         # print("NewMerge:", NMerge(tmat, mmat))
         # print("mmat:", mmat)
             
-        print("tpost:", tpost)
-        mpost = NMerge(tpost, mpost, debug)
-        # print("NewMerge:", NMerge(tpost, mpost))
-        # print("mpost:", mpost)
+        # print("tpost:", tpost)
+        mpost = NMerge(tpost, mpost, debug, "msite_setup/tpost") #debug)
+        # print("NewMerge:", mpost)
     
-    print("mdict:", mdict)
+    # print("mdict:", mdict)
     return (mdict, mmat, mpost)
 
 def setup(MyEnv, args, confdata, jsonfile, session=None):
@@ -251,7 +255,8 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     mmat = {}
     mpost = {}
 
-    print("confdata:", confdata)
+    if args.debug:
+        print("confdata:", confdata)
     cad_basename = ""
     if "geom" in confdata:
         print(f"Load a magnet {jsonfile} ", f"debug: {args.debug}")
@@ -272,7 +277,8 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
             with MyOpen(confdata["name"] + ".yaml", "x", paths=search_paths(MyEnv, "geom")) as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)
-        (mdict, mmat, mpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose, session)        
+        (mdict, mmat, mpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose, session)
+        # print(f"setup: msite mpost={mpost['current_H']}")        
         
     name = jsonfile
     if name in confdata:
