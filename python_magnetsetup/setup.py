@@ -71,6 +71,7 @@ def magnet_simfile(MyEnv, confdata: str, addAir: bool = False):
             for obj in confdata[mtype]:
                 print("obj:", obj)
                 cad = None
+                yamlfile = obj["geom"]
                 with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
     
@@ -95,16 +96,16 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
     if debug:
         print(f"magnet_setup: confdata: {confdata}"),
     
-    yamlfile = confdata["geom"]
-    if debug:
-        print(f"magnet_setup: yamfile: {yamlfile}")
-    
     mdict = {}
     mmat = {}
     mpost = {}
     
     if "Helix" in confdata:
         print("Load an insert")
+        yamlfile = confdata["geom"]
+        if debug:
+            print(f"magnet_setup: yamfile: {yamlfile}")
+    
         # Download or Load yaml file from data repository??
         cad = None
         with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
@@ -128,6 +129,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
     
                 if isinstance(cad, Bitter.Bitter):
                     (tdict, tmat, tpost) = Bitter_setup(MyEnv, obj, cad, method_data, templates, debug)
+                    print("Bitter tpost:", tpost)
                 elif isinstance(cad, Supra):
                     (tdict, tmat, tpost) = Supra_setup(MyEnv, obj, cad, method_data, templates, debug)
                 else:
@@ -249,12 +251,16 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     mmat = {}
     mpost = {}
 
+    print("confdata:", confdata)
     cad_basename = ""
     if "geom" in confdata:
         print(f"Load a magnet {jsonfile} ", f"debug: {args.debug}")
-        with MyOpen(confdata["geom"], "r", paths=search_paths(MyEnv, "geom")) as f:
-            cad = yaml.load(f, Loader = yaml.FullLoader)
-            cad_basename = cad.name
+        try :
+            with MyOpen(confdata["geom"], "r", paths=search_paths(MyEnv, "geom")) as f:
+                cad = yaml.load(f, Loader = yaml.FullLoader)
+                cad_basename = cad.name
+        except:
+            cad_basename = confdata["geom"].replace(".yaml","")
         (mdict, mmat, mpost) = magnet_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)
     else:
         print("Load a msite %s" % confdata["name"], "debug:", args.debug)
@@ -283,11 +289,27 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     jsonfile += "-sim.json"
     cfgfile = jsonfile.replace(".json", ".cfg")
 
+    addAir = False
+    if 'mag' in args.model or 'mqs' in args.model:
+        addAir = True
+
+    # TODO here name is entry name from yamlfile
+    xaofile = cad_basename + ".xao"
+    if args.geom == "Axi" and args.method == "cfpdes" :
+        xaofile = cad_basename + "-Axi.xao"
+        if "mqs" in args.model or "mag" in args.model:
+            xaofile = cad_basename + "-Axi_withAir.xao"
+        
+    # # if gmsh:
+    # meshfile = xaofile.replace(".xao", ".msh")
+    meshfile = xaofile.replace(".xao", ".med")
+    print(f"setup: meshfile={meshfile}")
+
     # TODO create_mesh() or load_mesh()
     # generate properly meshfile for cfg
     # generate solver section for cfg
     # here name is from args (aka name of magnet and/or msite if from db)
-    create_cfg(cfgfile, name, args.nonlinear, jsonfile, templates["cfg"], method_data, args.debug)
+    create_cfg(cfgfile, name, meshfile, args.nonlinear, jsonfile, templates["cfg"], method_data, args.debug)
             
     # create json
     create_json(jsonfile, mdict, mmat, mpost, templates, method_data, args.debug)
@@ -312,29 +334,10 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
             sim_files.append(dst)
 
     # list files to be archived
-    # TODO here name is entry name from yamlfile
-    xaofile = cad_basename + ".xao"
-    if "mqs" in args.model or "mag" in args.model:
-        xaofile = cad_basename + "_withAir.xao"
-    meshfile = xaofile.replace(".xao", ".med")
     
-    if args.geom == "Axi" and args.method == "cfpdes" :
-        xaofile = cad_basename + "-Axi.xao"
-        if "mqs" in args.model or "mag" in args.model:
-            xaofile = cad_basename + "-Axi_withAir.xao"
-        
-        # if gmsh:
-        meshfile = xaofile.replace(".xao", ".msh")
-        
-    addAir = False
-    if 'mag' in args.model or 'mqs' in args.model:
-        addAir = True
-
     try:
         mesh = findfile(meshfile, search_paths(MyEnv, "mesh"))
         sim_files.append(mesh)
-
-        #?? replace geo by med/msh in cfg ?? if 3D#
     except:
         if "geom" in confdata:
             print("geo:", name)
@@ -451,6 +454,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     
     if args.geom == "3D":
         cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
+        # TODO add command to change mesh.filename in cfgfile
     
     if server.smp:
         feelcmd = f"{exec} --config-file {cfgfile}"

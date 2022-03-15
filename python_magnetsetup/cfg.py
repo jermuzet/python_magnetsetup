@@ -11,11 +11,12 @@ def entry_cfg(template: str, rdata: dict, debug: bool = False) -> str:
     jsonfile = jsonfile.replace("\'", "\"")
     return jsonfile
 
-def create_cfg(cfgfile:str, name: str, nonlinear: bool, jsonfile: str, template: str, method_data: List[str], debug: bool=False):
+def create_cfg(cfgfile:str, name: str, mesh: str, nonlinear: bool, jsonfile: str, template: str, method_data: List[str], debug: bool=False):
     """
     Create a cfg file
     """
-    print("create_cfg %s from %s" % (cfgfile, template) )
+    print(f"create_cfg {cfgfile} from {template}")
+    print(f"create_cfg: {jsonfile}")
 
     dim = 2
     if method_data[2] == "3D":
@@ -24,8 +25,6 @@ def create_cfg(cfgfile:str, name: str, nonlinear: bool, jsonfile: str, template:
     linear = ""
     if nonlinear:
         linear = "nonlinear"
-
-    mesh = name + ".med" # "med", "gmsh", "hdf5" aka "json"
 
     data = {
         "dim": dim,
@@ -38,12 +37,12 @@ def create_cfg(cfgfile:str, name: str, nonlinear: bool, jsonfile: str, template:
         "jsonfile": jsonfile,
         "mesh": mesh,
         "scale": 0.001,
-        "partition": 0
+        "partition": 1
     }
     
     mdata = entry_cfg(template, data, debug)
     if debug:
-        print("create_cfg/mdata=", mdata)
+        print(f"create_cfg/mdata={mdata}")
 
     with open(cfgfile, "x") as out:
         out.write(mdata)

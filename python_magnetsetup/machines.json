@@ -1,26 +1,62 @@
 {
+    "calcul18":{
+		"type": "compute",
+		"smp": "True",
+		"dns": "calcul18.grenoble.lncmi.local",
+		"jobmanager":{
+	    	"type":"none",
+	    	"queues":{}
+		},
+		"cores": 64,
+		"multithreading": "True",
+		"mgkeydir" : "/opt/MeshGems"
+    },
+    "calcul19":{
+		"type": "compute",
+		"smp": "True",
+		"dns": "calcul19.grenoble.lncmi.local",
+		"jobmanager":{
+	    	"type":"none",
+	    	"queues":{}
+		},
+		"cores": 64,
+		"multithreading": "True",
+		"mgkeydir" : "/opt/MeshGems"
+    },
+    "calcul22":{
+		"type": "compute",
+		"smp": "True",
+		"dns": "calcul22.grenoble.lncmi.local",
+		"jobmanager":{
+	    	"type":"none",
+	    	"queues":{}
+		},
+		"cores": 64,
+		"multithreading": "True",
+		"mgkeydir" : "/opt/MeshGems"
+    },
     "kelvin":{
-	"type": "compute",
-	"smp": "True",
-	"dns": "kelvin.grenoble.lncmi.local",
-	"jobmanager":{
-	    "type":"none",
-	    "queues":{}
-	},
-	"cores": 64,
-	"multithreading": "True",
-	"mgkeydir" : "/opt/MeshGems"
+		"type": "compute",
+		"smp": "True",
+		"dns": "kelvin.grenoble.lncmi.local",
+		"jobmanager":{
+	    	"type":"none",
+	    	"queues":{}
+		},
+		"cores": 64,
+		"multithreading": "True",
+		"mgkeydir" : "/opt/MeshGems"
     },
     "stokes":{
-	"type": "compute",
-	"smp": "True",
-	"dns": "stokes.grenoble.lncmi.local",
-	"jobmanager":{
-	    "type":"slurm",
-	    "queues":{}
-	},
-	"cores": 64,
-	"multithreading": "True",
-	"mgkeydir" : "/opt/MeshGems"
+		"type": "compute",
+		"smp": "True",
+		"dns": "stokes.grenoble.lncmi.local",
+		"jobmanager":{
+	    	"type":"slurm",
+	    	"queues":{}
+		},
+		"cores": 64,
+		"multithreading": "True",
+		"mgkeydir" : "/opt/MeshGems"
     }
 }
