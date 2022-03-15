@@ -11,7 +11,7 @@ from .config import appenv
 def main():
 
     epilog = "The choice of model is actually linked with the choosen method following this table\n" \
-             "cfpes: thelec, mag, thmag_hcurl, thmagel_hcurl, mag_hcurl, thmag_hcurl, thmagel_hcurl\n" \
+             "cfpes: thelec, mag, mqs, thmag, thmqs, thmagel, mag_hcurl, mqs_hcurl, thmag_hcurl, thmqs_hcurl, thmagel_hcurl\n" \
              "CG (3D only): thelec\n" \
              "HDG (3D only): thelec\n"
 
@@ -32,7 +32,7 @@ def main():
     parser.add_argument("--geom", help="choose geom type", type=str,
                     choices=['Axi', '3D'], default='Axi')
     parser.add_argument("--model", help="choose model type", type=str,
-                    choices=['thelec', 'mag', 'thmag', 'thmagel', 'thmqs', 'mag_hcurl', 'thmag_hcurl', 'thmagel_hcurl', 'thmqs_hcurl'], default='thmagel')
+                    choices=['thelec', 'mag', 'thmag', 'thmagel', 'mqs', 'thmqs', 'mag_hcurl', 'thmag_hcurl', 'thmagel_hcurl', 'mqs_hcurl', 'thmqs_hcurl'], default='thmagel')
     parser.add_argument("--nonlinear", help="force non-linear", action='store_true')
     parser.add_argument("--cooling", help="choose cooling type", type=str,
                     choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
