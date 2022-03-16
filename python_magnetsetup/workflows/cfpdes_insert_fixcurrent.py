@@ -1,9 +1,14 @@
+from lib2to3.pgen2.pgen import DFAState
+from typing import List, Union
+
 import sys
 import os
 import re
-# import feelpp
-# import feelpp.toolboxes.core as tb
-# import feelpp.toolboxes.cfpdes as cfpdes
+
+
+import feelpp
+import feelpp.toolboxes.core as tb
+import feelpp.toolboxes.cfpdes as cfpdes
 
 import pandas as pd
 import math
@@ -14,264 +19,249 @@ import json
 import yaml
 
 from python_magnetgeo import MSite, Insert, Bitter, Supra
-from python_magnetgeo import get_main_characteristics, get_cut_characteristics
+from python_magnetgeo import python_magnetgeo
 
 import tabulate
 import itertools
 
 import argparse
 
-def getparam(param:str, parameters: dict, rsearch: str, rmatch: str,  ):
+def Merge(dict1: dict, dict2: dict, debug: bool = False) -> dict:
+
+    if debug : 
+        print(f"dict1: {dict1}")
+        print(f"dict2: {dict2}")
+
+    if isinstance(dict2, type(None)):
+        return dict1
+
+    for key1 in dict1:
+        if key1 in dict2:
+            dict2[key1].update(dict1[key1])
+        else:
+            dict2[key1] = dict1[key1]
+
+    if debug : 
+        print(f"dict1: {dict1}")
+        print(f"dict2: {dict2}")
+            
+
+    if debug : 
+        print(f"res: {dict2}")
+    return dict2
+
+def getparam(param:str, parameters: dict, rmatch: str, debug: bool = False ):
     """
     """
-    print(f"getparam: {param} ====== Start")
+    if debug:
+        print(f"getparam: {param} ====== Start")
     
     n = 0
-    val = []
+    val = {}
 
-    regex_search = re.compile(rsearch)
     regex_match = re.compile(rmatch)
     for p in parameters.keys() :
         if regex_match.fullmatch(p):
-            print(f"{p}: {parameters[p]}, {regex_search.findall(p)}")
-            val.append(parameters[p])
-            n = max(int(regex_search.findall(p)[0]), n)
+            marker = p.split(param + '_')[-1]
+            if debug:
+                print(f"match {p}: {marker}")
+            val[marker] = { param: parameters[p]}
+            if debug:
+                print(f"{p}: {parameters[p]}")
     
-    print(f"val: {val}")
-    print(f"n: {n}")
-    print(f"getparam: {param} ====== Done")
-    return (val, n)
+    if debug:
+        print(f"val: {val}")
+        print(f"getparam: {param} ====== Done")
+    return (val)
 
-command_line = None
-parser = argparse.ArgumentParser(description="Cfpdes HiFiMagnet Fully Coupled model")
-parser.add_argument("cfgfile", help="input cfg file (ex. HL-31.cfg)")
-parser.add_argument("--wd", help="set a working directory", type=str, default="")
-parser.add_argument("--geo", help="specify geometry yaml file (use Auto to automatically retreive yaml filename from xao, default is None)", type=str, default="None")
-parser.add_argument("--mtype", help="specify type (default: Magnet)", choices=["Msite", "Magnet"], default="Magnet")
-parser.add_argument("--current", help="specify requested current (default: 31kA)", type=float, default=31000)
-parser.add_argument("--eps", help="specify requested tolerance (default: 1.e-3)", type=float, default=1.e-3)
-parser.add_argument("--itermax", help="specify maximum iteration (default: 10)", type=int, default=10)
-parser.add_argument("--debug", help="activate debug", action='store_true')
-parser.add_argument("--verbose", help="activate verbose", action='store_true')
+def setTargets(params: dict, current: float, debug: bool = False):
+    targets = {}
+    for key in params:
+        I_target = float(params[key]['N']) * current
+        if debug:
+            print(f"{key} turns: {params[key]['N']} target: {I_target}")
+        targets[key] = I_target
+    
+    if debug: print(f"targets: {targets}")
+    return targets
 
-args = parser.parse_args()
-if args.debug:
-    print(args)
+def init(args):
+    e = feelpp.Environment(sys.argv, opts=tb.toolboxes_options("coefficient-form-pdes","cfpdes"))
+    e.setConfigFile(args.cfgfile)
 
-cwd = os.getcwd()
-if args.wd:
-    os.chdir(args.wd)
+    print("Create cfpdes")
+    f = cfpdes.cfpdes(dim=2)
 
-eps = args.eps
-itmax = args.itermax
-I0 = args.current
+    print("Init problem")
+    f.init()
+    
+    return (e, f)
 
-# Load cfg as config
-import configparser
-feelpp_config = configparser.ConfigParser()
-with open(args.cfgfile, 'r') as inputcfg:
-    feelpp_config.read_string('[DEFAULT]\n[main]\n' + inputcfg.read())
-    print("feelpp_cfg:", feelpp_config['main'])
-    for section in feelpp_config.sections():
-        print("section:", section)
+def solve(e, f: str, args, paramsdict: dict, params: List[str], targets: dict):
+    it = 0
+    err_max = 0
 
-    # TODO get json for material def
-    jsonmodel = feelpp_config['cfpdes']['filename']
-    jsonmodel = jsonmodel.replace(r"$cfgdir/",'')
-    print(f"jsonmodel={jsonmodel}")
+    U = []
+    table = []
+    while err_max > args.eps and it < args.itmax :
 
-# Load yaml file for geo config
-yamlfile = ""
-if args.geo == 'Auto':
-    yamlfile = args.cfgfile.replace(".cfg",".yaml")
-else:
-    yamlfile = args.geo
-print("yamlfile=%s" % yamlfile)
+        # Update new value of U_Hi_Cuj on feelpp's senvironment
+        num = 0
+        for key in paramsdict:
+            for p in params:
+                entry = f'{p}_{key}'
+                f.addParameterInModelProperties(entry, paramsdict[entry])
+                U[num] = paramsdict[entry]
+                num += 1
+        f.updateParameterValues()
 
-U = []
-U_headers = ["it"]
-table = []
+        # Need to flatten U:
+        U_ = list(itertools.chain.from_iterable(U))
+        table_ = [it]
+        for d in U_:
+            table_.append(d)
 
-NHelices = 0
-Sections = []
-N_t = []
-sigma = []
+        if args.debug and e.isMasterRank():
+            print("Parameters after change :", f.modelProperties().parameters())
 
-# Load yaml file for geo config
-yamlfile = ""
-if args.geo != "None":
-    if args.geo == 'Auto':
-        yamlfile = args.cfgfile.replace(".cfg",".yaml")
-    else:
-        yamlfile = args.geo
-    print("yamlfile=%s" % yamlfile)
+        # Solve and export the simulation
+        f.solve()
+        f.exportResults()
+
+        filtered_df = post(["cfpdes.heat.measures.csv", "cfpdes.magnetic.measures.csv"], "Intensity_\w+_integrate")
+        if args.debug and e.isMasterRank():
+            print(filtered_df)
+        # df.select(lambda col: col.startswith('d'), axis=1)
+        I = filtered_df.to_numpy()
+        I = np.array( filtered_df.iloc[it] )
+
+        # TODO: define a function to handle error calc
+        err_max = 0
+        num = 0
+        for key in targets:
+            val = filtered_df[f"Intensity_{key}_integrate"]
+            target = targets[key]
+            err_max = max(abs(1 - val/target), err_max)
+            params[key]['U'] *= target/val
+
+        if e.isMasterRank():
+            print(f"it={it}, err_max={err_max}")
+        table.append(err_max)
+        table.append(table_)
+
+        it += 1
+
+    # Save results
+    print("Export result to csv")
+
+    data_U = list(itertools.chain.from_iterable(U))
+    data_U = pd.DataFrame(data_U)
+
+    with open("U.csv","w+") as resfile:
+        resfile.write(data_U.to_csv(index=False))
+
+    return U
+
+def update(jsonmodel: str, paramsdict: dict, params: List[str], debug: bool=False):
+    # Update tensions U
 
     with open(jsonmodel, 'r') as jsonfile:
         dict_json = json.loads(jsonfile.read())
+        parameters = dict_json['Parameters']
+    
+    for key in paramsdict:
+        for p in params:
+            if debug:
+                print(f"param: {p}")
+                print(f"init {p}_{key} = {parameters[f'{p}_{key}']}")
+                print(f"after {p}_{key} = {paramsdict[key][p]}")
+            parameters[f'{p}_{key}'] = paramsdict[key][p]
 
-    regex_search_sigma0 = re.compile('\d+(?=\/(1+alpha\*(heat_T\-T0)))')
+    new_name_json =  jsonmodel.replace('.json', '-fixcurrent.json')
 
-    with open(yamlfile, 'r') as cfgdata:
-        cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
-        if isinstance(cad, MSite): # MSite.MSite
-            print(f"Load MSite: {cfgdata.name}")
-            
-        if isinstance(cad, Bitter): # Bitter.Bitter
-            print(f"Load Bitter: {cfgdata.name}")
-            
-        if isinstance(cad, Supra): # Supra.Supra
-            print(f"Load Supra: {cfgdata.name}")
-            
-        if isinstance(cad, Insert): # Insert.Insert
-            print(f"Load Insert: {cfgdata.name}")
-            gdata = get_main_characteristics(cad)
-            (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
-            (Nturns, Pitch) = get_cut_characteristics(cad)
-            
-            for i,helix in enumerate(cad.Helices):
-                # Init value for U
-                U_H = []
-                sigma.append([])
-                for j in range(n_sections):
-                    sigmai = dict_json["Materials"][f"H{i+1}_Cu{j+1}"]['sigma0']
-                    sigma[i].append(float(sigmai))
-                    
-                    I_s = I0 * Nturns_h[i][j]
-                    j1 = I_s / (math.log(R2[i]/R1[i]) * (Pitch_h[i][j] * Nturns_h[i][j]) )
-                    U_s = 2 * math.pi * R1[i] * j1 / sigma[i][j]
-                    U_H.append(U_s)
-                    U_headers.append(f"U_H{i+1}S{j+1}")
-                    if args.debug:
-                        print(f"I[{i}][{j}]={I_s}")
-                
-                U.append(U_H)
-                N_t.append(hhelix.axi.turns)
-        
-        else:
-            raise Exception(f"{type(cad)} unsupported type of geometry")
+    with open(new_name_json, 'w+') as jsonfile:
+        jsonfile.write(json.dumps(dict_json, indent=4))
 
-else:
+    return 0
+
+def post(csv: List[str], rmatch: str):
+    """
+    extract data for csv result files
+    
+    eg: 
+    rmatch= "Intensity_\w+_integrate"
+    csv = ["cfpdes.heat.measures.csv", "cfpdes.magnetic.measures.csv"]
+    """
+    
+    # Retreive current intensities
+    df = pd.DataFrame()
+    for f in csv:
+        if os.path.isfile(f):
+            tmp_df = pd.read_csv(f, sep=",\s+|\s+", engine='python')
+        df = pd.concat([df, tmp_df], axis='columns')
+
+    filtered_df = df.filter(regex=(rmatch))
+
+    
+def main():
+    
+    command_line = None
+    parser = argparse.ArgumentParser(description="Cfpdes HiFiMagnet Fully Coupled model")
+    parser.add_argument("cfgfile", help="input cfg file (ex. HL-31.cfg)")
+    parser.add_argument("--wd", help="set a working directory", type=str, default="")
+    parser.add_argument("--current", help="specify requested current (default: 31kA)", type=float, default=31000)
+    parser.add_argument("--eps", help="specify requested tolerance (default: 1.e-3)", type=float, default=1.e-3)
+    parser.add_argument("--itermax", help="specify maximum iteration (default: 10)", type=int, default=10)
+    parser.add_argument("--debug", help="activate debug", action='store_true')
+    parser.add_argument("--verbose", help="activate verbose", action='store_true')
+
+    args = parser.parse_args()
+    if args.debug:
+        print(args)
+
+    cwd = os.getcwd()
+    if args.wd:
+        os.chdir(args.wd)
+
+    # Load cfg as config
+    import configparser
+    feelpp_config = configparser.ConfigParser()
+    with open(args.cfgfile, 'r') as inputcfg:
+        feelpp_config.read_string('[DEFAULT]\n[main]\n' + inputcfg.read())
+        if args.debug:
+            print("feelpp_cfg:", feelpp_config['main'])
+    
+            for section in feelpp_config.sections():
+                print("section:", section)
+
+        # TODO get json for material def
+        jsonmodel = feelpp_config['cfpdes']['filename']
+        jsonmodel = jsonmodel.replace(r"$cfgdir/",'')
+        if args.debug:
+            print(f"jsonmodel={jsonmodel}")
+
     # Get Parameters from JSON model file
+    params = {}
     with open(jsonmodel, 'r') as jsonfile:
         dict_json = json.loads(jsonfile.read())
         parameters = dict_json['Parameters']
 
-    # Get number of Helices and number of Sections
-    (Ut, NHelices) = getparam("U", parameters, '(?<=U_H)\d*(?=_Cu)', 'U_H\d*_Cu\d*') 
-    print(f"Ut: {type(Ut)}")
-
-    for p in parameters:
-        regex_match= re.compile('U_H\d*_Cu\d*')
-        if regex_match.fullmatch(p):
-            index = re.findall(r'\d+', p)
-            print(f"match {p}, findall {index}")
-            
-    for i in range(1,NHelices+1):
-        regex_search = re.compile('(?<=U_H'+str(i)+'_Cu)\d*')
-        regex_match= re.compile('U_H'+str(i)+'_Cu\d*')
-        Sections.append(0)
-        for param in parameters.keys() :
-            if regex_match.fullmatch(param):
-                Sections[-1] = max(int(regex_search.findall(param)[0]), Sections[-1])
-    print(f"Sections: {Sections}")
+        params = getparam("U", parameters, 'U_\w+', args.debug)
+        
+        tmp = getparam("N", parameters, 'N_\w+', args.debug)
+        params = Merge(tmp, params, args.debug)
+        
+    # define targets
+    targets = setTargets(params, args.current, True) # args.debug)
     
-    # Get U for Helices
-    for i in range(NHelices):
-        U.append([])
-        N_t.append([])
-        for j in range(0, Sections[i]):
-            U[i].append(float(dict_json["Parameters"]["U_H{}_Cu{}".format(int(i+1),int(j+1))]))
-            U_headers.append("U_H%dS%d" % (i+1, j+1))
-            N_t.append(float(dict_json["Parameters"]["N_H{}_Cu{}".format(int(i+1),int(j+1))]))
-
-U_headers.append("Error_max")
-
-# For Axi model
-
-# e = feelpp.Environment(sys.argv, opts=tb.toolboxes_options("coefficient-form-pdes","cfpdes"))
-# e.setConfigFile(args.cfgfile)
-
-# print("Create cfpdes")
-# f = cfpdes.cfpdes(dim=2)
-
-# print("Init problem")
-# f.init()
-
-os.chdir(cwd)
-
-# err_max = 2*eps
-# it = 0
-
-# while err_max > eps and it < itmax :
-
-#     # Update new value of U_Hi_Cuj on feelpp's senvironment
-#     for i in range(NHelices):
-#         for j in range(Sections[i]):
-#             f.addParameterInModelProperties(f"U_H{int(i+1)}_Cu{int(j+1)}", U[i][j])
-#     f.updateParameterValues()
-
-#     # Need to flatten U:
-#     U_ = list(itertools.chain.from_iterable(U))
-#     table_ = [it]
-#     for d in U_:
-#         table_.append(d)
-
-#     if args.debug and e.isMasterRank():
-#         print("Parameters after change :", f.modelProperties().parameters())
-
-#     # Solve and export the simulation
-#     f.solve()
-#     f.exportResults()
-
-#     # Retreive current intensities
-#     df = pd.DataFrame()
-#     if os.path.isfile("cfpdes.heat.measures.csv"):
-#         df = pd.read_csv("cfpdes.heat.measures.csv", sep=",\s+|\s+", engine='python')
-#     if os.path.isfile("cfpdes.magnetic.measures.csv"):
-#         df_magnetic = pd.read_csv("cfpdes.magnetic.measures.csv", sep=",\s+|\s+", engine='python')
-#         df = pd.concat([df, df_magnetic], axis='columns')
-
-#     filtered_df = df.filter(regex=("Statistics_Intensity_H\d+_Cu\d+_integrate"))
+    # init feelpp env
+    # (e, f) = init(args)
     
-#     if args.debug and e.isMasterRank():
-#         print(filtered_df)
-#     # df.select(lambda col: col.startswith('d'), axis=1)
-#     I = filtered_df.to_numpy()
-#     I = np.array( filtered_df.iloc[it] )
+    # solve
+    # solve(f, args, params, ["U"]  targets)
+    
+    # update
+    update(jsonmodel, params, ["U"])
 
-#     err_max = 0
-#     num = 0
-#     for i in range(NHelices):
-#         for j in range(Sections[i]):
-#             I_s = I[num]
-#             I_target = float(N_t[i][i]) * I0
-#             err_max = max(abs(I_s/I_target-1), err_max)
-#             U[i][j] *= I_target/I_s
-#             num += 1
-
-#     if e.isMasterRank():
-#         print("it={}, err_max={}".format(it, err_max))
-#     table_.append(err_max)
-#     table.append(table_)
-
-#     it += 1
-
-# Save results
-print("Export result to csv")
-
-data_U = list(itertools.chain.from_iterable(U))
-data_U = pd.DataFrame(data_U)
-
-with open("U.csv","w+") as resfile:
-    resfile.write(data_U.to_csv(index=False))
-
-# Update tensions U
-for i in range(NHelices):
-    for j in range(Sections[i]):
-        parameters[f"U_H{int(i+1)}_Cu{int(j+1)}"] = U[i][j]
-
-# Create name of new JSON file
-new_name_json =  jsonmodel.replace('.json', '-fixcurrent.json')
-
-with open(new_name_json, 'w+') as jsonfile:
-    jsonfile.write(json.dumps(data_json, indent=4))
+if __name__ == "__main__":
+    sys.exit(main())  # pragma: no cover
