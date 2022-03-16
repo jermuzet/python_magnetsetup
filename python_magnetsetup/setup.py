@@ -198,7 +198,7 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
     mpost = {}
 
     for magnet in confdata["magnets"]:
-        print(f"magnet:  {magnet}, type={type(magnet)}, debug={debug}")
+        print(f"magnet:  {magnet}")
         try:
             mconfdata = load_object(MyEnv, magnet + "-data.json", debug)
         except:
@@ -266,6 +266,24 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
                 cad_basename = cad.name
         except:
             cad_basename = confdata["geom"].replace(".yaml","")
+            print("confdata:", confdata)
+            for mtype in ["Bitter", "Supra"]:
+                if mtype in confdata:
+                    # why do I need that???
+                    try:
+                        findfile(confdata["geom"], search_paths(MyEnv, "geom"))
+                    except FileNotFoundError as e:
+                        print(f"try to create {MyEnv.yaml_repo + '/' + confdata['geom']}")
+                        magnets = {}
+                        magnets[mtype] = []
+                        for obj in confdata[mtype]:
+                            magnets[mtype].append( obj["geom"] )
+
+                        with open(MyEnv.yaml_repo + '/' + confdata["geom"], "x") as out:
+                            out.write(f"!<{mtype}>\n")
+                            yaml.dump(magnets, out)
+                        print(f"try to create {confdata['geom']} done")
+
         (mdict, mmat, mpost) = magnet_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)
     else:
         print("Load a msite %s" % confdata["name"], "debug:", args.debug)
@@ -273,10 +291,17 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
         cad_basename = confdata["name"]
 
         # why do I need that???
-        if not findfile(confdata["name"] + ".yaml", search_paths(MyEnv, "geom")):
-            with MyOpen(confdata["name"] + ".yaml", "x", paths=search_paths(MyEnv, "geom")) as out:
+        try:
+            findfile(confdata["name"] + ".yaml", search_paths(MyEnv, "geom"))
+        except FileNotFoundError as e:
+            print("confdata:", confdata)
+            print(f"try to create {MyEnv.yaml_repo + '/' + confdata['name'] + '.yaml'}")
+            # for obj in confdata[mtype]:
+            with open(MyEnv.yaml_repo + '/' + confdata["name"] + ".yaml", "x") as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)
+            print(f"try to create {confdata['name']}.yaml done")
+        
         (mdict, mmat, mpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose, session)
         # print(f"setup: msite mpost={mpost['current_H']}")        
         
@@ -284,8 +309,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     if name in confdata:
         name = confdata["name"]
         print(f"name={name} from confdata")
-    print(f"name={name}")
-
+    
     # create cfg
     jsonfile += "-" + args.method
     jsonfile += "-" + args.model
@@ -435,8 +459,6 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
         gmshfile = meshfile.replace(".med", ".msh")
         meshconvert = f"gmsh -0 {meshfile} -bin -o {gmshfile}"
 
-    # ?? if meshcmd need to replace geo by med/msh in cfg ??
-        
     h5file = xaofile.replace(".xao", "_p.json")
     partcmd = f"{partitioner} --ifile {gmshfile} --ofile {h5file} --part {NP} [--mesh.scale=0.001]"
 
@@ -460,17 +482,24 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     
     if args.geom == "3D":
         cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
-        # TODO add command to change mesh.filename in cfgfile
-    
+        meshfile = h5file
+        update_partition = f"perl -pi -e -s \"|gmsh.partition=\d+|gmsh.partition = 0|\" {cfgfile}" 
+
+    # TODO add command to change mesh.filename in cfgfile    
+    update_cfgmesh = f"perl -pi -e -s \"|mesh.filename=\w+|mesh.filename=\$cfgdir/data/geometries/{meshfile}|\" {cfgfile}"  
+    cmds["Update_Mesh"] = update_cfgmesh
+    if args.geom == "3D":
+        cmds["Update_Partition"] = update_partition
+
     if server.smp:
         feelcmd = f"{exec} --config-file {cfgfile}"
-        pyfeelcmd = f"python {pyfeel}"
+        pyfeelcmd = f"python3 {pyfeel}"
         cmds["Run"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {feelcmd}"
-        cmds["Python"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeel}"
+        cmds["Python"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeel} {cfgfile}"
     
     else:
         feelcmd = f"mpirun -np {NP} {exec} --config-file {cfgfile}"
-        pyfeelcmd = f"mpirun -np {NP} python {pyfeel}"
+        pyfeelcmd = f"mpirun -np {NP} {pyfeel} {cfgfile}"
         cmds["Run"] = f"singularity exec {simage_path}/{feelpp} {feelcmd}"
         cmds["Python"] = f"singularity exec {simage_path}/{feelpp} {pyfeel}"
     
