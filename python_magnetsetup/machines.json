@@ -7,7 +7,7 @@
 	    	"type":"none",
 	    	"queues":{}
 		},
-		"cores": 64,
+		"cores": 8,
 		"multithreading": "True",
 		"mgkeydir" : "/opt/MeshGems"
     },
@@ -19,7 +19,7 @@
 	    	"type":"none",
 	    	"queues":{}
 		},
-		"cores": 64,
+		"cores": 8,
 		"multithreading": "True",
 		"mgkeydir" : "/opt/MeshGems"
     },
@@ -31,7 +31,7 @@
 	    	"type":"none",
 	    	"queues":{}
 		},
-		"cores": 64,
+		"cores": 40,
 		"multithreading": "True",
 		"mgkeydir" : "/opt/MeshGems"
     },
