@@ -10,20 +10,14 @@ from .utils import Merge, NMerge
 
 import os
 
+from .file_utils import MyOpen, findfile
+
 def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter):
     print("Bitter_simfile: %s" % cad.name)
 
     from .file_utils import MyOpen, findfile
-    default_pathes={
-        "geom" : MyEnv.yaml_repo,
-        "cad" : MyEnv.cad_repo,
-        "mesh" : MyEnv.mesh_repo
-    }
 
     yamlfile = confdata["geom"]
-    
-    name = ""
-    snames = []
     with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
         return cfgdata
 
@@ -39,36 +33,28 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     boundary_maxwell = []
     boundary_electric = []
 
-    from .file_utils import MyOpen, findfile
-    default_pathes={
-        "geom" : MyEnv.yaml_repo,
-        "cad" : MyEnv.cad_repo,
-        "mesh" : MyEnv.mesh_repo
-    }
-
     yamlfile = confdata["geom"]
     if debug: print("Bitter_setup/Bitter yamlfile: %s" % yamlfile)
     
     name = ""
     snames = []
-    with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
-        cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
-        NSections = len(cad.axi.turns)
-        if debug: print(cad)
+    cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+    NSections = len(cad.axi.turns)
+    if debug: print(cad)
 
-        name = cad.name.replace('Bitter_','')
-        if method_data[2] == "Axi":
-            for i in range(len(cad.axi.turns)):
-                snames.append(name + "_B%d" % (i+1))
-                part_electric.append(snames[-1])
-                if 'th' in method_data[3]:
-                    part_thermic.append(snames[-1])
-            index_Bitters = f"1:{NSections}"
-            if debug: print("sname:", snames)
-        else:
-            part_electric.append(cad.name)
+    name = cad.name.replace('Bitter_','')
+    if method_data[2] == "Axi":
+        for i in range(len(cad.axi.turns)):
+            snames.append(name + "_B%d" % (i+1))
+            part_electric.append(snames[-1])
             if 'th' in method_data[3]:
-                part_thermic.append(cad.name)
+                part_thermic.append(snames[-1])
+        index_Bitters = f"1:{NSections}"
+        if debug: print("sname:", snames)
+    else:
+        part_electric.append(cad.name)
+        if 'th' in method_data[3]:
+            part_thermic.append(cad.name)
 
     gdata = (name, snames, cad.axi.turns)
 
