@@ -1,4 +1,3 @@
-from lib2to3.pgen2.pgen import DFAState
 from typing import List, Union
 
 import sys
@@ -18,10 +17,7 @@ import json
 
 import yaml
 
-from python_magnetgeo import MSite, Insert, Bitter, Supra
-from python_magnetgeo import python_magnetgeo
-
-import tabulate
+# import tabulate
 import itertools
 
 import argparse
@@ -89,81 +85,102 @@ def init(args):
     e = feelpp.Environment(sys.argv, opts=tb.toolboxes_options("coefficient-form-pdes","cfpdes"))
     e.setConfigFile(args.cfgfile)
 
-    print("Create cfpdes")
+    if e.isMasterRank(): print("Create cfpdes")
     f = cfpdes.cfpdes(dim=2)
 
-    print("Init problem")
+    if e.isMasterRank(): print("Init problem")
     f.init()
-    
+    # f.printAndSaveInfo()
+
     return (e, f)
 
 def solve(e, f: str, args, paramsdict: dict, params: List[str], targets: dict):
+    if e.isMasterRank(): print(f"solve: workingdir={ os.getcwd() }")
     it = 0
-    err_max = 0
+    err_max = 2 * args.eps
 
-    U = []
     table = []
-    while err_max > args.eps and it < args.itmax :
+    headers = ['it']
+    for key in paramsdict:
+        for p in params:
+            headers.append(f'{p}_{key}')
+    headers.append('err_max')
 
+
+    while err_max > args.eps and it < args.itermax :
+        
         # Update new value of U_Hi_Cuj on feelpp's senvironment
-        num = 0
         for key in paramsdict:
             for p in params:
                 entry = f'{p}_{key}'
-                f.addParameterInModelProperties(entry, paramsdict[entry])
-                U[num] = paramsdict[entry]
-                num += 1
+                val = float(paramsdict[key][p])
+                # print(f"{entry}: {val}")
+                f.addParameterInModelProperties(entry, val)
         f.updateParameterValues()
-
-        # Need to flatten U:
-        U_ = list(itertools.chain.from_iterable(U))
-        table_ = [it]
-        for d in U_:
-            table_.append(d)
 
         if args.debug and e.isMasterRank():
             print("Parameters after change :", f.modelProperties().parameters())
 
         # Solve and export the simulation
+        # try:
         f.solve()
         f.exportResults()
+        # except:
+        #    raise RuntimeError("cfpdes solver or exportResults fails - check feelpp logs for more info")
 
-        filtered_df = post(["cfpdes.heat.measures.csv", "cfpdes.magnetic.measures.csv"], "Intensity_\w+_integrate")
-        if args.debug and e.isMasterRank():
+        # TODO: get csv to look for depends on cfpdes model used
+        filtered_df = post(["heat.measures/values.csv"], "Statistics_Intensity_\w+_integrate", args.debug)
+        if args.debug and e.isMasterRank(): 
             print(filtered_df)
+            for key in filtered_df.columns.values.tolist():
+                print(key)
+
         # df.select(lambda col: col.startswith('d'), axis=1)
-        I = filtered_df.to_numpy()
-        I = np.array( filtered_df.iloc[it] )
+        # I = filtered_df.to_numpy()
+        # I = np.array( filtered_df.iloc[it] )
 
         # TODO: define a function to handle error calc
+        # and update depending on param 
+        
+        # print("compute error and update params")
         err_max = 0
         num = 0
+
+        # logging in table
+        table_ = [it]
         for key in targets:
-            val = filtered_df[f"Intensity_{key}_integrate"]
+            val = filtered_df[f"Statistics_Intensity_{key}_integrate"].iloc[-1]
             target = targets[key]
             err_max = max(abs(1 - val/target), err_max)
-            params[key]['U'] *= target/val
+            # print(f"{key}: target: {target} ({type(target)}) val: {val} ({type(val)}) error: {abs(1 - val/target)}")
+            # print(f"paramsdict[key]['U'] = {paramsdict[key]['U']} ({type(paramsdict[key]['U'])}")
+            table_.append(float(paramsdict[key]['U']))
+            paramsdict[key]['U'] = float(paramsdict[key]['U']) * target/val
+        
+        table_.append(err_max)
 
         if e.isMasterRank():
             print(f"it={it}, err_max={err_max}")
-        table.append(err_max)
         table.append(table_)
 
         it += 1
 
-    # Save results
-    print("Export result to csv")
+    # Save table (need headers)
+    # print(tabulate(table, headers, tablefmt="simple"))
+    if e.isMasterRank(): print("Export result to csv")
 
-    data_U = list(itertools.chain.from_iterable(U))
-    data_U = pd.DataFrame(data_U)
+    resfile = args.cfgfile.replace('.cfg', '-fixcurrent.csv')
+    with open(resfile,"w+") as f:
+        df = pd.DataFrame(table, columns = headers)
+        df.to_csv(resfile, encoding='utf-8')
+    
+    return paramsdict
 
-    with open("U.csv","w+") as resfile:
-        resfile.write(data_U.to_csv(index=False))
-
-    return U
-
-def update(jsonmodel: str, paramsdict: dict, params: List[str], debug: bool=False):
+def update(cwd: str, jsonmodel: str, paramsdict: dict, params: List[str], debug: bool=False):
     # Update tensions U
+    os.chdir(cwd)
+
+    print(f"update: workingdir={ os.getcwd() }")
 
     with open(jsonmodel, 'r') as jsonfile:
         dict_json = json.loads(jsonfile.read())
@@ -184,7 +201,7 @@ def update(jsonmodel: str, paramsdict: dict, params: List[str], debug: bool=Fals
 
     return 0
 
-def post(csv: List[str], rmatch: str):
+def post(csv: List[str], rmatch: str, debug: bool = False):
     """
     extract data for csv result files
     
@@ -192,15 +209,26 @@ def post(csv: List[str], rmatch: str):
     rmatch= "Intensity_\w+_integrate"
     csv = ["cfpdes.heat.measures.csv", "cfpdes.magnetic.measures.csv"]
     """
-    
+    if debug:
+        print(f"post: workingdir={ os.getcwd() }")
+        print(f"post: csv={csv}")
+
     # Retreive current intensities
     df = pd.DataFrame()
-    for f in csv:
-        if os.path.isfile(f):
-            tmp_df = pd.read_csv(f, sep=",\s+|\s+", engine='python')
+    for csv_ in csv:
+        if debug: print("post: loading {csv_}")
+        with open(csv_, 'r') as f:
+            _df = pd.read_csv(f, sep=",", engine='python')
+            if debug:
+                for key in _df.columns.values.tolist():
+                    print(key)
+
+            tmp_df = _df.filter(regex=(rmatch))
+            if debug: print(f"tmp_df: {tmp_df}")
+            
         df = pd.concat([df, tmp_df], axis='columns')
 
-    filtered_df = df.filter(regex=(rmatch))
+    return df
 
     
 def main():
@@ -252,16 +280,16 @@ def main():
         params = Merge(tmp, params, args.debug)
         
     # define targets
-    targets = setTargets(params, args.current, True) # args.debug)
+    targets = setTargets(params, args.current, args.debug)
     
     # init feelpp env
-    # (e, f) = init(args)
+    (feelpp_env, feel_pb) = init(args)
     
     # solve
-    # solve(f, args, params, ["U"]  targets)
+    params = solve(feelpp_env, feel_pb, args, params, ["U"],  targets)
     
     # update
-    update(jsonmodel, params, ["U"])
+    update(cwd, jsonmodel, params, ["U"], args.debug)
 
 if __name__ == "__main__":
     sys.exit(main())  # pragma: no cover
