@@ -142,17 +142,21 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     if method_data[2] == "Axi":
         import math
         params = params_data['Parameters']
+        # print('params:', type(params))
+        for key in params:
+            print(f"{key}")
         for j in range(len(cad.axi.turns)):
-            marker = name + "_B%d" % (i+1)
+            marker = name + "_B%d" % (j+1)
+            # print("marker:", marker)
             item = {"name": "U_" + marker, "value":"1"}
             index = params.index(item)
             mat = mmat[marker]
             # print("U=", params[index], mat['sigma'], R1[i], pitch_h[i][j])
             sigma = float(mat['sigma'])
-            I_s = I0 * cad.axi.turns[i]
-            j1 = I_s / (math.log(cad.r[1]/cad.r[1]) * (cad.axi.pitch[i]*1.e-3) * cad.axi.turns[i] )
+            I_s = I0 * cad.axi.turns[j]
+            j1 = I_s / (math.log(cad.r[1]/cad.r[0]) * (cad.axi.pitch[j]*1.e-3) * cad.axi.turns[j] )
             U_s = 2 * math.pi * (cad.r[0] * 1.e-3) * j1 / sigma
-            print("U=", params[index]['name'], cad.r[0], cad.axi.pitch[i], mat['sigma'], "U_s=", U_s, "j1=", j1)
+            print("U=", params[index]['name'], cad.r[0], cad.axi.pitch[j], mat['sigma'], "U_s=", U_s, "j1=", j1)
             item = {"name": "U_" + marker, "value":str(U_s)}
             params[index] = item
                 
