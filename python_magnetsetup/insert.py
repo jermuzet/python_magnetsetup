@@ -185,7 +185,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
         print("insert part_thermic:", part_thermic)
 
     # params section
-    params_data = create_params_insert(gdata, method_data, debug)
+    params_data = create_params_insert(gdata + (turns_h,), method_data, debug)
 
     # bcs section
     bcs_data = create_bcs_insert(boundary_meca, 
@@ -269,17 +269,20 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
         import math
         params = params_data['Parameters']
         for i in range(NHelices):
+            pitch = pitch_h[i]
+            turns = turns_h[i]
             for j in range(Nsections[i]):
                 marker = "H%d_Cu%d" % (i+1, j+1)
                 item = {"name": "U_" + marker, "value":"1"}
                 index = params.index(item)
                 mat = mmat[marker]
-                # print("U=", params[index], mat['sigma'], R1[i], pitch_h[i][j])
+                print(f"mat[{marker}]: {mat}")
+                # print("U=", params[index], mat['sigma'], R1[i], pitch_h[j])
                 sigma = float(mat['sigma'])
                 I_s = I0 * turns_h[i][j]
-                j1 = I_s / (math.log(R2[i]/R1[i]) * (pitch_h[i][j]*1.e-3) * turns_h[i][j] )
+                j1 = I_s / (math.log(R2[i]/R1[i]) * (pitch[j]*1.e-3) * turns[j] )
                 U_s = 2 * math.pi * (R1[i] * 1.e-3) * j1 / sigma
-                print("U=", params[index]['name'], R1[i], pitch_h[i][j], mat['sigma'], "U_s=", U_s, "j1=", j1)
+                print("U=", params[index]['name'], R1[i], R2[i], pitch[j], turns[j], mat['sigma'], "U_s=", U_s, "j1=", j1)
                 item = {"name": "U_" + marker, "value":str(U_s)}
                 params[index] = item
                 
