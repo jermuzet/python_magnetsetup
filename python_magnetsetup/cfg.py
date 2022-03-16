@@ -22,7 +22,7 @@ def create_cfg(cfgfile:str, name: str, mesh: str, nonlinear: bool, jsonfile: str
     if method_data[2] == "3D":
         dim = 3
 
-    linear = ""
+    linear = "linear"
     if nonlinear:
         linear = "nonlinear"
 
