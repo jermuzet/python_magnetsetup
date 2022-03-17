@@ -446,10 +446,16 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
             for md in odata["Stats_T"]:
                 data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_T"][md]
 
+    index_post_ = 0
     section = "electric"
-    if method_data[0] == "cfpdes" and method_data[2] == "Axi" and 'th' in method_data[3]: 
-        section = "heat" 
+    if method_data[0] == "cfpdes" and method_data[2] == "Axi":
+        if 'th' in method_data[3]: 
+            section = "heat"
+            index_post_ = 1 
+        if method_data[3] in ['mag', 'mag_hcurl', 'mqs', 'mqs_hcurl'] :
+            section = "magnetic" 
 
+    
     if "current_H" in mpost:
         if debug:
             print("current_H")
@@ -457,7 +463,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
             print("templates[stats]:", templates["stats"])
         currentH_data = mpost["current_H"]
         add = data["PostProcess"][section]["Measures"]["Statistics"]
-        odata = entry(templates["stats"][2], {'Current_H': currentH_data}, debug)
+        odata = entry(templates["stats"][index_post_+1], {'Current_H': currentH_data}, debug)
         if debug: print(odata)
         for md in odata["Stats_Current"]:
             data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Current"][md]
@@ -469,7 +475,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
             print("templates[stats]:", templates["stats"])
         powerH_data = mpost["power_H"]
         add = data["PostProcess"][section]["Measures"]["Statistics"]
-        odata = entry(templates["stats"][1], {'Power_H': powerH_data}, debug)
+        odata = entry(templates["stats"][index_post_], {'Power_H': powerH_data}, debug)
         if debug: print(odata)
         for md in odata["Stats_Power"]:
             data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]

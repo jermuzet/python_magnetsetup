@@ -131,12 +131,12 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
         fflux = os.path.join(template_path, flux_model)
         fstats_T = os.path.join(template_path, stats_T_model)
 
-    if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
-        stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
-        stats_Current_model = appcfg[method][time][geom][model]["stats_Current"]
+    #if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
+    stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
+    stats_Current_model = appcfg[method][time][geom][model]["stats_Current"]
 
-        fstats_Power = os.path.join(template_path, stats_Power_model)
-        fstats_Current = os.path.join(template_path, stats_Current_model)
+    fstats_Power = os.path.join(template_path, stats_Power_model)
+    fstats_Current = os.path.join(template_path, stats_Current_model)
 
     material_generic_def = ["conductor", "insulator"]
     if time == "transient":
@@ -156,9 +156,10 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
         dict["robin"] = frobin
         dict["flux"] = fflux
         dict["stats"].append(fstats_T)
-    if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
-        dict["stats"].append(fstats_Power)
-        dict["stats"].append(fstats_Current)
+    
+    #if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
+    dict["stats"].append(fstats_Power)
+    dict["stats"].append(fstats_Current)
 
     if check_templates(dict):
         pass
