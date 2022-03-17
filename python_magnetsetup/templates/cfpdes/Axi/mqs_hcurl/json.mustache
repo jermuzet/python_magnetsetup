@@ -1,0 +1,105 @@
+{
+    "Name": "Axi Magneto Quasi Static model",
+    "ShortName":"AxiMqs",
+    "Models":
+    {
+		"equations":[
+	    {
+			"name":"magnetic",
+			"unknown":
+			{
+			    "basis":"Pch2",
+			    "name":"Atheta",
+			    "symbol":"Atheta"
+			}
+	    }
+		]
+    },
+    "Parameters":
+    {
+		{{#Parameters}}
+		"{{name}}": "{{value}}",
+		{{/Parameters}}
+
+		"T0":"293."
+    },
+    "Materials":
+    {
+		"Air":
+		{
+	    	"physics":"magnetic",
+	    	"magnetic_c":"x/mu0:x:mu0",
+	    	"magnetic_a":"1/mu0/x:x:mu0"
+		}
+    },
+    "BoundaryConditions":
+    {
+		"magnetic":
+		{
+		    "Dirichlet":
+	    	{
+				"magdir":
+				{
+		    		"markers":["ZAxis","Infty"],
+		    		"expr":"0"
+				}
+			}
+	    }
+    },
+    "PostProcess":
+    {
+		"use-model-name":1,
+		"cfpdes":
+		{
+	    	"Exports":
+	    	{
+				"expr":
+				{
+					"atheta":"magnetic_Atheta:magnetic_Atheta",
+		    		"B":
+		    		{
+						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:magnetic_Atheta:x",
+						"representation":["element"]
+		    		},
+					"U":
+		    		{
+						"expr":"materials_U:materials_U",
+						"markers": {{part_electric}}
+		    		},
+		    		"Jth":
+		    		{
+						"expr":"-materials_sigma*(materials_U/(2*pi*x)+magnetic_dAtheta_dt):materials_sigma:materials_U:x:magnetic_dAtheta_dt",
+						"markers": {{part_electric}}
+		    		},
+		    		"Qth":
+		    		{
+						"expr":"materials_sigma*(materials_U/(2*pi*x)+magnetic_dAtheta_dt)*(materials_U/(2*pi*x)+magnetic_dAtheta_dt):materials_sigma:materials_U:x:magnetic_dAtheta_dt",
+						"markers": {{part_electric}}
+		    		}
+				}
+	    	}
+		},
+		"magnetic":
+		{
+	    	"Measures": 
+	    	{
+				"Statistics":
+				{
+		    		"MagneticEnergy":
+		    		{
+						"type":"integrate",
+						"expr":"-2*pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x):x:magnetic_Atheta:materials_sigma:magnetic_dAtheta_dt:materials_U",
+						"markers": {{part_electric}}
+		    		},
+                    "Intensity_%1%":
+					{
+    					"type":"integrate",
+    					"expr":"-materials_sigma*materials_U/2/pi/x:materials_sigma:materials_U:x",
+    					"markers": "%1%",
+			    		"index1": {{part_electric}}
+					}
+				}
+	    	}
+		}
+    }
+}

@@ -11,7 +11,7 @@ from .config import appenv
 def main():
 
     epilog = "The choice of model is actually linked with the choosen method following this table\n" \
-             "cfpes: thelec, mag, thmag_hcurl, thmagel_hcurl, mag_hcurl, thmag_hcurl, thmagel_hcurl\n" \
+             "cfpes: thelec, mag, mqs, thmag, thmqs, thmagel, mag_hcurl, mqs_hcurl, thmag_hcurl, thmqs_hcurl, thmagel_hcurl\n" \
              "CG (3D only): thelec\n" \
              "HDG (3D only): thelec\n"
 
@@ -32,7 +32,7 @@ def main():
     parser.add_argument("--geom", help="choose geom type", type=str,
                     choices=['Axi', '3D'], default='Axi')
     parser.add_argument("--model", help="choose model type", type=str,
-                    choices=['thelec', 'mag', 'thmag', 'thmagel', 'mag_hcurl', 'thmag_hcurl', 'thmagel_hcurl'], default='thmagel')
+                    choices=['thelec', 'mag', 'thmag', 'thmagel', 'mqs', 'thmqs', 'mag_hcurl', 'thmag_hcurl', 'thmagel_hcurl', 'mqs_hcurl', 'thmqs_hcurl'], default='thmagel')
     parser.add_argument("--nonlinear", help="force non-linear", action='store_true')
     parser.add_argument("--cooling", help="choose cooling type", type=str,
                     choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
@@ -58,7 +58,6 @@ def main():
     MyEnv = appenv()
     if args.debug: print(MyEnv.template_path())
 
-    name = ""
     # Get Object
     if args.datafile != None:
         confdata = load_object(MyEnv, args.datafile, args.debug)
@@ -77,15 +76,15 @@ def main():
     
     # Print command to run
     machine = MyEnv.compute_server
+
     workingdir = cfgfile.replace(".cfg", "")
 
     print("\n\n=== Guidelines for running a simu on {machine} ===")
     print(f"Edit {cfgfile} to fix the meshfile, scale, partition and solver props")
-    print(f"If you do change {cfgfile}, remenber to include the new file in {tarfilename}")
+    print(f"If you do change {cfgfile}, remember to include the new file in {tarfilename}")
     # TODO re-create a tgz archive if you modify cfgfile or jsonfile
     print(f"Create a {workingdir} directory on {machine}: ssh {machine} mkdir -p {workingdir}")
     print(f"Transfert {tarfilename} to {machine}: scp {tarfilename} {machine}:./{workingdir}")
-    # print(f"Untar {tarfilename} on {machine}: cd {workingdir}; tar zxvf {tarfilename}")
     print(f"Connect on {machine}: ssh -Y {machine}")
     print(f"Once connected on {machine} run the following commands")
     print(f"cd {workingdir}")

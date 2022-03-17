@@ -1,0 +1,213 @@
+{
+    "Name": "Fully coupled Axi Stationnary model",
+    "ShortName":"FullAxiStat",
+    "Models":
+    {
+		"equations":[
+	    {
+			"name":"heat",
+			"unknown":
+			{
+		    	"basis":"Pch1",
+		    	"name":"temperature",
+		    	"symbol":"T"
+			}
+	    },
+	    {
+			"name":"magnetic",
+			"unknown":
+			{
+			    "basis":"Pch2",
+			    "name":"Atheta",
+			    "symbol":"Atheta"
+			}
+	    },
+	    {
+			"name":"elastic",
+			"unknown":
+			{
+			    "basis":"Pchv1",
+			    "name":"displacement",
+			    "symbol":"u"
+			}
+	    }
+		]
+    },
+    "Parameters":
+    {
+		{{#Parameters}}
+		"{{name}}": "{{value}}",
+		{{/Parameters}}
+		
+		"T0":"293.",
+		"Tin":"284.15"
+    },
+    "Materials":
+    {
+		"Air":
+		{
+	    	"physics":"magnetic",
+	    	"magnetic_c":"x/mu0:x:mu0",
+	    	"magnetic_a":"1/mu0/x:x:mu0"
+		}
+    },
+    "BoundaryConditions":
+    {
+		"magnetic":
+		{
+		    "Dirichlet":
+	    	{
+				"magdir":
+				{
+		    		"markers":["ZAxis","Infty"],
+		    		"expr":"0"
+				}
+			}
+	    },
+		"heat":
+		{
+	    	"Robin":
+	    	{
+				{{#boundary_Therm_Robin}}
+				"{{name}}":
+				{
+					"expr1": "{{expr1}}",
+					"expr2": "{{expr2}}"
+				},
+				{{/boundary_Therm_Robin}}
+	    	}
+		},
+		"elastic":
+		{
+	    	"Dirichlet":
+	    	{
+				{{#boundary_Meca_Dir}}
+				"{{name}}":
+				{
+					"expr": "{{value}}"
+				},
+				{{/boundary_Meca_Dir}}
+	    	}
+		}
+    },
+    "InitialConditions":
+    {
+        "temperature":
+        {
+            "Expression":
+            {
+                "myic":
+                {
+                    "markers": {{part_thermic}},
+		    		"expr":"Tinit:Tinit"
+                }
+            }
+        }
+    },
+    "PostProcess":
+    {
+		"use-model-name":1,
+		"cfpdes":
+		{
+	    	"Exports":
+	    	{
+				"fields":["heat.temperature","elastic.displacement"],
+				"expr":
+				{
+		    		"atheta":"magnetic_Atheta:magnetic_Atheta",
+		    		"B":
+		    		{
+						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:magnetic_Atheta:x",
+						"representation":["element"]
+		    		},
+		    		"U":
+		    		{
+						"expr":"materials_U:materials_U",
+						"markers": {{part_electric}}
+		    		},
+		    		"Jth":
+		    		{
+						"expr":"-materials_sigma*materials_U/(2*pi*x):materials_sigma:materials_U:x",
+						"markers": {{part_electric}}
+		    		},
+		    		"Qth":
+		    		{
+						"expr":"materials_sigma*(materials_U/(2*pi*x))*(materials_U/(2*pi*x)):materials_sigma:materials_U:x",
+						"markers": {{part_electric}}
+		    		},
+		    		"Flaplace":
+		    		{
+						"expr":"{materials_F_laplace_0,materials_F_laplace_1}:materials_F_laplace_0:materials_F_laplace_1",
+						"markers": {{part_electric}}
+		    		},
+		    		"sigma":
+		    		{
+						"expr":"{(materials_Lame_lambda+2*materials_Lame_mu)*elastic_grad_u_00+materials_Lame_lambda*elastic_u_0/x+materials_Lame_lambda*elastic_grad_u_11+bool_dilatation*materials_sigma_T,0,materials_Lame_mu*(elastic_grad_u_01+elastic_grad_u_10),0,materials_Lame_lambda*elastic_grad_u_00+(materials_Lame_lambda+2*materials_Lame_mu)*materials_Lame_lambda*elastic_u_0/x+materials_Lame_lambda*elastic_grad_u_11+bool_dilatation*materials_sigma_T,0,materials_Lame_mu*(elastic_grad_u_01+elastic_grad_u_10),0,materials_Lame_lambda*elastic_grad_u_00+materials_Lame_lambda*materials_Lame_lambda*elastic_u_0/x+(materials_Lame_lambda+2*materials_Lame_mu)*elastic_grad_u_11+bool_dilatation*materials_sigma_T}:bool_dilatation:materials_Lame_lambda:materials_Lame_mu:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:elastic_grad_u_01:elastic_grad_u_10:materials_sigma_T",
+                        "markers": {{part_electric}},
+						"representation":["element"]
+		    		},
+		    		"sigma_tr":
+		    		{
+						"expr":"max(abs((materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T+materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)))-(materials_Lame_lambda*elastic_grad_u_00+(materials_Lame_lambda+2*materials_Lame_mu)/x*elastic_u_0+materials_Lame_lambda*elastic_grad_u_11+bool_dilatation*materials_sigma_T)),max(abs((materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T+materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)))-(materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T-materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)))),abs((materials_Lame_lambda*elastic_grad_u_00+(materials_Lame_lambda+2*materials_Lame_mu)/x*elastic_u_0+materials_Lame_lambda*elastic_grad_u_11+bool_dilatation*materials_sigma_T)-(materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T-materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)))))):bool_dilatation:x:materials_Lame_lambda:materials_Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_10:elastic_grad_u_01:elastic_grad_u_11:materials_sigma_T",
+                        "markers": {{part_electric}},
+						"representation":["element"]
+		    		},
+		    		"sigma_vm":
+		    		{
+						"expr":"sqrt(2/3*((materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T+materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)))*(materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T+materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)))+materials_Lame_lambda*elastic_grad_u_00+(materials_Lame_lambda+2*materials_Lame_mu)/x*elastic_u_0+materials_Lame_lambda*elastic_grad_u_11+bool_dilatation*materials_sigma_T*materials_Lame_lambda*elastic_grad_u_00+(materials_Lame_lambda+2*materials_Lame_mu)/x*elastic_u_0+materials_Lame_lambda*elastic_grad_u_11+bool_dilatation*materials_sigma_T+materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T-materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10))*materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T-materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10))-(materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T+materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)))*materials_Lame_lambda*elastic_grad_u_00+(materials_Lame_lambda+2*materials_Lame_mu)/x*elastic_u_0+materials_Lame_lambda*elastic_grad_u_11+bool_dilatation*materials_sigma_T-(materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T+materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)))*materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T-materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10))-materials_Lame_lambda*elastic_grad_u_00+(materials_Lame_lambda+2*materials_Lame_mu)/x*elastic_u_0+materials_Lame_lambda*elastic_grad_u_11+bool_dilatation*materials_sigma_T*materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T-materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)))):bool_dilatation:x:materials_Lame_lambda:materials_Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_10:elastic_grad_u_01:elastic_grad_u_11:materials_sigma_T",
+                        "markers": {{part_electric}},
+						"representation":["element"]
+		    		},
+			    	"principle_stresses":
+			    	{
+						"expr":"{materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T+materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)),materials_Lame_lambda*elastic_grad_u_00+(materials_Lame_lambda+2*materials_Lame_mu)/x*elastic_u_0+materials_Lame_lambda*elastic_grad_u_11+bool_dilatation*materials_sigma_T,materials_Lame_lambda/x*elastic_u_0+(materials_Lame_lambda+materials_Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*materials_sigma_T-materials_Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10))}:bool_dilatation:materials_Lame_lambda:materials_Lame_mu:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_10:elastic_grad_u_01:elastic_grad_u_11:materials_sigma_T",
+                        "markers": {{part_electric}},
+						"representation":["element"]
+		    		},
+		    		"epsilon":
+		    		{
+						"expr":"{elastic_grad_u_00,0,1/2*(elastic_grad_u_01+elastic_grad_u_10), 0,elastic_u_0/x,0, 1/2*(elastic_grad_u_01+elastic_grad_u_10),0,elastic_grad_u_11}:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11",
+                        "markers": {{part_electric}},
+						"representation":["element"]
+		    		}
+				}
+	    	}
+		},
+		"magnetic":
+		{
+	    	"Measures": 
+	    	{
+				"Statistics":
+				{
+		    		"MagneticEnergy":
+		    		{
+						"type":"integrate",
+						"expr":"-2*pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi):magnetic_Atheta:materials_sigma:materials_U",
+						"markers": {{part_electric}}
+		    		}
+				}
+	    	}
+		},
+		"heat":
+		{
+	    	"Save":
+	    	{
+				"Fields":
+				{
+		    		"names":["temperature"]
+				}
+	    	},
+	    	"Measures":
+	    	{
+				"Statistics":
+				{
+		    		"MeanT": 
+		    		{
+						"type":["min","max","mean"], 
+						"field":"temperature" 
+		    		}
+				}
+	    	}
+		}
+    }
+}
