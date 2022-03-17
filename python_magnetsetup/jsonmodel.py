@@ -78,7 +78,7 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
     unit_Length = method_data[5] # "meter"
     units = load_units(unit_Length)
 
-    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh, turns_h) = gdata
     
     if debug: print("R1:", R1)
     for data in [R1, R2, Z1, Z2, Zmin, Zmax, Dh]:
@@ -121,10 +121,12 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
     if method_data[2] == "Axi":
         for i in range(NHelices):
             for j in range(Nsections[i]):
+                # TODO set more realistic value for I0 = 31kA ??
                 params_data['Parameters'].append({"name":"U_H%d_Cu%d" % (i+1, j+1), "value":"1"})
-        for i in range(NHelices):
+
+            turns = turns_h[i]
             for j in range(Nsections[i]):
-                params_data['Parameters'].append({"name":"N_H%d_Cu%d" % (i+1, j+1), "value":Nsections[i]})
+                params_data['Parameters'].append({"name":"N_H%d_Cu%d" % (i+1, j+1), "value":turns[j]})
         # for i in range(NHelices):
         #     for j in range(Nsections[i]):
         #         params_data['Parameters'].append({"name":"S_H%d_Cu%d" % (i+1, j+1), "value":convert_data(units, distance_unit, Ssections[i], "Area")})
