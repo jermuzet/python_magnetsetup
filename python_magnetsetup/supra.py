@@ -10,7 +10,7 @@ from .utils import Merge
 
 from .file_utils import MyOpen, findfile
 
-def Supra_simfile(MyEnv, confdata: dict, cad: Bitter):
+def Supra_simfile(MyEnv, confdata: dict, cad: Supra):
     print("Supra_simfile: %s" % cad.name)
 
     from .file_utils import MyOpen, findfile

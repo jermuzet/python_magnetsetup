@@ -10,7 +10,7 @@ from .utils import Merge, NMerge
 
 import os
 
-from .file_utils import MyOpen, findfile
+from .file_utils import MyOpen, findfile, search_paths
 
 def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter):
     print("Bitter_simfile: %s" % cad.name)
@@ -18,12 +18,13 @@ def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter):
     from .file_utils import MyOpen, findfile
 
     yamlfile = confdata["geom"]
-    with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as cfgdata:
+    with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
         return cfgdata
 
 def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, templates: dict, debug: bool=False):
-    print("Bitter_setup: %s" % cad.name, "debug=", debug)
-    if debug: print("Bitter_setup/Bitter confdata: %s" % confdata)
+    print("Bitter_setup: %s" % cad.name) #, "debug=", debug, "confdata:", confdata)
+    if debug: 
+        print("Bitter_setup/Bitter confdata: %s" % confdata)
 
     part_thermic = []
     part_electric = []
@@ -34,9 +35,10 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     boundary_electric = []
 
     yamlfile = confdata["geom"]
-    if debug: print("Bitter_setup/Bitter yamlfile: %s" % yamlfile)
-    
-    cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+    if debug: 
+        print("Bitter_setup/Bitter yamlfile: %s" % yamlfile)
+
+    print("cad:", cad, type(cad))
     NSections = len(cad.axi.turns)
     if debug: print(cad)
 

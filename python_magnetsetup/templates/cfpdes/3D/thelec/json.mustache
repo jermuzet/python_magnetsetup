@@ -152,7 +152,13 @@
 	    	{
 				"Statistics":
 				{
-		    		"Intensity_%1_1%":
+		    		"Power":
+				    {
+        				"type": "integrate",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+        				"markers": {{part_electric}}
+    				},
+					"Intensity_%1_1%":
 					{
     					"type":"integrate",
 						"expr":"-materials_%1_2%_sigma*(electric_grad_V_0*nx+electric_grad_V_1*ny+electric_grad_V_2*nz:materials_%1_2%_sigma:electric_grad_V_0:electric_grad_v_1:electric_grad_V_2:nx:ny:nz",

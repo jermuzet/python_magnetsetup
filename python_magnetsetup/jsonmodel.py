@@ -131,7 +131,7 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
         #     for j in range(Nsections[i]):
         #         params_data['Parameters'].append({"name":"S_H%d_Cu%d" % (i+1, j+1), "value":convert_data(units, distance_unit, Ssections[i], "Area")})
     
-    if "mag" in method_data[3] or "mqs" :
+    if "mag" in method_data[3] or "mqs" in method_data[3] :
         params_data['Parameters'].append({"name":"mu0", "value":convert_data(units, unit_Length, 4*math.pi*1e-7, "mu0")})
     # TODO: CG: U_H%d%
     # TODO: HDG: U_H%d% if no ibc    # TODO: length data are written in mm should be in SI instead
