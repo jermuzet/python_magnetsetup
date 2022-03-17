@@ -66,6 +66,12 @@ def magnet_simfile(MyEnv, confdata: str, addAir: bool = False):
     for mtype in ["Bitter", "Supra"]:
         if mtype in confdata:
             print("load a %s insert" % mtype)
+            try:
+                with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
+                    cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+                    files.append(cfgdata.name)
+            except:
+                pass
 
             # loop on mtype
             for obj in confdata[mtype]:
@@ -115,7 +121,6 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
 
     for mtype in ["Bitter", "Supra"]:
         if mtype in confdata:
-
             # TODO check case with only 1 Bitter???
             
             # loop on mtype
@@ -273,16 +278,17 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
                     try:
                         findfile(confdata["geom"], search_paths(MyEnv, "geom"))
                     except FileNotFoundError as e:
-                        print(f"try to create {MyEnv.yaml_repo + '/' + confdata['geom']}")
-                        magnets = {}
-                        magnets[mtype] = []
-                        for obj in confdata[mtype]:
-                            magnets[mtype].append( obj["geom"] )
+                        # print(f"try to create {MyEnv.yaml_repo + '/' + confdata['geom']}")
+                        # magnets = {}
+                        # magnets[mtype] = []
+                        # for obj in confdata[mtype]:
+                        #    magnets[mtype].append( obj["geom"] )
 
-                        with open(MyEnv.yaml_repo + '/' + confdata["geom"], "x") as out:
-                            out.write(f"!<{mtype}>\n")
-                            yaml.dump(magnets, out)
-                        print(f"try to create {confdata['geom']} done")
+                        # with open(MyEnv.yaml_repo + '/' + confdata["geom"], "x") as out:
+                        #    out.write(f"!<{mtype}>\n")
+                        #    yaml.dump(magnets, out)
+                        # print(f"try to create {confdata['geom']} done")
+                        pass
 
         (mdict, mmat, mpost) = magnet_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)
     else:
@@ -323,16 +329,17 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     if 'mag' in args.model or 'mqs' in args.model:
         addAir = True
 
-    # TODO here name is entry name from yamlfile
+    # retreive xaofile and meshfile
     xaofile = cad_basename + ".xao"
     if args.geom == "Axi" and args.method == "cfpdes" :
         xaofile = cad_basename + "-Axi.xao"
         if "mqs" in args.model or "mag" in args.model:
             xaofile = cad_basename + "-Axi_withAir.xao"
         
-    # # if gmsh:
-    # meshfile = xaofile.replace(".xao", ".msh")
     meshfile = xaofile.replace(".xao", ".med")
+    if args.geom == "Axi" and args.method == "cfpdes" :
+        # # if gmsh:
+        meshfile = xaofile.replace(".xao", ".msh")
     print(f"setup: meshfile={meshfile}")
 
     # TODO create_mesh() or load_mesh()
@@ -483,25 +490,25 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     if args.geom == "3D":
         cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
         meshfile = h5file
-        update_partition = f"perl -pi -e -s \"|gmsh.partition=\d+|gmsh.partition = 0|\" {cfgfile}" 
+        update_partition = f"perl -pi -e \'s|gmsh.partition=.*|gmsh.partition = 0|\' {cfgfile}" 
 
     # TODO add command to change mesh.filename in cfgfile    
-    update_cfgmesh = f"perl -pi -e -s \"|mesh.filename=\w+|mesh.filename=\$cfgdir/data/geometries/{meshfile}|\" {cfgfile}"  
+    update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|\' {cfgfile}"  
     cmds["Update_Mesh"] = update_cfgmesh
     if args.geom == "3D":
         cmds["Update_Partition"] = update_partition
 
     if server.smp:
         feelcmd = f"{exec} --config-file {cfgfile}"
-        pyfeelcmd = f"python3 {pyfeel}"
+        pyfeelcmd = f"python {pyfeel}"
         cmds["Run"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {feelcmd}"
-        cmds["Python"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeel} {cfgfile}"
+        cmds["Python"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd} {cfgfile}"
     
     else:
         feelcmd = f"mpirun -np {NP} {exec} --config-file {cfgfile}"
-        pyfeelcmd = f"mpirun -np {NP} {pyfeel} {cfgfile}"
+        pyfeelcmd = f"mpirun -np {NP} python {pyfeel} {cfgfile}"
         cmds["Run"] = f"singularity exec {simage_path}/{feelpp} {feelcmd}"
-        cmds["Python"] = f"singularity exec {simage_path}/{feelpp} {pyfeel}"
+        cmds["Python"] = f"singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
     
     # TODO jobmanager if server.manager != JobManagerType.none
     # Need user email at this point
