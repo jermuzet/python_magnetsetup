@@ -289,7 +289,9 @@
 						"conductor": "conductor-transient.json",
 						"conduct-nosource": "conduct-nosource.json",
 						"insulator": "insulator-transient.json"
-					}
+					},
+					"stats_Power": "stats_Power.mustache",
+					"stats_Current": "stats_Current.mustache"
 				},
 				"thmqs_hcurl":
 				{

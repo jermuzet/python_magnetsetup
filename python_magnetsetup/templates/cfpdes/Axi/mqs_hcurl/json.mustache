@@ -90,14 +90,7 @@
 						"type":"integrate",
 						"expr":"-2*pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x):x:magnetic_Atheta:materials_sigma:magnetic_dAtheta_dt:materials_U",
 						"markers": {{part_electric}}
-		    		},
-                    "Intensity_%1%":
-					{
-    					"type":"integrate",
-    					"expr":"-materials_sigma*materials_U/2/pi/x:materials_sigma:materials_U:x",
-    					"markers": "%1%",
-			    		"index1": {{part_electric}}
-					}
+		    		}
 				}
 	    	}
 		}
