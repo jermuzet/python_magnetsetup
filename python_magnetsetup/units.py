@@ -41,7 +41,7 @@ def load_units(distance_unit: str):
         "ElectricalConductivity": [ ureg.siemens / ureg.meter, ureg.siemens / ureg.Unit(distance_unit) ],
         "Young": [ ureg.kilogram / ureg.meter / ureg.second,  ureg.kilogram / ureg.Unit(distance_unit) / ureg.second ],
         "Length": [ ureg.millimeter, ureg.Unit(distance_unit) ],
-        "Area": [ ureg.millimeter, ureg.Unit(distance_unit) ],
+        "Area": [ ureg.millimeter*ureg.millimeter, ureg.Unit(distance_unit)*ureg.Unit(distance_unit) ],
         "mu0": [ ureg.henry / ureg.meter, ureg.henry / ureg.Unit(distance_unit) ],
         "h": [ ureg.watt / ureg.meter**2 / ureg.kelvin,  ureg.watt / ureg.Unit(distance_unit)**2 / ureg.kelvin]
     }
@@ -49,7 +49,7 @@ def load_units(distance_unit: str):
     return units
 
     
-def convert_data(units: dict, length_unit: str, quantity: Union[float, List[float]], qtype: str, debug: bool=False):
+def convert_data(units: dict, quantity: Union[float, List[float]], qtype: str, debug: bool=False):
     """
     Returns quantity unit consistant with length unit
     """
@@ -120,13 +120,13 @@ def main():
             for mtype in ["Helix", "Ring", "Lead"]:
                 for i in range(len(confdata[mtype])):            
                     for prop in ["ThermalConductivity", "Young", "VolumicMass", "ElectricalConductivity"]:
-                        confdata[mtype][i]["material"][prop] = convert_data(units, distance_unit, confdata[mtype][i]["material"][prop], prop)
+                        confdata[mtype][i]["material"][prop] = convert_data(units, confdata[mtype][i]["material"][prop], prop)
             print("converted:", confdata)
 
             # mm -> distance_unit
             for data in [R1, R2, Z1, Z2, Zmin, Zmax, Dh]:
-                _convert = convert_data(units, distance_unit, R1, "Length")
-            Sh_convert = convert_data(units, distance_unit, Sh, "Area")
+                _convert = convert_data(units, R1, "Length")
+            Sh_convert = convert_data(units, Sh, "Area")
 
             # Ssections_convert = convert_data(units, distance_unit, Ssections, "Area")
 

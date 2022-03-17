@@ -52,11 +52,11 @@ def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False
     
     (name, snames, nturns) = gdata
     for thbc in ["rInt", "rExt"]:
-        params_data['Parameters'].append({"name":"%s_%s_hw" % (name, thbc), "value":convert_data(units, unit_Length, 58222.1, "h")})
+        params_data['Parameters'].append({"name":"%s_%s_hw" % (name, thbc), "value":convert_data(units, 58222.1, "h")})
         params_data['Parameters'].append({"name":"%s_%s_Tw" % (name, thbc), "value":290.671})
         params_data['Parameters'].append({"name":"%s_%s_dTw" % (name, thbc), "value":12.74})
     # for sname in snames:
-    #    params_data['Parameters'].append({"name":"%s_hw" % sname, "value":convert_data(units, unit_Length, 58222.1, "h")})
+    #    params_data['Parameters'].append({"name":"%s_hw" % sname, "value":convert_data(units, 58222.1, "h")})
     #    params_data['Parameters'].append({"name":"%s_Tw" % sname, "value":290.671})
     #    params_data['Parameters'].append({"name":"%s_dTw" % sname, "value":12.74})
 
@@ -65,7 +65,7 @@ def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False
         for i,sname in enumerate(snames):
             params_data['Parameters'].append({"name":"U_%s" % sname, "value":"1"})
             params_data['Parameters'].append({"name":"N_%s" % sname, "value":nturns[i]})
-            # params_data['Parameters'].append({"name":"S_%s" % sname, "value":convert_data(units, distance_unit, Ssections[i], "Area")})
+            # params_data['Parameters'].append({"name":"S_%s" % sname, "value":convert_data(units, Ssections[i], "Area")})
 
     if debug:
         print(params_data)
@@ -81,14 +81,23 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5] # "meter"
     units = load_units(unit_Length)
+    print("unit_Length", unit_Length)
 
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh, turns_h) = gdata
     
     if debug: print("R1:", R1)
-    for data in [R1, R2, Z1, Z2, Zmin, Zmax, Dh]:
-        data = convert_data(units, unit_Length, data, "Length")
-    Sh = convert_data(units, unit_Length, Sh, "Area")
-
+    print("Zmin:", Zmin)
+    if unit_Length == 'meter':
+        R1 = convert_data(units, R1, "Length")
+        R2 = convert_data(units, R2, "Length")
+        Z1 = convert_data(units, Z1, "Length")
+        Z2 = convert_data(units, Z2, "Length")
+        Zmin = convert_data(units, Zmin, "Length")
+        Zmax = convert_data(units, Zmax, "Length")
+        Dh = convert_data(units, Dh, "Length")
+        Sh  = convert_data(units, Dh, "Area")
+    print("Zmin:", Zmin)
+    
     # chech dim
     if debug: print("corrected R1:", R1)
     
@@ -104,7 +113,7 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
 
     params_data['Parameters'].append({"name":"Tinit", "value":293})
     # get value from coolingmethod and Flow(I) value
-    params_data['Parameters'].append({"name":"hw", "value":convert_data(units, unit_Length, 58222.1, "h")})
+    params_data['Parameters'].append({"name":"hw", "value":convert_data(units, 58222.1, "h")})
     params_data['Parameters'].append({"name":"Tw", "value":290.671})
     params_data['Parameters'].append({"name":"dTw", "value":12.74})
     
@@ -113,13 +122,13 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
 
     for i in range(NHelices+1):
         # get value from coolingmethod and Flow(I) value
-        params_data['Parameters'].append({"name":"h%d" % i, "value":convert_data(units, unit_Length, 58222.1, "h")})
+        params_data['Parameters'].append({"name":"h%d" % i, "value":convert_data(units, 58222.1, "h")})
         params_data['Parameters'].append({"name":"Tw%d" % i, "value":290.671})
         params_data['Parameters'].append({"name":"dTw%d" % i, "value":12.74})
-        params_data['Parameters'].append({"name":"Zmin%d" % i, "value":convert_data(units, unit_Length, Zmin[i]*1.e-3, "Length")})
-        params_data['Parameters'].append({"name":"Zmax%d" % i, "value":convert_data(units, unit_Length, Zmax[i]*1.e-3, "Length")})
-        params_data['Parameters'].append({"name":"Sh%d" % i, "value":convert_data(units, unit_Length, Sh[i]*1.e-6, "Area")})
-        params_data['Parameters'].append({"name":"Dh%d" % i, "value":convert_data(units, unit_Length, Dh[i]*1.e-3, "Length")})
+        params_data['Parameters'].append({"name":"Zmin%d" % i, "value": Zmin[i]})
+        params_data['Parameters'].append({"name":"Zmax%d" % i, "value": Zmax[i]})
+        params_data['Parameters'].append({"name":"Sh%d" % i, "value": Sh[i]})
+        params_data['Parameters'].append({"name":"Dh%d" % i, "value": Dh[i]})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
@@ -136,7 +145,7 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
         #         params_data['Parameters'].append({"name":"S_H%d_Cu%d" % (i+1, j+1), "value":convert_data(units, distance_unit, Ssections[i], "Area")})
     
     if "mag" in method_data[3] or "mqs" in method_data[3] :
-        params_data['Parameters'].append({"name":"mu0", "value":convert_data(units, unit_Length, 4*math.pi*1e-7, "mu0")})
+        params_data['Parameters'].append({"name":"mu0", "value":convert_data(units, 4*math.pi*1e-7, "mu0")})
     # TODO: CG: U_H%d%
     # TODO: HDG: U_H%d% if no ibc    # TODO: length data are written in mm should be in SI instead
     
@@ -156,7 +165,7 @@ def create_materials_supra(gdata: tuple, confdata: dict, templates: dict, method
     unit_Length = method_data[5] # "meter"
     units = load_units(unit_Length)
     for prop in ["ThermalConductivity", "Young", "VolumicMass", "ElectricalConductivity"]:
-        confdata["material"][prop] = convert_data(units, unit_Length, confdata["material"][prop], prop)
+        confdata["material"][prop] = convert_data(units, confdata["material"][prop], prop)
 
     if method_data[2] == "Axi":
         pass
@@ -176,7 +185,7 @@ def create_materials_bitter(gdata: tuple, confdata: dict, templates: dict, metho
     units = load_units(unit_Length)
     
     for prop in ["ThermalConductivity", "Young", "VolumicMass", "ElectricalConductivity"]:
-        confdata["material"][prop] = convert_data(units, unit_Length, confdata["material"][prop], prop)
+        confdata["material"][prop] = convert_data(units, confdata["material"][prop], prop)
 
     (name, snames, turns) = gdata
     for sname in snames:
@@ -208,7 +217,7 @@ def create_materials_insert(gdata: tuple, idata: Optional[List], confdata: dict,
         if mtype in confdata:
             for i in range(len(confdata[mtype])):            
                 for prop in ["ThermalConductivity", "Young", "VolumicMass", "ElectricalConductivity"]:
-                    confdata[mtype][i]["material"][prop] = convert_data(units, unit_Length, confdata[mtype][i]["material"][prop], prop)
+                    confdata[mtype][i]["material"][prop] = convert_data(units, confdata[mtype][i]["material"][prop], prop)
             
     # Loop for Helix
     for i in range(NHelices):
