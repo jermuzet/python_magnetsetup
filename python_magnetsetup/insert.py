@@ -105,7 +105,15 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
 
     print("Insert: %s" % cad.name, "NHelices=%d NRings=%d NChannels=%d" % (NHelices, NRings, NChannels))
 
+    pitch_h = []
+    turns_h = []
+
     for i in range(NHelices):
+        with MyOpen(cad.Helices[i]+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
+            hhelix = yaml.load(f, Loader = yaml.FullLoader)
+            pitch_h.append(hhelix.axi.pitch)
+            turns_h.append(hhelix.axi.turns)
+        
         if method_data[2] == "Axi":
             for j in range(1, Nsections[i]+1):
                 part_electric.append("H{}_Cu{}".format(i+1,j))
@@ -120,12 +128,10 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
             if 'th' in method_data[3]:
                 part_thermic.append("H{}".format(i+1))
 
-            with MyOpen(cad.Helices[i]+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
-                hhelix = yaml.load(f, Loader = yaml.FullLoader)
-                (insulator_name, insulator_number) = hhelix.insulators()
-                index_Insulators.append((insulator_name, insulator_number))
-                if 'th' in method_data[3]:
-                    part_thermic.append(insulator_name)
+            (insulator_name, insulator_number) = hhelix.insulators()
+            index_Insulators.append((insulator_name, insulator_number))
+            if 'th' in method_data[3]:
+                part_thermic.append(insulator_name)
 
     for i in range(NRings):
         if 'th' in method_data[3]:
@@ -179,7 +185,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
         print("insert part_thermic:", part_thermic)
 
     # params section
-    params_data = create_params_insert(gdata, method_data, debug)
+    params_data = create_params_insert(gdata + (turns_h,), method_data, debug)
 
     # bcs section
     bcs_data = create_bcs_insert(boundary_meca, 
@@ -254,4 +260,31 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     # print(f"insert: mpost={mpost}")
     mmat = create_materials_insert(gdata, index_Insulators, confdata, templates, method_data, debug)
 
+    # update U and hw, dTw param
+    print("Update U for I0=31kA")
+    # print(f"insert: mmat: {mmat}")
+    # print(f"insert: mdict['Parameters']: {mdict['Parameters']}")
+    I0 = 31.e+3
+    if method_data[2] == "Axi":
+        import math
+        params = params_data['Parameters']
+        for i in range(NHelices):
+            pitch = pitch_h[i]
+            turns = turns_h[i]
+            for j in range(Nsections[i]):
+                marker = "H%d_Cu%d" % (i+1, j+1)
+                item = {"name": "U_" + marker, "value":"1"}
+                index = params.index(item)
+                mat = mmat[marker]
+                # print(f"mat[{marker}]: {mat}")
+                # print("U=", params[index], mat['sigma'], R1[i], pitch_h[j])
+                sigma = float(mat['sigma'])
+                I_s = I0 * turns_h[i][j]
+                j1 = I_s / (math.log(R2[i]/R1[i]) * (pitch[j]*1.e-3) * turns[j] )
+                U_s = 2 * math.pi * (R1[i] * 1.e-3) * j1 / sigma
+                # print("U=", params[index]['name'], R1[i], R2[i], pitch[j], turns[j], mat['sigma'], "U_s=", U_s, "j1=", j1)
+                item = {"name": "U_" + marker, "value":str(U_s)}
+                params[index] = item
+                
+    
     return (mdict, mmat, mpost)
