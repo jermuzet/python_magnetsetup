@@ -406,7 +406,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     """
     Create a json model file
     """
-
+    
     if debug: 
         print("create_json jsonfile=", jsonfile)
         print("create_json mdict=", mdict)
@@ -452,7 +452,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
         if 'th' in method_data[3]: 
             section = "heat"
             index_post_ = 1 
-        if method_data[3] in ['mag', 'mag_hcurl', 'mqs', 'mqs_hcurl'] :
+        elif method_data[3] in ['mag', 'mag_hcurl', 'mqs', 'mqs_hcurl'] :
             section = "magnetic" 
 
     

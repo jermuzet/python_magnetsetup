@@ -252,10 +252,8 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
         "current_H": currentH_data        
     } 
     if 'th' in method_data[3]:
-        mpost = {  
-            "flux": {'index_h': "0:%s" % str(NChannels)},
-            "meanT_H": meanT_data
-        }
+        mpost["flux"] = {'index_h': "0:%s" % str(NChannels)}
+        mpost["meanT_H"] = meanT_data
         
     # check mpost output
     # print(f"insert: mpost={mpost}")

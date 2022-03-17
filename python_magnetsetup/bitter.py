@@ -112,9 +112,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
         "current_H": currentH_data
     } 
     if 'th' in method_data[3]:
-        mpost = {  
-            "meanT_H": meanT_data
-        }
+        mpost["meanT_H"] = meanT_data
         
     # check mpost output
     # print(f"bitter {name}: mpost={mpost}")
