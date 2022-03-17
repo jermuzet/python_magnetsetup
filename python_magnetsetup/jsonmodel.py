@@ -51,10 +51,14 @@ def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False
     params_data['Parameters'].append({"name":"Tinit", "value":293})
     
     (name, snames, nturns) = gdata
-    for sname in snames:
-        params_data['Parameters'].append({"name":"%s_hw" % sname, "value":convert_data(units, unit_Length, 58222.1, "h")})
-        params_data['Parameters'].append({"name":"%s_Tw" % sname, "value":290.671})
-        params_data['Parameters'].append({"name":"%s_dTw" % sname, "value":12.74})
+    for thbc in ["rInt", "rExt"]:
+        params_data['Parameters'].append({"name":"%s_%s_hw" % (name, thbc), "value":convert_data(units, unit_Length, 58222.1, "h")})
+        params_data['Parameters'].append({"name":"%s_%s_Tw" % (name, thbc), "value":290.671})
+        params_data['Parameters'].append({"name":"%s_%s_dTw" % (name, thbc), "value":12.74})
+    # for sname in snames:
+    #    params_data['Parameters'].append({"name":"%s_hw" % sname, "value":convert_data(units, unit_Length, 58222.1, "h")})
+    #    params_data['Parameters'].append({"name":"%s_Tw" % sname, "value":290.671})
+    #    params_data['Parameters'].append({"name":"%s_dTw" % sname, "value":12.74})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
