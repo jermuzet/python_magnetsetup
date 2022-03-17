@@ -85,9 +85,6 @@ def main():
     # TODO re-create a tgz archive if you modify cfgfile or jsonfile
     print(f"Create a {workingdir} directory on {machine}: ssh {machine} mkdir -p {workingdir}")
     print(f"Transfert {tarfilename} to {machine}: scp {tarfilename} {machine}:./{workingdir}")
-    print(f"Connect once more to {machine}: ssh -Y {machine}")
-    print(f"Go to {workingdir} directory on {machine}: cd {workingdir}")
-    # print(f"Untar {tarfilename} on {machine}: cd {workingdir}; tar zxvf {tarfilename}")
     print(f"Connect on {machine}: ssh -Y {machine}")
     print(f"Once connected on {machine} run the following commands")
     print(f"cd {workingdir}")

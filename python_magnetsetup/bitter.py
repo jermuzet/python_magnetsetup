@@ -50,7 +50,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
             part_electric.append(snames[-1])
             if 'th' in method_data[3]:
                 part_thermic.append(snames[-1])
-        index_Bitters = f"1:{NSections}"
+        index_Bitters = f"1:{NSections+1}"
         if debug: print("sname:", snames)
     else:
         part_electric.append(cad.name)
