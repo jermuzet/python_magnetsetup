@@ -1,0 +1,22 @@
+directory={{method}}-{{model}}-{{geom}}-{{time}}-{{linear}}/{{name}}
+case.dimension={{dim}}
+
+[cfpdes]
+filename=$cfgdir/{{jsonfile}}
+
+mesh.filename=$cfgdir/{{mesh}}
+# mesh.scale = {{scale}}
+gmsh.partition={{partition}}
+
+ksp-monitor=1
+
+pc-type=gamg
+
+[cfpdes.magnetic]
+#time-stepping=Theta
+bdf.order=1
+
+[ts]
+time-initial=0
+time-step=0.1
+time-final=22

@@ -354,7 +354,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     # copy some additional json file 
     material_generic_def = ["conductor", "insulator"]
     if args.time == "transient":
-        material_generic_def.append("conductor-nosource") # only for transient with mqs
+        material_generic_def.append("conduct-nosource") # only for transient with mqs
 
     # create list of files to be archived
     sim_files = [cfgfile, jsonfile]

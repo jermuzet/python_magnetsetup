@@ -261,11 +261,103 @@
 		{
 			"Axi":
 			{
+				"mqs_hcurl":
+				{
+					"cfg": "cfg.mustache",
+					"model":"json.mustache",
+					"model-nonlinear": "json-nonlinear.mustache",
+					"conductor-linear": "conductor-linear-transient.mustache",
+					"conduct-nosource": "conduct-nosource.mustache",
+					"insulator": "insulator-transient.mustache",
+					"filename":
+					{
+						"conductor": "conductor-transient.json",
+						"conduct-nosource": "conduct-nosource.json",
+						"insulator": "insulator-transient.json"
+					}
+				},
 				"mqs":
 				{
+					"cfg": "cfg.mustache",
+					"model":"json.mustache",
+					"model-nonlinear": "json-nonlinear.mustache",
+					"conductor-linear": "conductor-linear-transient.mustache",
+					"conduct-nosource": "conduct-nosource.mustache",
+					"insulator": "insulator-transient.mustache",
+					"filename":
+					{
+						"conductor": "conductor-transient.json",
+						"conduct-nosource": "conduct-nosource.json",
+						"insulator": "insulator-transient.json"
+					}
+				},
+				"thmqs_hcurl":
+				{
+					"cfg": "cfg.mustache",
+					"model": "json.mustache",
+					"model-nonlinear": "json-nonlinear.mustache",
+					"conductor-linear": "conductor-linear-transient.mustache",
+					"conductor-nonlinear": "conductor-nonlinear.mustache",
+					"conduct-nosource": "conduct-nosource.mustache",
+					"insulator": "insulator-transient.mustache",
+					"cooling":
+					{
+						"robin": "T_robin.mustache",
+						"mean": "channel-mean.mustache",
+						"grad": "channel-grad.mustache",
+						"meanH": "channel-meanH.mustache",
+						"gradH": "channel-gradH.mustache"
+					},
+					"cooling-post":
+					{
+						"mean": "flux-channel-mean.mustache",
+						"grad": "flux-channel-grad.mustache",
+						"meanH": "flux-channel-meanH.mustache",
+						"gradH": "flux-channel-gradH.mustache"
+					},
+					"filename":
+					{
+						"conductor": "conductor-transient.json",
+						"conduct-nosource": "conduct-nosource.json",
+						"insulator": "insulator-transient.json"
+					},
+					"stats_T": "stats_T.mustache",
+					"stats_Power": "stats_Power.mustache",
+					"stats_Current": "stats_Current.mustache"
 				},
 				"thmqs":
 				{
+					"cfg": "cfg.mustache",
+					"model": "json.mustache",
+					"model-nonlinear": "json-nonlinear.mustache",
+					"conductor-linear": "conductor-linear-transient.mustache",
+					"conductor-nonlinear": "conductor-nonlinear.mustache",
+					"conduct-nosource": "conduct-nosource.mustache",
+					"insulator": "insulator-transient.mustache",
+					"cooling":
+					{
+						"robin": "T_robin.mustache",
+						"mean": "channel-mean.mustache",
+						"grad": "channel-grad.mustache",
+						"meanH": "channel-meanH.mustache",
+						"gradH": "channel-gradH.mustache"
+					},
+					"cooling-post":
+					{
+						"mean": "flux-channel-mean.mustache",
+						"grad": "flux-channel-grad.mustache",
+						"meanH": "flux-channel-meanH.mustache",
+						"gradH": "flux-channel-gradH.mustache"
+					},
+					"filename":
+					{
+						"conductor": "conductor-transient.json",
+						"conduct-nosource": "conduct-nosource.json",
+						"insulator": "insulator-transient.json"
+					},
+					"stats_T": "stats_T.mustache",
+					"stats_Power": "stats_Power.mustache",
+					"stats_Current": "stats_Current.mustache"
 				}
 			},
 			"3D":
