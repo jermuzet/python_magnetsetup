@@ -85,7 +85,25 @@ def update_h():
 def getCurrent(df: pd.DataFrame, marker: str):
     return df[f"Statistics_Intensity_{marker}_integrate"].iloc[-1]
 
+def getPower(df: pd.DataFrame, marker: str):
+    return df[f"Statistics_Power_{marker}_integrate"].iloc[-1]
+
+def getFlux(df: pd.DataFrame, marker: str):
+    return df[f"Statistics_Flux_{marker}_integrate"].iloc[-1]
+
 # get Power to recompute dTw and h
+# bc_params depends on args.cooling
+# structure of a target:
+# name: 'I' 
+# csv: name of the csv file where name data are recorded
+# rematch: regexp to recover name data from csv
+# params from parameters section, 
+# control_params from parameters section,
+# bc_params from parameters section - affect bc calculations
+# post_params from postprocessing section - affect
+# value: name of the method to compute name
+# 
+# eg: "bc_params": [("dTw\d+", "dTw\d+", update_dT_H), ("hw\d+", "hw\d+", update_h)],
 targetdefs = {
     "I": {
         "csv": 'heat.measures/values.csv', 
@@ -94,7 +112,23 @@ targetdefs = {
         "control_params": [('U', 'U_\w+', update_U)],
         "bc_params": [("dTw", "dTw", update_dT), ("hw", "hw", update_h)],
         "value": getCurrent
-        }
+        },
+    "Power": {
+        "csv": 'heat.measures/values.csv', 
+        "rematch": 'Statistics_Power_\w+_integrate', 
+        "params": [],
+        "control_params": [],
+        "bc_params": [],
+        "value": getPower
+    },
+    "Flux": {
+        "csv": 'heat.measures/values.csv', 
+        "rematch": 'Statistics_Flux_\w+_integrate', 
+        "params": [],
+        "control_params": [],
+        "bc_params": [],
+        "value": getFlux
+    }
 }
 
 def setTarget(name: str, params: dict, current: float, debug: bool = False):
@@ -143,7 +177,7 @@ def init(args):
 
     return (e, f)
 
-def solve(e, f: str, args, objectif: str, paramsdict: dict, params: List[str], bc_params: List[str], targets: dict):
+def solve(e, f: str, args, objectif: str, paramsdict: dict, params: List[str], bcs_params: List[str], targets: dict):
     if e.isMasterRank(): print(f"solve: workingdir={ os.getcwd() }")
     it = 0
     err_max = 2 * args.eps
@@ -200,6 +234,11 @@ def solve(e, f: str, args, objectif: str, paramsdict: dict, params: List[str], b
                 table_.append(float(paramsdict[key][p[0]]))
                 # TODO method to update control_param from from targetdfs['I']
                 paramsdict[key][p[0]] = p[2](paramsdict, key, target, val)
+                
+        # update bcs 
+        df = getTarget('Q', e, True) # args.debug)
+        for p in targetdefs[objectif]['bc_params']:
+            print(f"{p[0]} : ")
         
         table_.append(err_max)
 
@@ -282,6 +321,8 @@ def main():
     parser.add_argument("cfgfile", help="input cfg file (ex. HL-31.cfg)")
     parser.add_argument("--wd", help="set a working directory", type=str, default="")
     parser.add_argument("--current", help="specify requested current (default: 31kA)", type=float, default=31000)
+    parser.add_argument("--cooling", help="choose cooling type", type=str,
+                    choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
     parser.add_argument("--eps", help="specify requested tolerance (default: 1.e-3)", type=float, default=1.e-3)
     parser.add_argument("--itermax", help="specify maximum iteration (default: 10)", type=int, default=10)
     parser.add_argument("--debug", help="activate debug", action='store_true')
