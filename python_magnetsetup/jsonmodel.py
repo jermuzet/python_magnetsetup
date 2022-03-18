@@ -100,7 +100,7 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
         Zmin = convert_data(units, Zmin, "Length")
         Zmax = convert_data(units, Zmax, "Length")
         Dh = convert_data(units, Dh, "Length")
-        Sh  = convert_data(units, Dh, "Area")
+        Sh  = convert_data(units, Sh, "Area")
     print("Zmin:", Zmin)
     
     # chech dim
