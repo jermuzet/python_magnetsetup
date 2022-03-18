@@ -406,7 +406,10 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
 
 def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     """
-    create cmds 
+    create cmds
+
+    Watchout: gsmh/salome base mesh is always in millimeter
+    For simulation it is madatory to use a mesh in meter except maybe for HDG
     """
 
     # loadconfig
@@ -466,8 +469,11 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
         gmshfile = meshfile.replace(".med", ".msh")
         meshconvert = f"gmsh -0 {meshfile} -bin -o {gmshfile}"
 
+    scale = ""
+    if args.method != "HDG":
+        scale = "--mesh.scale=0.001"
     h5file = xaofile.replace(".xao", "_p.json")
-    partcmd = f"{partitioner} --ifile {gmshfile} --ofile {h5file} --part {NP} [--mesh.scale=0.001]"
+    partcmd = f"{partitioner} --ifile {gmshfile} --ofile {h5file} --part {NP} {scale}"
 
     tarfile = cfgfile.replace("cfg", "tgz")
     # TODO if cad exist do not print CAD command
@@ -493,7 +499,11 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
         update_partition = f"perl -pi -e \'s|gmsh.partition=.*|gmsh.partition = 0|\' {cfgfile}" 
 
     # TODO add command to change mesh.filename in cfgfile    
-    update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|\' {cfgfile}"  
+    update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|\' {cfgfile}"
+    if args.geom =="Axi":
+        update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale|' {cfgfile}"
+        cmds["Update_cfg"] = update_cfg
+
     cmds["Update_Mesh"] = update_cfgmesh
     if args.geom == "3D":
         cmds["Update_Partition"] = update_partition

@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 
 import sys
 import os
@@ -70,7 +70,69 @@ def getparam(param:str, parameters: dict, rmatch: str, debug: bool = False ):
         print(f"getparam: {param} ====== Done")
     return (val)
 
-def setTargets(params: dict, current: float, debug: bool = False):
+def update_U(params: dict, marker: str, target: float, val: float):
+    return float(params[marker]['U']) * target/val
+    pass
+
+def update_dT():
+    # compute dT as Power / rho *Cp * Flow(I)
+    pass
+
+def update_h():
+    # compute h as Montgomery()
+    pass
+
+def getCurrent(df: pd.DataFrame, marker: str):
+    return df[f"Statistics_Intensity_{marker}_integrate"].iloc[-1]
+
+def getPower(df: pd.DataFrame, marker: str):
+    return df[f"Statistics_Power_{marker}_integrate"].iloc[-1]
+
+def getFlux(df: pd.DataFrame, marker: str):
+    return df[f"Statistics_Flux_{marker}_integrate"].iloc[-1]
+
+# get Power to recompute dTw and h
+# bc_params depends on args.cooling
+# structure of a target:
+# name: 'I' 
+# csv: name of the csv file where name data are recorded
+# rematch: regexp to recover name data from csv
+# params from parameters section, 
+# control_params from parameters section,
+# bc_params from parameters section - affect bc calculations
+# post_params from postprocessing section - affect
+# value: name of the method to compute name
+# 
+# eg: "bc_params": [("dTw\d+", "dTw\d+", update_dT_H), ("hw\d+", "hw\d+", update_h)],
+targetdefs = {
+    "I": {
+        "csv": 'heat.measures/values.csv', 
+        "rematch": 'Statistics_Intensity_\w+_integrate', 
+        "params": [('N','N_\w+')],
+        "control_params": [('U', 'U_\w+', update_U)],
+        "bc_params": [("dTw", "dTw", update_dT), ("hw", "hw", update_h)],
+        "value": getCurrent
+        },
+    "Power": {
+        "csv": 'heat.measures/values.csv', 
+        "rematch": 'Statistics_Power_\w+_integrate', 
+        "params": [],
+        "control_params": [],
+        "bc_params": [],
+        "value": getPower
+    },
+    "Flux": {
+        "csv": 'heat.measures/values.csv', 
+        "rematch": 'Statistics_Flux_\w+_integrate', 
+        "params": [],
+        "control_params": [],
+        "bc_params": [],
+        "value": getFlux
+    }
+}
+
+def setTarget(name: str, params: dict, current: float, debug: bool = False):
+    print(f"getTarget: workingdir={ os.getcwd() } name={name}")
     targets = {}
     for key in params:
         I_target = float(params[key]['N']) * current
@@ -80,6 +142,27 @@ def setTargets(params: dict, current: float, debug: bool = False):
     
     if debug: print(f"targets: {targets}")
     return targets
+
+def getTarget(name: str, e, debug: bool = False):
+
+    cwd = os.getcwd()
+    print(f"getTarget: workingdir={ os.getcwd() } name={name}")
+    defs = targetdefs[name]
+    print(f"defs: {defs}")
+    print(f"csv: {defs['csv']}")
+    print(f"rematch: {defs['rematch']}")
+
+    filename = str(cwd) + '/' + defs['csv']
+    with open(filename, "r") as f:
+        print(f"csv: {f.name}")
+        filtered_df = post(f.name, defs['rematch'], debug)
+    
+    if debug and e.isMasterRank(): 
+        print(filtered_df)
+        for key in filtered_df.columns.values.tolist():
+            print(key)
+    
+    return filtered_df
 
 def init(args):
     e = feelpp.Environment(sys.argv, opts=tb.toolboxes_options("coefficient-form-pdes","cfpdes"))
@@ -94,7 +177,7 @@ def init(args):
 
     return (e, f)
 
-def solve(e, f: str, args, paramsdict: dict, params: List[str], targets: dict):
+def solve(e, f: str, args, objectif: str, paramsdict: dict, params: List[str], bcs_params: List[str], targets: dict):
     if e.isMasterRank(): print(f"solve: workingdir={ os.getcwd() }")
     it = 0
     err_max = 2 * args.eps
@@ -129,15 +212,7 @@ def solve(e, f: str, args, paramsdict: dict, params: List[str], targets: dict):
         #    raise RuntimeError("cfpdes solver or exportResults fails - check feelpp logs for more info")
 
         # TODO: get csv to look for depends on cfpdes model used
-        filtered_df = post(["heat.measures/values.csv"], "Statistics_Intensity_\w+_integrate", args.debug)
-        if args.debug and e.isMasterRank(): 
-            print(filtered_df)
-            for key in filtered_df.columns.values.tolist():
-                print(key)
-
-        # df.select(lambda col: col.startswith('d'), axis=1)
-        # I = filtered_df.to_numpy()
-        # I = np.array( filtered_df.iloc[it] )
+        filtered_df = getTarget(objectif, e, args.debug)
 
         # TODO: define a function to handle error calc
         # and update depending on param 
@@ -149,13 +224,21 @@ def solve(e, f: str, args, paramsdict: dict, params: List[str], targets: dict):
         # logging in table
         table_ = [it]
         for key in targets:
-            val = filtered_df[f"Statistics_Intensity_{key}_integrate"].iloc[-1]
+            # TODO get f"Statistics_Intensity_{key}_integrate" from targetdfs['I']
+            val = targetdefs[objectif]['value'](filtered_df, key)
             target = targets[key]
             err_max = max(abs(1 - val/target), err_max)
             # print(f"{key}: target: {target} ({type(target)}) val: {val} ({type(val)}) error: {abs(1 - val/target)}")
             # print(f"paramsdict[key]['U'] = {paramsdict[key]['U']} ({type(paramsdict[key]['U'])}")
-            table_.append(float(paramsdict[key]['U']))
-            paramsdict[key]['U'] = float(paramsdict[key]['U']) * target/val
+            for p in targetdefs[objectif]['control_params']:
+                table_.append(float(paramsdict[key][p[0]]))
+                # TODO method to update control_param from from targetdfs['I']
+                paramsdict[key][p[0]] = p[2](paramsdict, key, target, val)
+                
+        # update bcs 
+        df = getTarget('Q', e, True) # args.debug)
+        for p in targetdefs[objectif]['bc_params']:
+            print(f"{p[0]} : ")
         
         table_.append(err_max)
 
@@ -167,19 +250,48 @@ def solve(e, f: str, args, paramsdict: dict, params: List[str], targets: dict):
 
     # Save table (need headers)
     # print(tabulate(table, headers, tablefmt="simple"))
-    if e.isMasterRank(): print("Export result to csv")
 
     resfile = args.cfgfile.replace('.cfg', '-fixcurrent.csv')
+    if e.isMasterRank(): 
+        print(f"Export result to csv: {os.getcwd() + '/' + resfile}")
     with open(resfile,"w+") as f:
         df = pd.DataFrame(table, columns = headers)
         df.to_csv(resfile, encoding='utf-8')
     
     return paramsdict
 
+def post(csv: str, rmatch: str, debug: bool = False):
+    """
+    extract data for csv result files
+    
+    eg: 
+    rmatch= "Intensity_\w+_integrate"
+    csv = ["cfpdes.heat.measures.csv", "cfpdes.magnetic.measures.csv"]
+    """
+    if debug:
+        print(f"post: workingdir={ os.getcwd() }")
+        print(f"post: csv={csv}")
+
+    # Retreive current intensities
+    df = pd.DataFrame()
+    if debug: print("post: loading {csv_}")
+    with open(csv, 'r') as f:
+        _df = pd.read_csv(f, sep=",", engine='python')
+        if debug:
+            for key in _df.columns.values.tolist():
+                print(key)
+
+        tmp_df = _df.filter(regex=(rmatch))
+        if debug: print(f"tmp_df: {tmp_df}")
+            
+        df = pd.concat([df, tmp_df], axis='columns')
+
+    return df
+
 def update(cwd: str, jsonmodel: str, paramsdict: dict, params: List[str], debug: bool=False):
     # Update tensions U
+     
     os.chdir(cwd)
-
     print(f"update: workingdir={ os.getcwd() }")
 
     with open(jsonmodel, 'r') as jsonfile:
@@ -201,35 +313,6 @@ def update(cwd: str, jsonmodel: str, paramsdict: dict, params: List[str], debug:
 
     return 0
 
-def post(csv: List[str], rmatch: str, debug: bool = False):
-    """
-    extract data for csv result files
-    
-    eg: 
-    rmatch= "Intensity_\w+_integrate"
-    csv = ["cfpdes.heat.measures.csv", "cfpdes.magnetic.measures.csv"]
-    """
-    if debug:
-        print(f"post: workingdir={ os.getcwd() }")
-        print(f"post: csv={csv}")
-
-    # Retreive current intensities
-    df = pd.DataFrame()
-    for csv_ in csv:
-        if debug: print("post: loading {csv_}")
-        with open(csv_, 'r') as f:
-            _df = pd.read_csv(f, sep=",", engine='python')
-            if debug:
-                for key in _df.columns.values.tolist():
-                    print(key)
-
-            tmp_df = _df.filter(regex=(rmatch))
-            if debug: print(f"tmp_df: {tmp_df}")
-            
-        df = pd.concat([df, tmp_df], axis='columns')
-
-    return df
-
     
 def main():
     
@@ -238,6 +321,8 @@ def main():
     parser.add_argument("cfgfile", help="input cfg file (ex. HL-31.cfg)")
     parser.add_argument("--wd", help="set a working directory", type=str, default="")
     parser.add_argument("--current", help="specify requested current (default: 31kA)", type=float, default=31000)
+    parser.add_argument("--cooling", help="choose cooling type", type=str,
+                    choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
     parser.add_argument("--eps", help="specify requested tolerance (default: 1.e-3)", type=float, default=1.e-3)
     parser.add_argument("--itermax", help="specify maximum iteration (default: 10)", type=int, default=10)
     parser.add_argument("--debug", help="activate debug", action='store_true')
@@ -269,27 +354,46 @@ def main():
             print(f"jsonmodel={jsonmodel}")
 
     # Get Parameters from JSON model file
-    params = {}
+    parameters = {}
     with open(jsonmodel, 'r') as jsonfile:
         dict_json = json.loads(jsonfile.read())
         parameters = dict_json['Parameters']
 
-        params = getparam("U", parameters, 'U_\w+', args.debug)
-        
-        tmp = getparam("N", parameters, 'N_\w+', args.debug)
+    params = {}
+    bc_params = {}
+    control_params = []
+    for p in targetdefs['I']['control_params']:
+        print(f"extract control params for {p[0]}")
+        control_params.append(p[0])
+        tmp = getparam(p[0], parameters, p[1], args.debug)
         params = Merge(tmp, params, args.debug)
-        
+
+    for p in targetdefs['I']['params']:
+        print(f"extract compute params for {p[0]}")
+        tmp = getparam(p[0], parameters, p[1], args.debug)
+        params = Merge(tmp, params, args.debug)
+
+    for p in targetdefs['I']['bc_params']:
+        print(f"extract bc params for {p[0]}")
+        tmp = getparam(p[0], parameters, p[1], args.debug)
+        bc_params = Merge(tmp, bc_params, args.debug)
+    
+    print("params:", params)
+    print("bc_params:", bc_params)
+
     # define targets
-    targets = setTargets(params, args.current, args.debug)
+    targets = setTarget('I', params, args.current, args.debug)
+    print("targets:", targets)
     
     # init feelpp env
     (feelpp_env, feel_pb) = init(args)
     
-    # solve
-    params = solve(feelpp_env, feel_pb, args, params, ["U"],  targets)
+    # solve (output params contains both control_params and bc_params values )
+    params = solve(feelpp_env, feel_pb, args, 'I', params, control_params, bc_params, targets)
     
     # update
-    update(cwd, jsonmodel, params, ["U"], args.debug)
+    update(cwd, jsonmodel, params, control_params, args.debug)
+    # update(cwd, jsonmodel, params, ['hw', 'Tw', 'dTw'], args.debug) for bc
 
 if __name__ == "__main__":
     sys.exit(main())  # pragma: no cover

@@ -209,9 +209,11 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     print("insert_setup: post-processing section")
     currentH_data = []
     powerH_data = []
+    power_data = []
     meanT_data = []
 
     currentH_data.append( {"part_electric": part_electric } )
+    power_data.append( {"part_electric": part_electric } )
         
     # if method_data[3] != 'mag' and method_data[3] != 'mag_hcurl':
     if method_data[2] == "Axi":
@@ -227,20 +229,17 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
             powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
             meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
 
-        """
         if cad.CurrentLeads:
             print("insert: 3D currentH, powerH, meanT for leads")
             currentH_data.append( {"header": "Current_iL1", "markers": { "name:": "iL1_V0" } } )
             currentH_data.append( {"header": "Current_oL2", "markers": { "name:": "oL2_V0" } } )
             powerH_data.append( {"header": "Power_iL1", "markers": { "name": "iL1"} } )
             powerH_data.append( {"header": "Power_oL2", "markers": { "name": "oL2"} } )
-            if 'th' in method_data[3]:
-                meanT_data.append( {"header": "MeanT_iL1", "markers": { "name": "iL1" } } )
-                meanT_data.append( {"header": "MeanT_oL2", "markers": { "name": "oL2" } } )
-            else:
-                currentH_data.append( {"header": "Current_H1", "markers": { "name:": "H1_V0" } } )
-                currentH_data.append( {"header": "Current_H{}".format(NHelices), "markers": { "name:": "H{}_V0".format(NHelices) } } )
-        """
+            meanT_data.append( {"header": "MeanT_iL1", "markers": { "name": "iL1" } } )
+            meanT_data.append( {"header": "MeanT_oL2", "markers": { "name": "oL2" } } )
+        else:
+            currentH_data.append( {"header": "Current_H1", "markers": { "name:": "H1_V0" } } )
+            currentH_data.append( {"header": "Current_H{}".format(NHelices), "markers": { "name:": "H{}_V0".format(NHelices) } } )
 
         print(f"insert: 3D powerH for {NRings} rings")
         for i in range(NRings) :
@@ -254,6 +253,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     if 'th' in method_data[3]:
         mpost["flux"] = {'index_h': "0:%s" % str(NChannels)}
         mpost["meanT_H"] = meanT_data
+
         
     # check mpost output
     # print(f"insert: mpost={mpost}")
