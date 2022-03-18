@@ -94,6 +94,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     part_thermic = []
     part_electric = []
     index_Helices = []
+    index_Helices_e = []
     index_Insulators = []
     
     boundary_meca = []
@@ -122,6 +123,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
                     part_thermic.append("H{}_Cu{}".format(i+1,j))
             for j in range(Nsections[i]):
                 index_Helices.append(["0:{}".format(Nsections[i]+2)])
+                index_Helices_e.append(["1:{}".format(Nsections[i]+1)])
                 
         else:
             part_electric.append("H{}".format(i+1))
@@ -219,7 +221,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     if method_data[2] == "Axi":
         for i in range(NHelices) :
             meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
-            powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
+            powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices_e[i]} } )
         
         for i in range(NRings) :
             meanT_data.append( {"header": "MeanT_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
