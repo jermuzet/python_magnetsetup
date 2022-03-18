@@ -315,7 +315,7 @@ def create_bcs_bitter(boundary_meca: List,
         for thbc in ["rInt", "rExt"]:
             bcname =  name + "_" + thbc
             # Add markers list
-            mdata = entry(fcooling, {'name': bcname, "markers": snames, 'hw': '%s_hw' % name, 'Tw': '%s_Tw' % name, 'dTw':'%s_dTw' % name},  debug)
+            mdata = entry(fcooling, {'name': bcname, "markers": snames, 'hw': '%s_hw' % bcname, 'Tw': '%s_Tw' % bcname, 'dTw':'%s_dTw' % bcname},  debug)
             thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": bcname}, mdata[bcname]) )
     
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
