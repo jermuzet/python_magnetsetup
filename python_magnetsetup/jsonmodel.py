@@ -23,7 +23,7 @@ def create_params_supra(gdata: tuple, method_data: List[str], debug: bool=False)
     # Tini, Aini for transient cases??
     params_data = { 'Parameters': []}
     if "mag" in method_data[3] or "mqs" in method_data[3] :
-        params_data['Parameters'].append({"name":"mu0", "value":convert_data(units, unit_Length, 4*math.pi*1e-7, "mu0")})
+        params_data['Parameters'].append({"name":"mu0", "value":convert_data(units,  4*math.pi*1e-7, "mu0")})
 
     if debug:
         print(params_data)
@@ -70,7 +70,7 @@ def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False
             # params_data['Parameters'].append({"name":"S_%s" % sname, "value":convert_data(units, Ssections[i], "Area")})
 
     if "mag" in method_data[3] or "mqs" in method_data[3] :
-        params_data['Parameters'].append({"name":"mu0", "value":convert_data(units, unit_Length, 4*math.pi*1e-7, "mu0")})
+        params_data['Parameters'].append({"name":"mu0", "value":convert_data(units,  4*math.pi*1e-7, "mu0")})
 
     if debug:
         print(params_data)
