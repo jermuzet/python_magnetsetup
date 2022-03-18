@@ -43,6 +43,7 @@ def main():
                     choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
     parser.add_argument("--scale", help="scale of geometry", type=float, default=1e-3)
 
+    parser.add_argument("--auto", help="activate auto mode", action='store_true')
     parser.add_argument("--debug", help="activate debug", action='store_true')
     parser.add_argument("--verbose", help="activate verbose", action='store_true')
     args = parser.parse_args()
@@ -109,9 +110,35 @@ def main():
 
 
     # test fabric
-    result = Connection(f'{machine}').run('hostname')
-    print("fabric:", result)
+    if args.auto:
+        print(f"\n\n=== Testing automatic run on {machine} ===")
+        connection_ = Connection(f'{machine}')
+        if connection_.run('hostname').exited != 0:
+            raise Exception(f"cannot connect to {machine}")
+        result = connection_.run('hostname', hide=True)
+        result = connection_.run('lsb_release -cs', hide=True)
+        result = connection_.run('pwd', hide=True)
+        homedir = result.stdout.strip()
+        print(f"{machine}: homedir={homedir}")
+        result = connection_.run(f'[ -d {homedir}/{workingdir} ] && echo 0 || echo 1')
+    
+        if result.stdout.strip() == '1':
+            connection_.run(f'mkdir -p {workingdir}')
+            connection_.put(f'{tarfilename}', remote=f'{homedir}/{workingdir}')
+            connection_.run(f'cd {homedir}/{workingdir} && tar -zxvf {tarfilename}')
+            for cmd in cmds:
+                if not cmd in ['Pre', 'Run', 'Python', 'Workflow']:
+                    connection_.run(f"cd {homedir}/{workingdir} && {cmds['Pre']} && {cmds[cmd]}")
 
+            connection_.run(f'ls -lrth {homedir}/{workingdir}/data/geometries/{meshfile}')
+            # TODO change NP for cmds Run
+            connection_.run(f"cd {homedir}/{workingdir} && {cmds['Run']}")
+            #
+            # could also do something like:
+            # if cmd in ['CAD', 'Mesh']:
+            #    connection_.run(f"cd {homedir}/{workingdir} && {cmds[cmd]}", env={'HIFIMAGNET': f'{hifimagnet}'})
+        else:
+            raise Exception(f'python_magnetsetup/cli: {workingdir} already exists on {machine}')
     return 0
 
 

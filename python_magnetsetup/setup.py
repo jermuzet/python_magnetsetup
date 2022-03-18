@@ -501,7 +501,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     # TODO add command to change mesh.filename in cfgfile    
     update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|\' {cfgfile}"
     if args.geom =="Axi":
-        update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale|' {cfgfile}"
+        update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale =|' {cfgfile}"
         cmds["Update_cfg"] = update_cfg
 
     cmds["Update_Mesh"] = update_cfgmesh
