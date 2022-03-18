@@ -23,7 +23,7 @@ def create_params_supra(gdata: tuple, method_data: List[str], debug: bool=False)
     # Tini, Aini for transient cases??
     params_data = { 'Parameters': []}
     if "mag" in method_data[3] or "mqs" in method_data[3] :
-        params_data['Parameters'].append({"name":"mu0", "value":convert_data(units, unit_Length, 4*math.pi*1e-7, "mu0")})
+        params_data['Parameters'].append({"name":"mu0", "value":convert_data(units,  4*math.pi*1e-7, "mu0")})
 
     if debug:
         print(params_data)
@@ -70,7 +70,7 @@ def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False
             # params_data['Parameters'].append({"name":"S_%s" % sname, "value":convert_data(units, Ssections[i], "Area")})
 
     if "mag" in method_data[3] or "mqs" in method_data[3] :
-        params_data['Parameters'].append({"name":"mu0", "value":convert_data(units, unit_Length, 4*math.pi*1e-7, "mu0")})
+        params_data['Parameters'].append({"name":"mu0", "value":convert_data(units,  4*math.pi*1e-7, "mu0")})
 
     if debug:
         print(params_data)
@@ -419,7 +419,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     """
     Create a json model file
     """
-
+    
     if debug: 
         print("create_json jsonfile=", jsonfile)
         print("create_json mdict=", mdict)
@@ -459,10 +459,16 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
             for md in odata["Stats_T"]:
                 data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_T"][md]
 
+    index_post_ = 0
     section = "electric"
-    if method_data[0] == "cfpdes" and method_data[2] == "Axi" and 'th' in method_data[3]: 
-        section = "heat" 
+    if method_data[0] == "cfpdes" and method_data[2] == "Axi":
+        if 'th' in method_data[3]: 
+            section = "heat"
+            index_post_ = 1 
+        elif method_data[3] in ['mag', 'mag_hcurl', 'mqs', 'mqs_hcurl'] :
+            section = "magnetic" 
 
+    
     if "current_H" in mpost:
         if debug:
             print("current_H")
@@ -470,7 +476,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
             print("templates[stats]:", templates["stats"])
         currentH_data = mpost["current_H"]
         add = data["PostProcess"][section]["Measures"]["Statistics"]
-        odata = entry(templates["stats"][2], {'Current_H': currentH_data}, debug)
+        odata = entry(templates["stats"][index_post_+1], {'Current_H': currentH_data}, debug)
         if debug: print(odata)
         for md in odata["Stats_Current"]:
             data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Current"][md]
@@ -482,7 +488,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
             print("templates[stats]:", templates["stats"])
         powerH_data = mpost["power_H"]
         add = data["PostProcess"][section]["Measures"]["Statistics"]
-        odata = entry(templates["stats"][1], {'Power_H': powerH_data}, debug)
+        odata = entry(templates["stats"][index_post_], {'Power_H': powerH_data}, debug)
         if debug: print(odata)
         for md in odata["Stats_Power"]:
             data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]

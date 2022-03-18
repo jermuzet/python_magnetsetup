@@ -248,15 +248,14 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
             powerH_data.append( {"header": "Power_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
             meanT_data.append( {"header": "MeanT_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
 
-    mpost = { } 
+    mpost = { 
+        "power_H": powerH_data ,
+        "current_H": currentH_data        
+    } 
     if 'th' in method_data[3]:
-        mpost = {  
-            "flux": {'index_h': "0:%s" % str(NChannels)},
-            "meanT_H": meanT_data ,
-            "power_H": powerH_data ,
-            "current_H": currentH_data,
-            "power": power_data
-        }
+        mpost["flux"] = {'index_h': "0:%s" % str(NChannels)}
+        mpost["meanT_H"] = meanT_data
+
         
     # check mpost output
     # print(f"insert: mpost={mpost}")

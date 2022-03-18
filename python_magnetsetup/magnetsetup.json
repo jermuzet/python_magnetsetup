@@ -71,7 +71,9 @@
 					{
 						"conductor": "conductor-static.json",
 						"insulator": "insulator-static.json"
-					}
+					},
+					"stats_Power": "stats_Power.mustache",
+					"stats_Current": "stats_Current.mustache"
 				},
 				"mag":
 				{
@@ -84,7 +86,9 @@
 					{
 						"conductor": "conductor-static.json",
 						"insulator": "insulator-static.json"
-					}
+					},
+					"stats_Power": "stats_Power.mustache",
+					"stats_Current": "stats_Current.mustache"
 				},
 				"thmag_hcurl":
 				{
@@ -274,7 +278,9 @@
 						"conductor": "conductor-transient.json",
 						"conduct-nosource": "conduct-nosource.json",
 						"insulator": "insulator-transient.json"
-					}
+					},
+					"stats_Power": "stats_Power.mustache",
+					"stats_Current": "stats_Current.mustache"
 				},
 				"mqs":
 				{
@@ -289,7 +295,9 @@
 						"conductor": "conductor-transient.json",
 						"conduct-nosource": "conduct-nosource.json",
 						"insulator": "insulator-transient.json"
-					}
+					},
+					"stats_Power": "stats_Power.mustache",
+					"stats_Current": "stats_Current.mustache"
 				},
 				"thmqs_hcurl":
 				{
