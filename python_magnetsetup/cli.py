@@ -11,9 +11,11 @@ from .config import appenv
 def main():
 
     epilog = "The choice of model is actually linked with the choosen method following this table\n" \
-             "cfpes: thelec, mag, mqs, thmag, thmqs, thmagel, mag_hcurl, mqs_hcurl, thmag_hcurl, thmqs_hcurl, thmagel_hcurl\n" \
+             "cfpdes: thelec, mag, mqs, thmag, thmqs, thmagel, mag_hcurl, mqs_hcurl, thmag_hcurl, thmqs_hcurl, thmagel_hcurl\n" \
              "CG (3D only): thelec\n" \
-             "HDG (3D only): thelec\n"
+             "HDG (3D only): thelec\n" \
+             "" \
+             "NB: for cfpdes you must use a linear case as a starting point for a nonlinear case"    
 
     # Manage Options
     command_line = None
@@ -85,6 +87,7 @@ def main():
     # TODO re-create a tgz archive if you modify cfgfile or jsonfile
     print(f"Create a {workingdir} directory on {machine}: ssh {machine} mkdir -p {workingdir}")
     print(f"Transfert {tarfilename} to {machine}: scp {tarfilename} {machine}:./{workingdir}")
+    print(f"Install worflow in {machine}: scp -r {os.path.dirname(os.path.abspath(__file__))}'/workflows {machine}:./{workingdir}")
     print(f"Connect on {machine}: ssh -Y {machine}")
     print(f"Once connected on {machine} run the following commands")
     print(f"cd {workingdir}")

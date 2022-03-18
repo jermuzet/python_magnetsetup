@@ -445,7 +445,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
         exec = AppCfg[args.method]["exec"]
     if "exec" in AppCfg[args.method][args.time][args.geom][args.model]:
         exec = AppCfg[args.method][args.time][args.geom][args.model]
-    pyfeel = 'cfpdes_insert_fixcurrent.py' # commisioning, fixcooling
+    pyfeel = ' -m workflows.cli' # commisioning, fixcooling
 
     if "mqs" in args.model or "mag" in args.model:
         geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--air,2,2,--wd,data/geometries"
@@ -512,13 +512,13 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
         feelcmd = f"{exec} --config-file {cfgfile}"
         pyfeelcmd = f"python {pyfeel}"
         cmds["Run"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {feelcmd}"
-        cmds["Python"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd} {cfgfile}"
+        cmds["Workflow"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd} {cfgfile}"
     
     else:
         feelcmd = f"mpirun -np {NP} {exec} --config-file {cfgfile}"
         pyfeelcmd = f"mpirun -np {NP} python {pyfeel} {cfgfile}"
         cmds["Run"] = f"singularity exec {simage_path}/{feelpp} {feelcmd}"
-        cmds["Python"] = f"singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
+        cmds["Workflow"] = f"singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
     
     # TODO jobmanager if server.manager != JobManagerType.none
     # Need user email at this point
