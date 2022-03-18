@@ -51,6 +51,11 @@ def main():
     # if args.debug:
     #    print("Arguments: " + str(args._))
     
+    # Get current dir
+    cwd = os.getcwd()
+    if args.wd:
+        os.chdir(args.wd)
+
     # make datafile/[magnet|msite] exclusive one or the other
     if args.magnet != None and args.msite:
         print("cannot specify both magnet and msite")
@@ -110,6 +115,7 @@ def main():
 
 
     # test fabric
+    # TODO inhibit auto mode for Transient and 3D cases
     if args.auto:
         print(f"\n\n=== Testing automatic run on {machine} ===")
         connection_ = Connection(f'{machine}')
@@ -133,12 +139,22 @@ def main():
             connection_.run(f'ls -lrth {homedir}/{workingdir}/data/geometries/{meshfile}')
             # TODO change NP for cmds Run
             connection_.run(f"cd {homedir}/{workingdir} && {cmds['Run']}")
+
             #
             # could also do something like:
             # if cmd in ['CAD', 'Mesh']:
             #    connection_.run(f"cd {homedir}/{workingdir} && {cmds[cmd]}", env={'HIFIMAGNET': f'{hifimagnet}'})
+
+            # TODO some basic post operation
+            # TODO store simu in db????
         else:
             raise Exception(f'python_magnetsetup/cli: {workingdir} already exists on {machine}')
+
+        print("pwd", os.getcwd())
+        for f in [cfgfile, jsonfile, tarfilename]:
+            print(f'Remove {f} ({type(f)}')
+            os.unlink(os.path.join(cwd, f))
+
     return 0
 
 
