@@ -11,6 +11,8 @@ from .solver import init, solve
 def main():
     
     # TODO: current several args depending of cfgfile nature (aka magnet or msite)
+    epilog = "Only work for magnet of insert type\n" \
+             "This workflow actually fix current and compute cooling BCs using Montgomery correlation with an average water velocity\n"
     
     command_line = None
     parser = argparse.ArgumentParser(description="Cfpdes HiFiMagnet Fully Coupled model")
@@ -102,7 +104,7 @@ def main():
     (params, bcparams) = solve(feelpp_env, feel_pb, args, 'I', params, control_params, bc_params, targets)
     
     # update
-    update(cwd, jsonmodel, params, control_params, bcparams, args.debug)
+    update(cwd, jsonmodel, params, control_params, bcparams, args.current[0], args.debug)
     # update(cwd, jsonmodel, params, ['hw', 'Tw', 'dTw'], args.debug) for bc
 
 if __name__ == "__main__":

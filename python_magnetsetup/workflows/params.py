@@ -175,7 +175,7 @@ def post(csv: str, rmatch: str, debug: bool = False):
 
     return df
 
-def update(cwd: str, jsonmodel: str, paramsdict: dict, params: List[str], bcparams: dict, debug: bool=False):
+def update(cwd: str, jsonmodel: str, paramsdict: dict, params: List[str], bcparams: dict, objectif: float, debug: bool=False):
     # Update tensions U
      
     os.chdir(cwd)
@@ -196,7 +196,7 @@ def update(cwd: str, jsonmodel: str, paramsdict: dict, params: List[str], bcpara
     for key in bcparams:
         parameters[key] = bcparams[key]
 
-    new_name_json =  jsonmodel.replace('.json', '-fixcurrent.json')
+    new_name_json =  jsonmodel.replace('.json', f'-I{str(objectif)}A.json')
 
     with open(new_name_json, 'w+') as jsonfile:
         jsonfile.write(json.dumps(dict_json, indent=4))
