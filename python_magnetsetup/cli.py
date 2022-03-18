@@ -3,10 +3,13 @@ import argparse
 from argparse import RawTextHelpFormatter
 
 import sys
+import os
 
 from .setup import setup, setup_cmds
 from .objects import load_object, load_object_from_db
 from .config import appenv
+
+from fabric import Connection
 
 def main():
 
@@ -105,7 +108,10 @@ def main():
     print("==================================================")
 
 
-    
+    # test fabric
+    result = Connection(f'{machine}').run('hostname')
+    print("fabric:", result)
+
     return 0
 
 
