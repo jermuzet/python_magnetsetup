@@ -1,0 +1,13 @@
+#! /bin/bash
+# type 'sbatch /home/math/trophime/feelpp_build/clang/testsuite/feelcore/feelpp_test_gatherscatter_mpi.slurm' to submit the job,
+# sbatch will pich the number of cores
+# given in the script by '#SBATCH -n xxx', you can override this value by
+# typing 'sbatch -n xxxx /home/math/trophime/feelpp_build/clang/testsuite/feelcore/feelpp_test_gatherscatter_mpi.slurm'
+
+#SBATCH -n 6 #need 6 cores (one thread by core)
+#SBATCH --mail-type=END
+#SBATCH --mail-user=user_email
+
+source $HOME/.bashrc_profile
+
+ctest -j6 -R . 
