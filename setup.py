@@ -40,9 +40,10 @@ setup(
     include_package_data=True,
     keywords='python_magnetsetup',
     name='python_magnetsetup',
-    packages=find_packages(include=['python_magnetsetup', 'python_magnetsetup.*']),
+    packages=find_packages(include=['python_magnetsetup', 'python_magnetsetup.*', 'python_magnetsetup.workflows.*']),
     package_data={'': [
         'settings.env', 
+        'flow_params.json', 
         'magnetsetup.json', 
         'machines.json', 
         'templates/cfpdes/Axi/thelec/*.mustache', 
