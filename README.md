@@ -36,6 +36,7 @@ You can also use directly the magnetdb. To do so:
 
 ```bash
 python -m python_magnetsetup.cli --magnet HL-test --method cfpdes --time static --geom Axi --model thmagel  --cooling mean
+python -m python_magnetsetup.cli --magnet HL-test --method cfpdes --time static --geom Axi --model thmagel  --cooling mean --nonlinear
 python -m python_magnetsetup.cli --magnet M9Bitters --method cfpdes --time static --geom Axi --model thmagel  --cooling mean
 python -m python_magnetsetup.cli --msite MTest --method cfpdes --time static --geom Axi --model thmagel  --cooling mean
 ```

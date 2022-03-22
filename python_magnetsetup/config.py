@@ -183,3 +183,29 @@ def check_templates(templates: dict):
     print("==========================\n\n")
     
     return True
+
+def supported_models(Appcfg, method: str, geom: str, time: str) -> List:
+    """
+    get supported models by method as a dict
+    """
+
+    models = []
+    print("supported_models:", Appcfg[method])
+    if Appcfg[method][time]:
+        if geom in Appcfg[method][time]:
+            for key in Appcfg[method][time][geom]:
+                models.append(key)
+
+    return models
+
+def supported_methods(Appcfg) -> List:
+    """
+    get supported methods as a dict
+    """
+
+    methods = []
+    for key in Appcfg:
+        if Appcfg[key] and not key in ['mesh']:
+            methods.append(key)
+
+    return methods

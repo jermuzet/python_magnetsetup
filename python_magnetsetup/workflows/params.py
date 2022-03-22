@@ -17,53 +17,93 @@ import json
 
 from .real_methods import *
 
+# TODO create/modify targetdefs on the fly
+
 targetdefs = {
     "I": {
         "csv": 'heat.measures/values.csv', 
         "rematch": 'Statistics_Intensity_\w+_integrate', 
         "params": [('N','N_\w+')],
         "control_params": [('U', 'U_\w+', update_U)],
-        "value": (getCurrent, setCurrent)
+        "value": (getCurrent, setCurrent),
+        "unit": "Current"
         },
     "PowerH": {
         "csv": 'heat.measures/values.csv', 
         "rematch": 'Statistics_Power_\w+_integrate', 
         "params": [],
         "control_params": [],
-        "value": (getPower, setPower)
+        "value": (getPower, setPower),
+        "unit": "Power"
     },
     "Power": {
         "csv": 'heat.measures/values.csv', 
         "rematch": 'Statistics_Power_integrate', 
         "params": [],
         "control_params": [],
-        "value": (getPower, setPower)
+        "value": (getPower, setPower),
+        "unit": "Power"
+    },
+    "MeanTH": {
+        "csv": 'heat.measures/values.csv', 
+        "rematch": 'Statistics_MeanT_\w+_mean', 
+        "params": [],
+        "control_params": [],
+        "value": (getMeanT, setMeanT),
+        "unit": "Temperature"
+    },
+    "MeanT": {
+        "csv": 'heat.measures/values.csv', 
+        "rematch": 'Statistics_MeanT_mean', 
+        "params": [],
+        "control_params": [],
+        "value": (getMeanT, getMeanT),
+        "unit": "Temperature"
+    },
+    "MaxTH": {
+        "csv": 'heat.measures/values.csv', 
+        "rematch": 'Statistics_MeanT_\w+_max', 
+        "params": [],
+        "control_params": [],
+        "value": (getMaxT, setMaxT),
+        "unit": "Temperature"
+    },
+    "MaxT": {
+        "csv": 'heat.measures/values.csv', 
+        "rematch": 'Statistics_MeanT_max', 
+        "params": [],
+        "control_params": [],
+        "value": (getMaxT, getMaxT),
+        "unit": "Temperature"
     },
     "Flux": {
         "csv": 'heat.measures/values.csv', 
         "rematch": 'Statistics_Flux_Channel\d+_integrate', 
         "params": [],
         "control_params": [],
-        "value": (getFlux, setFlux)
+        "value": (getFlux, setFlux),
+        "unit": "Power"
     },
     "HeatCoeff": {
         "csv": '', 
         "rematch": '', 
         "params": [('Dh','Dh\d+'), ('Sh','Sh\d+'), ('hw','hw'),('h','h\d+')],
         "control_params": [],
-        "value": (getHeatCoeff, setHeatCoeff)
+        "value": (getHeatCoeff, setHeatCoeff),
+        "unit": "h"
     },
     "DT": {
         "csv": '', 
         "rematch": '', 
         "params": [('Tw','Tw'), ('TwH','Tw\d+')],
         "control_params": [],
-        "value": (getDT, setDT)
+        "value": (getDT, setDT),
+        "unit": "Temperature"
     },
 }
 
 def setTarget(name: str, params: dict, objectif: float, debug: bool = False):
-    print(f"getTarget: workingdir={ os.getcwd() } name={name}")
+    # print(f"setTarget: workingdir={ os.getcwd() } name={name}")
     targets = {}
     for key in params:
         I_target = targetdefs[name]['value'][1](key, params, objectif)
@@ -75,17 +115,15 @@ def setTarget(name: str, params: dict, objectif: float, debug: bool = False):
     return targets
 
 def getTarget(name: str, e, debug: bool = False):
-
-    cwd = os.getcwd()
-    if debug:
-        print(f"getTarget: workingdir={ os.getcwd() } name={name}")
+    # print(f"getTarget: workingdir={ os.getcwd() } name={name}")
+    
     defs = targetdefs[name]
     if debug:
         print(f"defs: {defs}")
         print(f"csv: {defs['csv']}")
         print(f"rematch: {defs['rematch']}")
 
-    filename = str(cwd) + '/' + defs['csv']
+    filename = defs['csv']
     with open(filename, "r") as f:
         if debug: print(f"csv: {f.name}")
         filtered_df = post(f.name, defs['rematch'], debug)
@@ -177,9 +215,12 @@ def post(csv: str, rmatch: str, debug: bool = False):
 
 def update(cwd: str, jsonmodel: str, paramsdict: dict, params: List[str], bcparams: dict, objectif: float, debug: bool=False):
     # Update tensions U
-     
+    import re
+    
+    pwd = os.getcwd()
     os.chdir(cwd)
-    print(f"update: workingdir={ os.getcwd() }")
+    if debug:
+        print(f"update: workingdir={ os.getcwd() }")
 
     with open(jsonmodel, 'r') as jsonfile:
         dict_json = json.loads(jsonfile.read())
@@ -201,5 +242,16 @@ def update(cwd: str, jsonmodel: str, paramsdict: dict, params: List[str], bcpara
     with open(new_name_json, 'w+') as jsonfile:
         jsonfile.write(json.dumps(dict_json, indent=4))
 
+    # cfg = jsonmodel.replace(".json", ".cfg")
+    # new_cfg =  jsonmodel.replace('.json', f'-I{str(objectif)}A.cfg')
+    # cregexp = re.compile(r"^directory=\.$")
+    # jregexp = re.compile(r".json")
+    # with open(cfg, 'r') as cfgfile:
+    #     content = cfgfile.read()
+    # print("content:", cregexp.sub(f'-I{str(objectif)}A', content))
+    # print("content:", jregexp.sub(f'-I{str(objectif)}A.json', content))
+    
+    os.chdir(pwd)
     return 0
+
 

@@ -431,33 +431,36 @@
 		{
 			"3D":
 			{
-				"exec": "feelpp_toolbox_hdg_thermoelectric",
-				"model": "json.mustache",
-				"cfg": "cfg.mustache",
-				"conductor-linear": "conductor-linear-static.mustache",
-				"conductor-nonlinear": "conductor-nonlinear-static.mustache",
-				"insulator": "insulator-static.mustache",
-				"cooling":
-				{
-					"robin": "T_robin.mustache",
-					"mean": "channel-mean.mustache",
-					"grad": "channel-grad.mustache",
-					"meanH": "channel-meanH.mustache",
-					"gradH": "channel-gradH.mustache"
-				},
-				"cooling-post":
-				{
-					"mean": "flux-channel-mean.mustache",
-					"grad": "flux-channel-grad.mustache",
-					"meanH": "flux-channel-meanH.mustache",
-					"gradH": "flux-channel-grad.mustache"
-				},
-				"filename":
-				{
-				},
-				"stats_T": "stats_T.mustache",
-				"stats_Power": "stats_Power.mustache",
-				"stats_Current": ""
+			    "thelec":
+			    {
+					"exec": "feelpp_toolbox_hdg_thermoelectric",
+					"model": "json.mustache",
+					"cfg": "cfg.mustache",
+					"conductor-linear": "conductor-linear-static.mustache",
+					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
+					"insulator": "insulator-static.mustache",
+					"cooling":
+					{
+						"robin": "T_robin.mustache",
+						"mean": "channel-mean.mustache",
+						"grad": "channel-grad.mustache",
+						"meanH": "channel-meanH.mustache",
+						"gradH": "channel-gradH.mustache"
+					},
+					"cooling-post":
+					{
+						"mean": "flux-channel-mean.mustache",
+						"grad": "flux-channel-grad.mustache",
+						"meanH": "flux-channel-meanH.mustache",
+						"gradH": "flux-channel-grad.mustache"
+					},
+					"filename":
+					{
+					},
+					"stats_T": "stats_T.mustache",
+					"stats_Power": "stats_Power.mustache",
+					"stats_Current": ""
+				}
 			}
 		},
 		"transient":	

@@ -9,8 +9,9 @@ import os
 import pandas as pd
 
 from .params import targetdefs, getTarget
-from .real_methods import pressure, umean, montgomery
+from .real_methods import pressure, umean, flow, montgomery
 
+# TODO create toolboxes_options on the fly
 def init(args):
     e = feelpp.Environment(sys.argv, opts=tb.toolboxes_options("coefficient-form-pdes","cfpdes"))
     e.setConfigFile(args.cfgfile)
@@ -73,15 +74,13 @@ def solve(e, f: str, args, objectif: str, paramsdict: dict, params: List[str], b
             print(f"Compute error on {objectif}")
         table_ = [it]
         for key in targets:
-            # TODO get f"Statistics_Intensity_{key}_integrate" from targetdfs['I']
             val = targetdefs[objectif]['value'][0](filtered_df, key)
             target = targets[key]
             err_max = max(abs(1 - val/target), err_max)
-            # print(f"{key}: target: {target} ({type(target)}) val: {val} ({type(val)}) error: {abs(1 - val/target)}")
-            # print(f"paramsdict[key]['U'] = {paramsdict[key]['U']} ({type(paramsdict[key]['U'])}")
+
+            # update val
             for p in targetdefs[objectif]['control_params']:
                 table_.append(float(paramsdict[key][p[0]]))
-                # TODO method to update control_param from from targetdfs['I']
                 paramsdict[key][p[0]] = p[2](paramsdict, key, target, val)
         table_.append(err_max)
 
@@ -95,10 +94,10 @@ def solve(e, f: str, args, objectif: str, paramsdict: dict, params: List[str], b
             print("Update Bcs")
         flux_df = getTarget('Flux', e, args.debug)
         power_df = getTarget('PowerH', e, args.debug)
-        Power = power_df.iloc[-1].sum()
+        SPower_H = power_df.iloc[-1].sum()
+        Power = getTarget("Power", e, args.debug)
         if args.debug and e.isMasterRank():
-            print('PowerH:', Power, "df:", power_df)
-            print('Power: df:', getTarget('Power', e, args.debug))
+            print(f'it={it} Power={Power.iloc[-1]} SPower_H={SPower_H} PowerH={power_df.iloc[-1]}')
         Pressure = pressure(args.current[0])
 
         Dh = []
@@ -107,30 +106,30 @@ def solve(e, f: str, args, objectif: str, paramsdict: dict, params: List[str], b
             if "Dh" in p: Dh.append(float(bcs_params[p]['Dh']))
             if "Sh" in p: Sh.append(float(bcs_params[p]['Sh']))
 
-        Umean = umean(args.current[0], sum(Sh)/len(Sh))
+        Umean = umean(args.current[0], sum(Sh))
+        if args.debug and e.isMasterRank():
+            print(f'it={it} Umean={Umean} Flow={flow(args.current[0])}')
         for i,(d, s) in enumerate(zip(Dh, Sh)):
             PowerCh = flux_df[f'Statistics_Flux_Channel{i}_integrate'].iloc[-1]
             if args.debug and e.isMasterRank():
                 print(f"Channel{i}: umean={Umean}, Dh={d}, Sh={s}, Power={PowerCh}")
             Tw = float(bcs_params[f'Tw{i}']['TwH'])
-            dTwi = targetdefs['DT']['value'][1](args.current[0], PowerCh, Tw, Pressure)
-            hi = targetdefs['HeatCoeff']['value'][1](d, Umean, Tw)
+            dTwi = targetdefs['DT']['value'][0](args.current[0], PowerCh, Tw, Pressure)
+            hi = targetdefs['HeatCoeff']['value'][0](d, Umean, Tw)
             f.addParameterInModelProperties(f'dTw{i}', dTwi)
             f.addParameterInModelProperties(f'h{i}', hi)        
             if args.debug and e.isMasterRank():
-                print(f'dTw{i}:', dTwi)
-                print(f'hw{i}:', hi)
+                print(f'it={it} dTw{i}: {dTwi} hw{i}: {hi}')
             bcparams[f'dTw{i}'] = dTwi
             bcparams[f'h{i}'] = hi
 
         Tw = float(bcs_params['Tw']['Tw'])
-        dTw = targetdefs['DT']['value'][1](args.current[0], Power, Tw, Pressure)
+        dTw = targetdefs['DT']['value'][0](args.current[0], SPower_H, Tw, Pressure)
         hw = montgomery(Tw, Umean, sum(Dh)/len(Dh))
         f.addParameterInModelProperties("dTw", dTw)
         f.addParameterInModelProperties("hw", hw )        
         if args.debug and e.isMasterRank():
-            print('dTw:', targetdefs['DT']['value'][1](args.current[0], Power, Tw, Pressure))
-            print('hw:', montgomery(Tw, Umean, sum(Dh)/len(Dh) ))
+            print(f'it={it}: dTw={dTw} hw={hw}')
         bcparams['dTw'] = dTw
         bcparams['hw'] = hw
 
@@ -142,7 +141,7 @@ def solve(e, f: str, args, objectif: str, paramsdict: dict, params: List[str], b
     # Save table (need headers)
     # print(tabulate(table, headers, tablefmt="simple"))
 
-    resfile = args.cfgfile.replace('.cfg', '-fixcurrent.csv')
+    resfile = args.cfgfile.replace('.cfg', '-I{str(args.current[0])}A.csv')
     if e.isMasterRank(): 
         print(f"Export result to csv: {os.getcwd() + '/' + resfile}")
     with open(resfile,"w+") as f:

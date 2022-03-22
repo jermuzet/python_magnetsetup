@@ -400,6 +400,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
                 if mname in filename:
                     if args.debug: print(f"remove {filename}")
                     os.unlink(filename)
+        tar.add('flow_param.json')
         tar.close()
 
     return (yamlfile, cfgfile, jsonfile, xaofile, meshfile, tarfilename)

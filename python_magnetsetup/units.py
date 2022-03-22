@@ -44,7 +44,10 @@ def load_units(distance_unit: str):
         "Area": [ ureg.millimeter*ureg.millimeter, ureg.Unit(distance_unit)*ureg.Unit(distance_unit) ],
         "mu0": [ ureg.henry / ureg.meter, ureg.henry / ureg.Unit(distance_unit) ],
         "h": [ ureg.watt / ureg.meter**2 / ureg.kelvin,  ureg.watt / ureg.Unit(distance_unit)**2 / ureg.kelvin],
-        "Flow": [ ureg.liter/ureg.second, ureg.Unit(distance_unit)*ureg.Unit(distance_unit)*ureg.Unit(distance_unit)/ureg.second]
+        "Flow": [ ureg.liter/ureg.second, ureg.Unit(distance_unit)*ureg.Unit(distance_unit)*ureg.Unit(distance_unit)/ureg.second],
+        "Current": [ureg.ampere, ureg.ampere],
+        "Power": [ureg.watt, ureg.watt],
+        "Temperature": [ureg.degK, ureg.degK]
     }
 
     return units
