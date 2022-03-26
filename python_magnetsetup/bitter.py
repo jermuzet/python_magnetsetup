@@ -136,7 +136,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
             index = params.index(item)
             mat = mmat[marker]
             # print("U=", params[index], mat['sigma'], R1[i], pitch_h[i][j])
-            sigma = float(mat['sigma0'])
+            sigma = float(mat['sigma'])
             I_s = I0 * cad.axi.turns[j]
             j1 = I_s / (math.log(cad.r[1]/cad.r[0]) * (cad.r[0]*1.e-3) * (cad.axi.pitch[j]*1.e-3) * cad.axi.turns[j] )
             U_s = 2 * math.pi * (cad.r[0] * 1.e-3) * j1 / sigma
