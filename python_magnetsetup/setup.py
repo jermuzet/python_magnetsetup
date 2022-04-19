@@ -357,10 +357,10 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
         material_generic_def.append("conduct-nosource") # only for transient with mqs
 
     # create list of files to be archived
+    from shutil import copyfile
     sim_files = [cfgfile, jsonfile]
     if args.method == "cfpdes":
         if args.debug: print("cwd=", cwd)
-        from shutil import copyfile
         for jfile in material_generic_def:
             filename = AppCfg[args.method][args.time][args.geom][args.model]["filename"][jfile]
             src = os.path.join(MyEnv.template_path(), args.method, args.geom, args.model, filename)
@@ -384,6 +384,13 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
             yamlfile = confdata["name"] + ".yaml"
             sim_files += msite_simfile(MyEnv, confdata, session, addAir)
 
+    # TODO create a flow_params from records data
+    sdir = os.path.dirname(os.path.abspath(__file__))
+    # print("sdir:", sdir)
+    src = os.path.join(sdir, 'flow_params.json')
+    dst = 'flow_params.json'
+    copyfile(src, dst)
+
     if args.debug:
         print("List of simulations files:", sim_files)
     import tarfile
@@ -400,7 +407,8 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
                 if mname in filename:
                     if args.debug: print(f"remove {filename}")
                     os.unlink(filename)
-        tar.add('flow_param.json')
+        tar.add('flow_params.json')
+        os.unlink('flow_params.json')
         tar.close()
 
     return (yamlfile, cfgfile, jsonfile, xaofile, meshfile, tarfilename)
@@ -442,6 +450,9 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     salome = AppCfg["mesh"]["salome"]
     feelpp = AppCfg[args.method]["feelpp"]
     partitioner = AppCfg["mesh"]["partitioner"]
+    workingdir = MyEnv.yaml_repo.replace('/','',1)
+    print(f"setup_cmds: workingdir={workingdir}")
+
     if "exec" in AppCfg[args.method]:
         exec = AppCfg[args.method]["exec"]
     if "exec" in AppCfg[args.method][args.time][args.geom][args.model]:
@@ -449,10 +460,10 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     pyfeel = ' -m workflows.cli' # commisioning, fixcooling
 
     if "mqs" in args.model or "mag" in args.model:
-        geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--air,2,2,--wd,data/geometries"
+        geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--air,2,2,--wd,{workingdir}"
         meshcmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--air,2,2,--wd,$PWD,mesh,--group,CoolingChannels,Isolants"
     else:
-        geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},2,2,--wd,data/geometries"
+        geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},2,2,--wd,{workingdir}"
         meshcmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},2,2,--wd,$PWD,mesh,--group,CoolingChannels,Isolants"
 
     gmshfile = meshfile.replace(".med", ".msh")
@@ -460,12 +471,12 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
 
     if args.geom == "Axi" and args.method == "cfpdes" :
         if "mqs" in args.model or "mag" in args.model:
-            geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--axi,--air,2,2,--wd,data/geometries"
+            geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--axi,--air,2,2,--wd,{workingdir}"
         else:
-            geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--axi,--wd,data/geometries"
+            geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--axi,--wd,{workingdir}"
         
         # if gmsh:
-        meshcmd = f"python3 -m python_magnetgeo.xao {xaofile} --wd data/geometries mesh --group CoolingChannels --geo {name} --lc=1"
+        meshcmd = f"python3 -m python_magnetgeo.xao {xaofile} --wd {workingdir} mesh --group CoolingChannels --geo {name} --lc=1"
     else:
         gmshfile = meshfile.replace(".med", ".msh")
         meshconvert = f"gmsh -0 {meshfile} -bin -o {gmshfile}"
@@ -500,7 +511,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
         update_partition = f"perl -pi -e \'s|gmsh.partition=.*|gmsh.partition = 0|\' {cfgfile}" 
 
     # TODO add command to change mesh.filename in cfgfile    
-    update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|\' {cfgfile}"
+    update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/{workingdir}/{meshfile}|\' {cfgfile}"
     if args.geom =="Axi":
         update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale =|' {cfgfile}"
         cmds["Update_cfg"] = update_cfg
