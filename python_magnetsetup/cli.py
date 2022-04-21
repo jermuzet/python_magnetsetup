@@ -92,7 +92,7 @@ def main():
     epilog = "The choice of model is actually linked with the choosen method following this table\n" \
              f"{comment}\n" \
              "" \
-             "NB: for cfpdes you must use a linear case as a starting point for a nonlinear case"    
+             "NB: for cfpdes/3D you must use a linear case as a starting point for a nonlinear case"    
 
 
     # Manage Options
