@@ -87,6 +87,7 @@ def loadmachine(server: str):
         return server_defs[server]
     else:
         raise ValueError(f"loadmachine: {server} no such server defined")
+
     pass
 
 def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear: bool=True, debug: bool=False):
@@ -190,7 +191,7 @@ def supported_models(Appcfg, method: str, geom: str, time: str) -> List:
     """
 
     models = []
-    print("supported_models:", Appcfg[method])
+    print(f'supported_models[{method}]: {Appcfg[method]}')
     if Appcfg[method][time]:
         if geom in Appcfg[method][time]:
             for key in Appcfg[method][time][geom]:
@@ -205,7 +206,7 @@ def supported_methods(Appcfg) -> List:
 
     methods = []
     for key in Appcfg:
-        if Appcfg[key] and not key in ['mesh']:
+        if Appcfg[key] and not key in ['mesh', 'post']:
             methods.append(key)
 
     return methods

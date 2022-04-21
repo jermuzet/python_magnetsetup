@@ -8,8 +8,19 @@ mesh.filename=$cfgdir/{{mesh}}
 # mesh.scale = {{scale}}
 gmsh.partition={{partition}}
 
-ksp-monitor=1
+solver=Newton
+verbose_solvertimer=1
 
+ksp-monitor=1
+snes-monitor=1
+snes-maxit=40
+
+# Fieldsplit
+pc-type=fieldsplit
+fieldsplit-type=additive #additive, multiplicative, symmetric-multiplicative
+[cfpdes.fieldsplit-0]
+pc-type=gamg
+[cfpdes.fieldsplit-1]
 pc-type=gamg
 
 [cfpdes.magnetic]

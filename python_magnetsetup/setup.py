@@ -30,11 +30,13 @@ import sys
 import os
 import json
 import yaml
+import re
 
 from python_magnetgeo import Insert, MSite, Bitter, Supra
 from python_magnetgeo import python_magnetgeo
 
-from .config import appenv, loadconfig, loadtemplates
+from .machines import load_machines
+from .config import appenv, loadconfig, loadtemplates, loadmachine
 from .objects import load_object, load_object_from_db
 from .utils import Merge, NMerge
 from .cfg import create_cfg
@@ -100,12 +102,12 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
     
     print("magnet_setup")
     if debug:
-        print(f"magnet_setup: confdata: {confdata}"),
-    
+        print(f"magnet_setup: confdata: {confdata}")
+
     mdict = {}
     mmat = {}
     mpost = {}
-    
+
     if "Helix" in confdata:
         print("Load an insert")
         yamlfile = confdata["geom"]
@@ -433,17 +435,19 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     # get NP from server (with an heuristic from meshsize)
     # TODO adapt NP to the size of the problem
     # if server is SMP mpirun outside otherwise inside singularity
-    from .machines import load_machines
 
-    machines = load_machines()
-    if args.debug:
-        print(f"machine={MyEnv.compute_server} type={type(MyEnv.compute_server)}")
-    server = machines[MyEnv.compute_server]
+    server = loadmachine(args.machine)
+    print(f'setup_cmds: {server}')
     NP = server.cores
     if server.multithreading:
         NP = int(NP/2)
     if args.debug:
         print(f"NP={NP} {type(NP)}")
+    if args.np > 0:
+        if args.np > NP:
+            print(f'requested number of cores {args.np} exceed {server.name} capability (max: {NP})')
+        else:
+            NP = args.np
 
     simage_path = MyEnv.simage_path()
     hifimagnet = AppCfg["mesh"]["hifimagnet"]
@@ -531,12 +535,29 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
         pyfeelcmd = f"mpirun -np {NP} python {pyfeel} {cfgfile}"
         cmds["Run"] = f"singularity exec {simage_path}/{feelpp} {feelcmd}"
         cmds["Workflow"] = f"singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
+
+    # compute resultdir:
+    with open(cfgfile, 'r') as f:
+        directory = re.sub('directory=', '', f.readline(),  flags=re.DOTALL)
+    result_dir = f'{directory.rstrip()}/np_{NP}'
+    home_env = 'HOME'
+    print(f'result_dir={os.getenv(home_env)}/feelppdb/{result_dir}')
+
+    paraview = AppCfg["post"]["paraview"]
+
+    # get expr and exprlegend from method/model/...
+    if "post" in AppCfg[args.method][args.time][args.geom][args.model]:
+        postdata = AppCfg[args.method][args.time][args.geom][args.model]["post"]
+        for key in postdata:
+            pyparaview = f'pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"postdata[key]\" --resultdir ${result_dir}'
+            pyparaviewcmd = f"pvpython {pyparaview}"
+            cmds["Postprocessing"] = f"singularity exec {simage_path}/{paraview} {pyparaviewcmd}"
     
     # TODO jobmanager if server.manager != JobManagerType.none
     # Need user email at this point
     # Template for oar and slurm
-    
-    # TODO what about postprocess??
+
+    # TODO get results (value.csv, png, raw data) to magnetdb 
     
     return cmds
 

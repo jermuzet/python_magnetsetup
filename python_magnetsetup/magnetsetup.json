@@ -1,5 +1,9 @@
 {
-	"mesh":
+	"post":
+	{
+		"paraview": "paraview-osmesa-5.10.1.sif"
+	},
+        "mesh":
 	{
 		"hifimagnet": "/opt/SALOME-9.8.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome",
 		"salome": "hifimagnet-salome-9.8.0.sif",
@@ -58,7 +62,11 @@
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+				        "stats_Current": "stats_Current.mustache",
+				        "post":
+				        {
+					    "heat.temperature": "T[K]"
+				        }
 				},
 				"mag_hcurl":
 				{
