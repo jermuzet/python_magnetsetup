@@ -44,7 +44,7 @@ def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False
     params_data = { 'Parameters': []}
 
     # for cfpdes only
-    if method_data[0] == "cfpdes" and method_data[3] == "thmagel" :
+    if method_data[0] == "cfpdes" and method_data[3] in ["thmagel", "thmagel_hcurl", "thmqsel", "thmqsel_hcurl"] :
         params_data['Parameters'].append({"name":"bool_laplace", "value":"1"})
         params_data['Parameters'].append({"name":"bool_dilatation", "value":"1"})
 
