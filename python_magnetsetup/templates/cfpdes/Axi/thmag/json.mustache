@@ -3,26 +3,48 @@
     "ShortName":"AxiThermo-Magnetostatic",
     "Models":
     {
-		"equations":[
-	    {
-			"name":"heat",
-			"unknown":
+		"cfpdes":{
+			"equations":["heat","magnetic"]
+		},
+		heat":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"temperature",
+						"symbol":"T""
+					}
+				}
+			},
+			"models":[
+			
+			]
+		},
+		"magnetic":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch2",
+						"name":"phi",
+						"symbol":"phi"
+					}
+				}
+			},
+			"models":[
 			{
-		    	"basis":"Pch1",
-		    	"name":"temperature",
-		    	"symbol":"T"
+				"name":"magnetic_Air",
+				"materials":"Air",
+				"setup":{
+					"coefficients":{
+						"c":"x/mu0:x:mu0",
+						"beta":"{2/mu0,0}:mu0"
+					}
+				}
 			}
-	    },
-	    {
-			"name":"magnetic",
-			"unknown":
-			{
-			    "basis":"Pch2",
-			    "name":"phi",
-			    "symbol":"phi"
-			}
-	    }
-		]
+			]
+		}
     },
     "Parameters":
     {
@@ -32,6 +54,18 @@
 
 		"T0":"293.",
 		"Tin":"284.15"
+    },
+	"Meshes":
+    {
+        "cfpdes":
+        {
+            "Import":
+            {
+                "filename":"$cfgdir/{{mesh}}",
+				// "scale":{{scale}},
+				"partition":{{partition}}
+            }
+        }
     },
     "Materials":
     {

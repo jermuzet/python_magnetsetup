@@ -3,17 +3,33 @@
     "ShortName":"AxiMagnetoStatic",
     "Models":
     {
-		"equations":[
-	    {
-			"name":"magnetic",
-			"unknown":
+		"cfpdes":{
+			"equations":"magnetic"
+		},
+		"magnetic":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch2",
+						"name":"phi",
+						"symbol":"phi"
+					}
+				}
+			},
+			"models":[
 			{
-			    "basis":"Pch2",
-			    "name":"phi",
-			    "symbol":"phi"
+				"name":"magnetic_Air",
+				"materials":"Air",
+				"setup":{
+					"coefficients":{
+						"c":"x/mu0:x:mu0",
+						"beta":"{2/mu0,0}:mu0"
+					}
+				}
 			}
-	    }
-		]
+			]
+		}
     },
     "Parameters":
     {
@@ -23,13 +39,23 @@
 
 		"T0":"293."
     },
+	"Meshes":
+    {
+        "cfpdes":
+        {
+            "Import":
+            {
+                "filename":"$cfgdir/{{mesh}}",
+				// "scale":{{scale}},
+				"partition":{{partition}}
+            }
+        }
+    },
     "Materials":
     {
 		"Air":
 		{
-	    	"physics":"magnetic",
-	    	"magnetic_c":"x/mu0:x:mu0",
-	    	"magnetic_beta":"{2/mu0,0}:mu0"
+	    	
 		}
     },
     "BoundaryConditions":

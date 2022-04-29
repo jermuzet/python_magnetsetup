@@ -1,0 +1,6 @@
+{
+    "c":"materials_k*x:materials_k:x",
+    "f":"materials_sigma*(materials_U/(2*pi)+magnetic_dphi_dt)*(materials_U/(2*pi)+magnetic_dphi_dt)/x:materials_sigma:materials_U:magnetic_dphi_dt:x",
+    "d":"materials_rho*materials_Cp*x:materials_rho:materials_Cp:x"
+}
+

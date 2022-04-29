@@ -1,0 +1,6 @@
+{  
+    "c":"x/materials_mu:x:materials_mu",
+    "beta":"{2/materials_mu,0}:materials_mu",
+    "f":"materials_j_th*x*x:materials_j_th:x",
+    "d":"materials_sigma*x:x:materials_sigma"
+}

@@ -3,17 +3,24 @@
     "ShortName":"AxiThermoElectricStat",
     "Models":
     {
-		"equations":[
-	    {
-			"name":"heat",
-			"unknown":
-			{
-		    	"basis":"Pch1",
-		    	"name":"temperature",
-		    	"symbol":"T"
-			}
-	    }
-		]
+		"cfpdes":{
+			"equations":"heat"
+		},
+		"heat":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"temperature",
+						"symbol":"T""
+					}
+				}
+			},
+			"models":[
+			
+			]
+		}
     },
     "Parameters":
     {
@@ -23,6 +30,18 @@
 		
 		"Tin":"284.15",		
 		"T0":"293."
+    },
+	"Meshes":
+    {
+        "cfpdes":
+        {
+            "Import":
+            {
+                "filename":"$cfgdir/{{mesh}}",
+				// "scale":{{scale}},
+				"partition":{{partition}}
+            }
+        }
     },
     "Materials":
     {

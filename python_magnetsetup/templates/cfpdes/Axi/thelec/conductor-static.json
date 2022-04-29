@@ -1,6 +1,0 @@
-{
-    "j_th":"-sigma*U/2/pi/x:sigma:U:x",
-    
-    "heat_c":"k*x:k:x",
-    "heat_f":"sigma*U/(2*pi)*U/(2*pi)/x:sigma:U:x"
-}

@@ -1,9 +1,0 @@
-{
-    "heat_c":"k*x:k:x",
-    "heat_f":"sigma*(magnetic_dphi_dt)*(magnetic_dphi_dt)/x:sigma:magnetic_dphi_dt:x",
-    "heat_d":"rho*Cp*x:rho:Cp:x",
-	    
-    "magnetic_c":"x/mu:x:mu",
-    "magnetic_beta":"{2/mu,0}:mu",
-    "magnetic_d":"sigma*x:x:sigma"
-}
