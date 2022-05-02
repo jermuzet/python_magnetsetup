@@ -1,0 +1,5 @@
+{
+    "c":"materials_k*x:materials_k:x",
+    "f":"materials_sigma*(magnetic_dAtheta_dt*x)*(magnetic_dAtheta_dt*x)/x:materials_sigma:magnetic_dAtheta_dt:x",
+    "d":"materials_rho*materials_Cp*x:materials_rho:materials_Cp:x"
+}

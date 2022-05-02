@@ -3,26 +3,48 @@
     "ShortName":"AxiThermo-Mqs",
     "Models":
     {
-		"equations":[
-	    {
-			"name":"heat",
-			"unknown":
+		"cfpdes":{
+			"equations":["heat","magnetic"]
+		},
+		heat":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"temperature",
+						"symbol":"T""
+					}
+				}
+			},
+			"models":[
+			
+			]
+		},
+		"magnetic":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch2",
+						"name":"Atheta",
+						"symbol":"Atheta"
+					}
+				}
+			},
+			"models":[
 			{
-		    	"basis":"Pch1",
-		    	"name":"temperature",
-		    	"symbol":"T"
+				"name":"magnetic_Air",
+				"materials":"Air",
+				"setup":{
+					"coefficients":{
+						"c":"x/mu0:x:mu0",
+						"a":"1/mu0/x:x:mu0"
+					}
+				}
 			}
-	    },
-	    {
-			"name":"magnetic",
-			"unknown":
-			{
-			    "basis":"Pch2",
-			    "name":"Atheta",
-			    "symbol":"Atheta"
-			}
-	    }
-		]
+			]
+		}
     },
     "Parameters":
     {
@@ -33,13 +55,23 @@
 		"T0":"293.",
 		"Tin":"284.15"
     },
+	"Meshes":
+    {
+        "cfpdes":
+        {
+            "Import":
+            {
+                "filename":"$cfgdir/{{mesh}}",
+				// "scale":{{scale}},
+				"partition":{{partition}}
+            }
+        }
+    },
     "Materials":
     {
 		"Air":
 		{
-	    	"physics":"magnetic",
-	    	"magnetic_c":"x/mu0:x:mu0",
-	    	"magnetic_a":"1/mu0/x:x:mu0"
+
 		}
     },
     "BoundaryConditions":
@@ -96,7 +128,7 @@
 		    		"atheta":"magnetic_Atheta:magnetic_Atheta",
 		    		"B":
 		    		{
-						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:magnetic_Atheta:x",
+						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x",
 						"representation":["element"]
 		    		},
 		    		"U":
@@ -106,12 +138,12 @@
 		    		},
 		    		"Jth":
 		    		{
-						"expr":"-materials_sigma*(materials_U/(2*pi*x)+magnetic_dAtheta_dt):materials_sigma:materials_U:x:magnetic_dAtheta_dt",
+						"expr":"-materials_sigma*(materials_U/(2*pi*x)+magnetic_dphi_dt/x):materials_sigma:materials_U:x:magnetic_dphi_dt",
 						"markers": {{part_electric}}
 		    		},
 		    		"Qth":
 		    		{
-						"expr":"materials_sigma*(materials_U/(2*pi)+magnetic_dAtheta_dt*x)*(materials_U/(2*pi+magnetic_dAtheta_dt*x)):x:materials_sigma:materials_U:magnetic_dAtheta_dt",
+						"expr":"materials_sigma*(materials_U/(2*pi)+magnetic_dphi_dt)*(materials_U/(2*pi+magnetic_dphi_dt)):x:materials_sigma:materials_U:magnetic_dphi_dt",
 						"markers": {{part_electric}}
 		    		}
 				}
@@ -126,7 +158,7 @@
 					"MagneticEnergy":
 		    		{
 						"type":"integrate",
-						"expr":"-2*pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x):magnetic_Atheta:magnetic_dAtheta_dt:materials_sigma:materials_U:x",
+						"expr":"-2*pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi+magnetic_dphi_dt):magnetic_phi:magnetic_dphi_dt:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 		    		}
 				}
