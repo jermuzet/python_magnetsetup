@@ -6,19 +6,37 @@
 		"cfpdes":{
 			"equations":["heat","magnetic"]
 		},
-		heat":{
+		"heat":{
 			"common":{
                 "setup":{
 					"unknown":
 					{
 						"basis":"Pch1",
 						"name":"temperature",
-						"symbol":"T""
+						"symbol":"T"
 					}
 				}
 			},
 			"models":[
-			
+				{
+                    "name":"heat_conductor",
+                    "materials":{{part_conductor}},
+                    "setup":{
+                        "coefficients":{
+							"c":"materials_k*x:materials_k:x",
+                            "f":"materials_sigma*materials_U/(2*pi)*materials_U/(2*pi)/x:materials_sigma:materials_U:x",
+							"d":"materials_rho*materials_Cp*x:materials_rho:materials_Cp:x"
+                        }
+                    }
+                },{
+					"name":"heat_insulator",
+					"materials":{{part_insulator}},
+					"setup":{
+						"coefficients":{
+							"c":"materials_k*x:materials_k:x"
+						}
+					}
+				}
 			]
 		},
 		"magnetic":{
@@ -33,16 +51,36 @@
 				}
 			},
 			"models":[
-			{
-				"name":"magnetic_Air",
-				"materials":"Air",
-				"setup":{
-					"coefficients":{
-						"c":"x/mu0:x:mu0",
-						"a":"1/mu0/x:x:mu0"
+				{
+                    "name":"magnetic_conductor",
+                    "materials":{{part_conductor}},
+                    "setup":{
+                        "coefficients":{
+							"c":"x/materials_mu:x:materials_mu",
+    						"a":"1/materials_mu/x:x:materials_mu",
+							"d":"materials_sigma*x:x:materials_sigma",
+                            "f":"materials_j_th*x*x:materials_j_th:x"
+                        }
+                    }
+                },{
+					"name":"magnetic_insulator",
+					"materials":{{part_insulator}},
+					"setup":{
+						"coefficients":{
+							"c":"x/materials_mu:x:materials_mu",
+    						"a":"1/materials_mu/x:x:materials_mu"
+						}
+					}
+				},{
+					"name":"magnetic_Air",
+					"materials":"Air",
+					"setup":{
+						"coefficients":{
+							"c":"x/mu0:x:mu0",
+							"a":"1/mu0/x:x:mu0"
+						}
 					}
 				}
-			}
 			]
 		}
     },
@@ -54,18 +92,6 @@
 
 		"T0":"293.",
 		"Tin":"284.15"
-    },
-	"Meshes":
-    {
-        "cfpdes":
-        {
-            "Import":
-            {
-                "filename":"$cfgdir/{{mesh}}",
-				// "scale":{{scale}},
-				"partition":{{partition}}
-            }
-        }
     },
     "Materials":
     {
@@ -128,7 +154,7 @@
 		    		"atheta":"magnetic_Atheta:magnetic_Atheta",
 		    		"B":
 		    		{
-						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x",
+						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x",
 						"representation":["element"]
 		    		},
 		    		"U":
@@ -138,12 +164,12 @@
 		    		},
 		    		"Jth":
 		    		{
-						"expr":"-materials_sigma*(materials_U/(2*pi*x)+magnetic_dphi_dt/x):materials_sigma:materials_U:x:magnetic_dphi_dt",
+						"expr":"-materials_sigma*(materials_U/(2*pi*x)+magnetic_dAtheta_dt):materials_sigma:materials_U:x:magnetic_dAtheta_dt",
 						"markers": {{part_electric}}
 		    		},
 		    		"Qth":
 		    		{
-						"expr":"materials_sigma*(materials_U/(2*pi)+magnetic_dphi_dt)*(materials_U/(2*pi+magnetic_dphi_dt)):x:materials_sigma:materials_U:magnetic_dphi_dt",
+						"expr":"materials_sigma*(materials_U/(2*pi)+magnetic_dAtheta_dt*x)*(materials_U/(2*pi+magnetic_dAtheta_dt*x)):x:materials_sigma:materials_U:magnetic_dAtheta_dt",
 						"markers": {{part_electric}}
 		    		}
 				}
@@ -158,7 +184,7 @@
 					"MagneticEnergy":
 		    		{
 						"type":"integrate",
-						"expr":"-2*pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi+magnetic_dphi_dt):magnetic_phi:magnetic_dphi_dt:materials_sigma:materials_U:x",
+						"expr":"-2*pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x):magnetic_Atheta:magnetic_dAtheta_dt:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 		    		}
 				}

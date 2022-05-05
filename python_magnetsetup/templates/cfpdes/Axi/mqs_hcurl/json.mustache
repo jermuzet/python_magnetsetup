@@ -18,16 +18,36 @@
 				}
 			},
 			"models":[
-			{
-				"name":"magnetic_Air",
-				"materials":"Air",
-				"setup":{
-					"coefficients":{
-						"c":"x/mu0:x:mu0",
-						"a":"1/mu0/x:x:mu0"
+				{
+                    "name":"magnetic_conductor",
+                    "materials":{{part_conductor}},
+                    "setup":{
+                        "coefficients":{
+							"c":"x/materials_mu:x:materials_mu",
+    						"a":"materials_mu/x:x:materials_mu",
+                            "f":"materials_j_th*x*x:materials_j_th:x",
+    						"d":"materials_sigma*x:x:materials_sigma"
+                        }
+                    }
+                },{
+					"name":"magnetic_insulator",
+					"materials":{{part_insulator}},
+					"setup":{
+						"coefficients":{
+							"c":"x/materials_mu:x:materials_mu",
+    						"a":"materials_mu/x:x:materials_mu"
+						}
+					}
+				},{
+					"name":"magnetic_Air",
+					"materials":"Air",
+					"setup":{
+						"coefficients":{
+							"c":"x/mu0:x:mu0",
+							"a":"mu0/x:x:mu0"
+						}
 					}
 				}
-			}
 			]
 		}
     },
@@ -38,18 +58,6 @@
 		{{/Parameters}}
 
 		"T0":"293."
-    },
-	"Meshes":
-    {
-        "cfpdes":
-        {
-            "Import":
-            {
-                "filename":"$cfgdir/{{mesh}}",
-				// "scale":{{scale}},
-				"partition":{{partition}}
-            }
-        }
     },
     "Materials":
     {
@@ -94,7 +102,7 @@
 		    		},
 		    		"Jth":
 		    		{
-						"expr":"-materials_sigma*(materials_U/(2*pi)/x+magnetic_dAtheta_dt):magnetic_dAtheta_dt:materials_sigma:materials_U:x",
+						"expr":"-materials_sigma*(materials_U/(2*pi*x)+magnetic_dAtheta_dt):magnetic_dAtheta_dt:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 		    		}
 				}

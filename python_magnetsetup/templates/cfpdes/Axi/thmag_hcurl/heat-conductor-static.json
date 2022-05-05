@@ -1,4 +1,0 @@
-{    
-    "c":"materials_k*x:materials_k:x",
-    "f":"materials_sigma*materials_U/(2*pi)*materials_U/(2*pi)/x:materials_sigma:materials_U:x"
-}

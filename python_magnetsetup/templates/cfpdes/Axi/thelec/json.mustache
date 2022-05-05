@@ -13,12 +13,27 @@
 					{
 						"basis":"Pch1",
 						"name":"temperature",
-						"symbol":"T""
+						"symbol":"T"
+					},
+					"coefficients":
+					{
+						"c":"materials_k*x:materials_k:x"
 					}
 				}
 			},
 			"models":[
-			
+				{
+                    "name":"heat_conductor",
+                    "materials":{{part_conductor}},
+                    "setup":{
+                        "coefficients":{
+                            "f":"materials_sigma*materials_U/(2*pi)*materials_U/(2*pi)/x:materials_sigma:materials_U:x"
+                        }
+                    }
+                },{
+					"name":"heat_insulator",
+					"materials":{{part_insulator}}
+				}
 			]
 		}
     },
@@ -30,18 +45,6 @@
 		
 		"Tin":"284.15",		
 		"T0":"293."
-    },
-	"Meshes":
-    {
-        "cfpdes":
-        {
-            "Import":
-            {
-                "filename":"$cfgdir/{{mesh}}",
-				// "scale":{{scale}},
-				"partition":{{partition}}
-            }
-        }
     },
     "Materials":
     {

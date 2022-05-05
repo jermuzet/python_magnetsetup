@@ -4,6 +4,10 @@ case.dimension={{dim}}
 [cfpdes]
 filename=$cfgdir/{{jsonfile}}
 
+mesh.filename=$cfgdir/{{mesh}}
+# mesh.scale = {{scale}}
+gmsh.partition={{partition}}
+
 solver=Newton
 verbose_solvertimer=1
 

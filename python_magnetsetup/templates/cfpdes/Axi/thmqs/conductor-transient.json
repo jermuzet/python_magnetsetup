@@ -1,0 +1,13 @@
+{
+    "j_th":"-sigma*U/2/pi/x:sigma:U:x",
+
+    "heat_c":"k*x:k:x",
+    "heat_f":"sigma*(U/(2*pi)+magnetic_dphi_dt)*(U/(2*pi)+magnetic_dphi_dt)/x:sigma:U:magnetic_dphi_dt:x",
+    "heat_d":"rho*Cp*x:rho:Cp:x",
+	    
+    "magnetic_c":"x/mu:x:mu",
+    "magnetic_beta":"{2/mu,0}:mu",
+    "magnetic_d":"sigma*x:x:sigma",
+    "magnetic_f":"j_th*x*x:j_th:x"
+}
+
