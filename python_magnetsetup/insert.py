@@ -93,6 +93,8 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     print("Insert_setup: %s" % cad.name)
     part_thermic = []
     part_electric = []
+    part_conductor = []
+    part_insulator = []
     index_Helices = []
     index_Helices_e = []
     index_Insulators = []
@@ -118,9 +120,12 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
         if method_data[2] == "Axi":
             for j in range(1, Nsections[i]+1):
                 part_electric.append("H{}_Cu{}".format(i+1,j))
-            if 'th' in method_data[3]:
-                for j in range(Nsections[i]+2):
+                part_conductor.append("H{}_Cu{}".format(i+1,j))
+            for j in range(Nsections[i]+2):
+                if 'th' in method_data[3]:
                     part_thermic.append("H{}_Cu{}".format(i+1,j))
+                if "H{}_Cu{}".format(i+1,j) not in part_electric :
+                    part_insulator.append("H{}_Cu{}".format(i+1,j))
             for j in range(Nsections[i]):
                 index_Helices.append(["0:{}".format(Nsections[i]+2)])
                 index_Helices_e.append(["1:{}".format(Nsections[i]+1)])
@@ -136,6 +141,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
                 part_thermic.append(insulator_name)
 
     for i in range(NRings):
+        part_insulator.append("R{}".format(i+1))
         if 'th' in method_data[3]:
             part_thermic.append("R{}".format(i+1))
         if method_data[2] == "3D":
@@ -185,6 +191,8 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     if debug:
         print("insert part_electric:", part_electric)
         print("insert part_thermic:", part_thermic)
+        print("insert part_conductor:", part_conductor)
+        print("insert part_insulator:", part_insulator)
 
     # params section
     params_data = create_params_insert(gdata + (turns_h,), method_data, debug)
@@ -202,6 +210,8 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     main_data = {
         "part_thermic": part_thermic,
         "part_electric": part_electric,
+        "part_conductor": part_conductor,
+        "part_insulator": part_insulator,
         "index_V0": boundary_electric,
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5"
