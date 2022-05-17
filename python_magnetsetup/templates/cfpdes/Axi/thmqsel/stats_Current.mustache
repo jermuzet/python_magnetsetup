@@ -1,0 +1,15 @@
+{
+    "Stats_Current":
+    {
+    {{#Current_H}}
+    "Intensity_%1%": 
+    {
+        "type": "integrate",
+        "expr": "-materials_sigma*(materials_U/2/pi+magnetic_dphi_dt)/x:magnetic_dphi_dt:materials_sigma:materials_U:x",
+        "markers": "%1%",
+        "index1": {{part_electric}}
+    },
+    {{/Current_H}}
+    }
+}
+                    
