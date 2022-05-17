@@ -402,13 +402,18 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     else:
         tar = tarfile.open(tarfilename, "w:gz")
         for filename in sim_files:
-            if args.debug:
-                print(f"add {filename} to {tarfilename}")  
-            tar.add(filename)
-            for mname in material_generic_def:
-                if mname in filename:
-                    if args.debug: print(f"remove {filename}")
-                    os.unlink(filename)
+            # TODO skip xao and brep if Axi args.geom?
+            if args.geom == 'Axi' and ( filename.endswith('.xao') or filename.endswith('.brep') ) :
+                if args.debug:
+                    print(f"skip {filename}")  
+            else:
+                if args.debug:
+                    print(f"add {filename} to {tarfilename}")  
+                tar.add(filename)
+                for mname in material_generic_def:
+                    if mname in filename:
+                        if args.debug: print(f"remove {filename}")
+                        os.unlink(filename)
         tar.add('flow_params.json')
         os.unlink('flow_params.json')
         tar.close()
@@ -437,7 +442,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     # if server is SMP mpirun outside otherwise inside singularity
 
     server = loadmachine(args.machine)
-    print(f'setup_cmds: {server}')
+    # print(f'setup_cmds: {server}')
     NP = server.cores
     if server.multithreading:
         NP = int(NP/2)
@@ -454,7 +459,9 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     salome = AppCfg["mesh"]["salome"]
     feelpp = AppCfg[args.method]["feelpp"]
     partitioner = AppCfg["mesh"]["partitioner"]
-    workingdir = MyEnv.yaml_repo.replace('/','',1)
+    workingdir = MyEnv.yaml_repo
+    if workingdir.startswith('/'):
+        workingdir = MyEnv.yaml_repo.replace('/','',1)
     print(f"setup_cmds: workingdir={workingdir}")
 
     if "exec" in AppCfg[args.method]:
@@ -462,6 +469,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     if "exec" in AppCfg[args.method][args.time][args.geom][args.model]:
         exec = AppCfg[args.method][args.time][args.geom][args.model]
     pyfeel = ' -m workflows.cli' # commisioning, fixcooling
+    # TODO add current specs, depends on 
 
     if "mqs" in args.model or "mag" in args.model:
         geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--air,2,2,--wd,{workingdir}"
@@ -549,7 +557,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     if "post" in AppCfg[args.method][args.time][args.geom][args.model]:
         postdata = AppCfg[args.method][args.time][args.geom][args.model]["post"]
         for key in postdata:
-            pyparaview = f'pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"postdata[key]\" --resultdir ${result_dir}'
+            pyparaview = f'pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"postdata[key]\" --resultdir {result_dir}'
             pyparaviewcmd = f"pvpython {pyparaview}"
             cmds["Postprocessing"] = f"singularity exec {simage_path}/{paraview} {pyparaviewcmd}"
     

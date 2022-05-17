@@ -37,7 +37,8 @@ class appenv():
             self.mesh_repo = data.get('DATA_REPO') + "/meshes"
             self.mrecord_repo = data.get('DATA_REPO') + "/mrecords"
             self.optim_repo = data.get('DATA_REPO') + "/optims"
-        print(f"DATA: {self.yaml_repo}")
+        if debug:
+            print(f"DATA: {self.yaml_repo}")
 
     def template_path(self, debug: bool = False):
         """
@@ -191,7 +192,7 @@ def supported_models(Appcfg, method: str, geom: str, time: str) -> List:
     """
 
     models = []
-    print(f'supported_models[{method}]: {Appcfg[method]}')
+    # print(f'supported_models[{method}]: {Appcfg[method]}')
     if Appcfg[method][time]:
         if geom in Appcfg[method][time]:
             for key in Appcfg[method][time][geom]:

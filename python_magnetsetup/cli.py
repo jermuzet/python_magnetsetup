@@ -176,14 +176,15 @@ def main():
     workingdir = cfgfile.replace(".cfg", "")
     geodir = MyEnv.yaml_repo.replace('/','',1)
 
-    print("\n\n=== Guidelines for running a simu on {args.machine} ===")
+    print(f"\n\n=== Guidelines for running a simu on {args.machine} ===")
     print(f"Edit {cfgfile} to fix the meshfile, scale, partition and solver props")
     print(f"If you do change {cfgfile}, remember to include the new file in {tarfilename}")
     # TODO re-create a tgz archive if you modify cfgfile or jsonfile
-    print(f"Create a {workingdir} directory on {machine}: ssh {args.machine} mkdir -p {workingdir}")
-    print(f"Transfert {tarfilename} to {args.machine}: scp {tarfilename} {args.machine}:./{workingdir}")
-    print(f"Install worflow in {args.machine}: scp -r {os.path.dirname(os.path.abspath(__file__))}'/workflows {args.machine}:./{workingdir}")
-    print(f"Connect on {machine}: ssh -Y {args.machine}")
+    print(f"Create a {workingdir} directory on {args.machine}: ssh {args.machine} mkdir -p {workingdir}")
+    print(f"Transfert {tarfilename} to {machine.name}: scp {tarfilename} {args.machine}:./{workingdir}")
+    print(f"Install worflow in {args.machine}: scp -r {os.path.dirname(os.path.abspath(__file__))}/workflows {args.machine}:./{workingdir}")
+    print(f"Install postprocessing in {args.machine}: scp -r {os.path.dirname(os.path.abspath(__file__))}/postprocessing {args.machine}:./{workingdir}")
+    print(f"Connect on {args.machine}: ssh -Y {args.machine}")
     print(f"Once connected on {args.machine} run the following commands")
     print(f"cd {workingdir}")
     for key in cmds:
