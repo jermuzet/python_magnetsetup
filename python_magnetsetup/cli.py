@@ -37,7 +37,7 @@ def fabric(machine: str, workingdir: str, geodir: str, args, cfgfile: str, jsonf
             connection_.put(f'{tarfilename}', remote=f'{homedir}/{workingdir}')
             connection_.run(f'cd {homedir}/{workingdir} && tar -zxvf {tarfilename}')
             for cmd in cmds:
-                if not cmd in ['Pre', 'Run', 'Python', 'Workflow']:
+                if not cmd in ['Pre', 'Python', 'Workflow']:
                     connection_.run(f"cd {homedir}/{workingdir} && {cmds['Pre']} && {cmds[cmd]}")
 
             # TODO data/geometries aka MyEnv.yaml_repo
