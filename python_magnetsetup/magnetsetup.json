@@ -21,7 +21,7 @@
 	},
 	"cfpdes":
 	{
-    	"feelpp": "feelpp-toolboxes-v0.110.0-alpha.3.sif",
+    	"feelpp": "latest-feelpp-toolboxes-v0.110.0-alpha.3-ubuntu-20.04.sif",
     	"exec": "feelpp_toolbox_coefficientformpdes",
 		"static":
 		{

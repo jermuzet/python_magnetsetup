@@ -3,26 +3,84 @@
     "ShortName":"AxiThermo-Magnetostatic",
     "Models":
     {
-		"equations":[
-	    {
-			"name":"heat",
-			"unknown":
-			{
-		    	"basis":"Pch1",
-		    	"name":"temperature",
-		    	"symbol":"T"
-			}
-	    },
-	    {
-			"name":"magnetic",
-			"unknown":
-			{
-			    "basis":"Pch2",
-			    "name":"phi",
-			    "symbol":"phi"
-			}
-	    }
-		]
+		"cfpdes":{
+			"equations":["heat","magnetic"]
+		},
+		"heat":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"temperature",
+						"symbol":"T"
+					}
+				}
+			},
+			"models":[
+				{
+                    "name":"heat_conductor",
+                    "materials":{{part_conductor}},
+                    "setup":{
+                        "coefficients":{
+							"c":"materials_k*x:materials_k:x",
+                            "f":"materials_sigma*materials_U/(2*pi)*materials_U/(2*pi)/x:materials_sigma:materials_U:x"
+                        }
+                    }
+                },{
+					"name":"heat_insulator",
+					"materials":{{part_insulator}},
+                    "setup":{
+                        "coefficients":{
+							"c":"materials_k*x:materials_k:x"
+                        }
+                    }
+				}
+			]
+		},
+		"magnetic":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch2",
+						"name":"phi",
+						"symbol":"phi"
+					}
+				}
+			},
+			"models":[
+				{
+                    "name":"magnetic_conductor",
+                    "materials":{{part_conductor}},
+                    "setup":{
+                        "coefficients":{
+							"c":"x/materials_mu:x:materials_mu",
+    						"beta":"{2/materials_mu,0}:materials_mu",
+                            "f":"materials_j_th*x*x:materials_j_th:x"
+                        }
+                    }
+                },{
+					"name":"magnetic_insulator",
+					"materials":{{part_insulator}},
+					"setup":{
+						"coefficients":{
+							"c":"x/materials_mu:x:materials_mu",
+    						"beta":"{2/materials_mu,0}:materials_mu"
+						}
+					}
+				},{
+					"name":"magnetic_Air",
+					"materials":"Air",
+					"setup":{
+						"coefficients":{
+							"c":"x/mu0:x:mu0",
+							"beta":"{2/mu0,0}:mu0"
+						}
+					}
+				}
+			]
+		}
     },
     "Parameters":
     {
@@ -37,9 +95,7 @@
     {
 		"Air":
 		{
-	    	"physics":"magnetic",
-	    	"magnetic_c":"x/mu0:x:mu0",
-	    	"magnetic_beta":"{2/mu0,0}:mu0"
+
 		}
     },
     "BoundaryConditions":
