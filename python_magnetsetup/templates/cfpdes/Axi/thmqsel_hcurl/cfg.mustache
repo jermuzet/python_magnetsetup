@@ -14,6 +14,7 @@ verbose_solvertimer=1
 ksp-monitor=1
 snes-monitor=1
 snes-maxit=40
+snes-line-search-type=basic
 
 # Fieldsplit
 pc-type=fieldsplit
@@ -25,3 +26,11 @@ pc-type=gamg
 [cfpdes.fieldsplit-2]
 pc-type=gamg
 
+[cfpdes.magnetic]
+#time-stepping=Theta
+bdf.order=1
+
+[ts]
+time-initial=0
+time-step=0.1
+time-final=22

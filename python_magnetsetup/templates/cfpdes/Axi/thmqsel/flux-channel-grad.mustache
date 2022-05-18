@@ -1,0 +1,12 @@
+{
+   "Flux":
+   {
+   "Flux_Channel%1%":
+   {
+      "type": "integrate",
+      "expr": "hw*(heat_T-(Tw*(y<Zmin%1%) + (dTw/(Zmax%1%-Zmin%1%)*(y-Zmin%1%)+Tw%1%)*(y>Zmin%1%)*(y<Zmax%1%) + (Tw+dTw)*(y>Zmax%1%)))*2*pi*x:x:y:heat_T:hw:Tw:dTw:Zmin%1%,Zmax%1%",
+      "markers": "Channel%1%",
+      "index1": {{index_h}}
+   }
+   }
+}

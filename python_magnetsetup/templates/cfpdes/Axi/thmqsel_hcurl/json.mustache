@@ -1,6 +1,6 @@
 {
-    "Name": "Fully coupled Axi Stationnary model",
-    "ShortName":"FullAxiStat",
+    "Name": "Fully coupled Axi Transient model",
+    "ShortName":"FullAxiTrans",
     "Models":
     {
 		"equations":[
@@ -18,17 +18,26 @@
 			"unknown":
 			{
 			    "basis":"Pch2",
-			    "name":"phi",
-			    "symbol":"phi"
+			    "name":"Atheta",
+			    "symbol":"Atheta"
 			}
 	    },
 	    {
-			"name":"elastic",
+			"name":"elastic1",
 			"unknown":
 			{
 			    "basis":"Pchv1",
 			    "name":"displacement",
 			    "symbol":"u"
+			}
+	    },
+	    {
+			"name":"elastic2",
+			"unknown":
+			{
+			    "basis":"Pchv1",
+			    "name":"speed",
+			    "symbol":"v"
 			}
 	    }
 		]
@@ -48,7 +57,7 @@
 		{
 	    	"physics":"magnetic",
 	    	"magnetic_c":"x/mu0:x:mu0",
-	    	"magnetic_beta":"{2/mu0,0}:mu0"
+	    	"magnetic_a":"1/mu0/x:x:mu0"
 		}
     },
     "BoundaryConditions":
@@ -77,7 +86,7 @@
 				{{/boundary_Therm_Robin}}
 			}
 		},
-		"elastic":
+		"elastic1":
 		{
 	    	"Dirichlet":
 	    	{
@@ -111,13 +120,13 @@
 		{
 	    	"Exports":
 	    	{
-				"fields":["heat.temperature","elastic.displacement"],
+				"fields":["heat.temperature","elastic1.displacement"],
 				"expr":
 				{
-		    		"atheta":"magnetic_phi/x:magnetic_phi:x",
+		    		"atheta":"magnetic_Atheta:magnetic_Atheta:x",
 		    		"B":
 		    		{
-						"expr":"{-magnetic_grad_phi_1/x,magnetic_grad_phi_0/x}:magnetic_grad_phi_0:magnetic_grad_phi_1:x",
+						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x",
 						"representation":["element"]
 		    		},
 		    		"U":
@@ -127,12 +136,12 @@
 		    		},
 		    		"Jth":
 		    		{
-						"expr":"-materials_sigma*materials_U/(2*pi*x):materials_sigma:materials_U:x",
+						"expr":"-materials_sigma*(materials_U/(2*pi)+magnetic_dAtheta_dt*x)/x:magnetic_dAtheta_dt:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 		    		},
 		    		"Qth":
 		    		{
-						"expr":"materials_sigma*(materials_U/(2*pi*x))*(materials_U/(2*pi*x)):materials_sigma:materials_U:x",
+						"expr":"materials_sigma*(materials_U/(2*pi)+magnetic_dAtheta_dt*x)*(materials_U/(2*pi)+magnetic_dAtheta_dt*x):x:magnetic_dAtheta_dt:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 		    		},
 		    		"Flaplace":
@@ -166,7 +175,7 @@
 		    		},
 		    		"epsilon":
 		    		{
-						"expr":"{elastic_grad_u_00,0,1/2*(elastic_grad_u_01+elastic_grad_u_10), 0,elastic_u_0/x,0, 1/2*(elastic_grad_u_01+elastic_grad_u_10),0,elastic_grad_u_11}:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11",
+						"expr":"{elastic1_grad_u_00,0,1/2*(elastic1_grad_u_01+elastic1_grad_u_10), 0,elastic1_u_0/x,0, 1/2*(elastic1_grad_u_01+elastic1_grad_u_10),0,elastic1_grad_u_11}:x:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_01:elastic1_grad_u_10:elastic1_grad_u_11",
                         "markers": {{part_electric}},
 						"representation":["element"]
 		    		}
@@ -182,7 +191,7 @@
 		    		"MagneticEnergy":
 		    		{
 						"type":"integrate",
-						"expr":"-2*pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi):magnetic_phi:materials_sigma:materials_U:x",
+						"expr":"-2*pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x):magnetic_dAtheta_dt:magnetic_Atheta:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 		    		}
 				}
@@ -204,7 +213,7 @@
 		    		"Power":
 				    {
         				"type": "integrate",
-        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x)*(materials_U/2/pi+magnetic_dAtheta_dt*x)/x:magnetic_dAtheta_dt:materials_sigma:materials_U:x",
         				"markers": {{part_electric}}
     				},
 				"MeanT": 
