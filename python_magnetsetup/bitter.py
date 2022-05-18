@@ -28,6 +28,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
 
     part_thermic = []
     part_electric = []
+    part_conductor = []
     index_Bitters = ""
 
     boundary_meca = []
@@ -48,6 +49,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
         for i in range(len(cad.axi.turns)):
             snames.append(name + "_B%d" % (i+1))
             part_electric.append(snames[-1])
+            part_conductor.append(snames[-1])
             if 'th' in method_data[3]:
                 part_thermic.append(snames[-1])
         index_Bitters = f"1:{NSections+1}"
@@ -62,6 +64,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     if debug:
         print("bitter part_thermic:", part_thermic)
         print("bitter part_electric:", part_electric)
+        print("bitter part_conducto:", part_conductor)
         
     if  method_data[2] == "Axi" and ('el' in method_data[3] and  method_data[3] != 'thelec'):
         boundary_meca.append("{}_V0".format(name))
@@ -86,6 +89,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     main_data = {
         "part_thermic": part_thermic,
         "part_electric": part_electric,
+        "part_conductor": part_conductor,
         "index_V0": boundary_electric,
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5"
