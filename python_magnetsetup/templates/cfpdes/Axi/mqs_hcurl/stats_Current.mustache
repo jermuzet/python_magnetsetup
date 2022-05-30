@@ -5,7 +5,7 @@
     "Intensity_%1%": 
     {
         "type": "integrate",
-        "expr": "-materials_sigma*(materials_U/2/pi/x+magnetic_dAtheta_dt):magnetic_dAtheta_dt:materials_sigma:materials_U:x",
+        "expr": "-materials_%1%_sigma*(materials_%1%_U/2/pi+magnetic_dphi_dt)/x:magnetic_dphi_dt:materials_%1%_sigma:materials_%1%_U:x",
         "markers": "%1%",
         "index1": {{part_electric}}
     },

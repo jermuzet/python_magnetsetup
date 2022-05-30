@@ -1,14 +1,15 @@
 {
     "Stats_Current":
     {
-        {{#Current_H}}
-        "Intensity_%1%": 
-        {
-            "type": "integrate",
-            "expr": "-materials_sigma*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
-            "markers": "%1%",
-            "index1": {{part_electric}}
-        },
-        {{/Current_H}}
+    {{#Current_H}}
+    "Intensity_%1%": 
+    {
+        "type": "integrate",
+        "expr": "-materials_%1%_sigma*(materials_%1%_U/2/pi)/x:materials_%1%_sigma:materials_%1%_U:x",
+        "markers": "%1%",
+        "index1": {{part_electric}}
+    },
+    {{/Current_H}}
     }
 }
+                    
