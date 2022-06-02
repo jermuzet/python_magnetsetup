@@ -2,7 +2,7 @@
     "Lame_lambda":"E*nu/(1-2*nu)/(1+nu):E:nu",
     "Lame_mu":"E/(2*(1+nu)):E:nu",
 
-    "sigma_T":"-(3*Lame_lambda+2*Lame_mu)*alphaT*(heat_T-T0):Lame_lambda:Lame_mu:alphaT:heat_T:T0",
+    "sigma_T":"-(3*Lame_lambda+2*Lame_mu)*alphaT*(heat_T-T0):Lame_lambda:Lame_mu:alphaT:heat_T:T0"
 
 }
 
