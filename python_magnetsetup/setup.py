@@ -558,12 +558,10 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     if "post" in AppCfg[args.method][args.time][args.geom][args.model]:
         postdata = AppCfg[args.method][args.time][args.geom][args.model]["post"]
         for key in postdata:
-            pyparaview = f'/usr/lib/python3/dist-packages/python_magnetsetup/postprocessing/pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"{postdata[key]}\" --resultdir {result_dir}'
+            pyparaview = f'pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"{postdata[key]}\" --resultdir ${result_dir}'
             pyparaviewcmd = f"pvpython {pyparaview}"
             cmds["Postprocessing"] = f"singularity exec {simage_path}/{paraview} {pyparaviewcmd}"
-
-        cmds["Save"] = f"tmpdir=$(pwd) && pushd {result_dir}/.. && tar zcf $tmpdir/{result_arch} np_{NP} && popd"
-        
+    
     # TODO jobmanager if server.manager != JobManagerType.none
     # Need user email at this point
     # Template for oar and slurm
