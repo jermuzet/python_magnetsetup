@@ -1,0 +1,23 @@
+{
+    "{{name}}":
+{
+    "alpha":"{{alpha}}",
+    "sigma0":"{{ElectricalConductivity}}",
+    "sigma":"sigma0/(1+alpha*(heat_T-T0)):sigma0:alpha:heat_T:T0",
+
+    "k0":"{{ThermalConductivity}}",
+    "k":"k0/(1+alpha*(heat_T-T0))*heat_T/T0:k0:alpha:heat_T:T0",
+    "rho":"{{VolumicMass}}",
+    "Cp":"{{SpecificHeat}}",
+
+    "mu": "{{MagnetPermeability}}*mu0:mu0",
+
+    "E":"{{Young}}",
+    "nu":"{{Poisson}}",
+    "alphaT":"{{CoefDilatation}}",
+
+    "U":"U_{{name}}:U_{{name}}",
+
+    "filename":"$cfgdir/conductor-cfpdes-thmqsel_hcurl-Axi.json"
+}
+}

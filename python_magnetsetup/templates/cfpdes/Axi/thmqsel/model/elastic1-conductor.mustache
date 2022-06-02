@@ -1,0 +1,10 @@
+{
+    "name":"elastic1_{{name}}",
+    "materials":"{{name}}",
+    "setup":{
+        "coefficients":{
+            "d":"materials_{{name}}_rho*x:materials_{{name}}_rho:x",
+            "f":"{x*elastic2_v_0,x*elastic2_v_1}:x:elastic2_v_0:elastic2_v_1"
+        }
+    }
+}

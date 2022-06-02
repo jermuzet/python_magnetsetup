@@ -1,0 +1,36 @@
+directory={{method}}-{{model}}-{{geom}}-{{time}}-{{linear}}/{{name}}
+case.dimension={{dim}}
+
+[cfpdes]
+filename=$cfgdir/{{jsonfile}}
+
+mesh.filename=$cfgdir/{{mesh}}
+# mesh.scale = {{scale}}
+gmsh.partition={{partition}}
+
+solver=Newton
+verbose_solvertimer=1
+
+ksp-monitor=1
+snes-monitor=1
+snes-maxit=40
+snes-line-search-type=basic
+
+# Fieldsplit
+pc-type=fieldsplit
+fieldsplit-type=additive #additive, multiplicative, symmetric-multiplicative
+[cfpdes.fieldsplit-0]
+pc-type=gamg
+[cfpdes.fieldsplit-1]
+pc-type=gamg
+[cfpdes.fieldsplit-2]
+pc-type=gamg
+
+[cfpdes.magnetic]
+#time-stepping=Theta
+bdf.order=1
+
+[ts]
+time-initial=0
+time-step=0.1
+time-final=22
