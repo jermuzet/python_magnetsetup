@@ -123,14 +123,44 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     fconductor = os.path.join(template_path, conductor_model)
     finsulator = os.path.join(template_path, insulator_model)
     if 'th' in model:
+        heat_conductor = appcfg[method][time][geom][model]["models"]["heat-conductor"]
+        heat_insulator = appcfg[method][time][geom][model]["models"]["heat-insulator"]
+
         cooling_model = appcfg[method][time][geom][model]["cooling"][cooling]
         flux_model = appcfg[method][time][geom][model]["cooling-post"][cooling]
         stats_T_model = appcfg[method][time][geom][model]["stats_T"]
+
+        fheatconductor = os.path.join(template_path, heat_conductor)
+        fheatinsulator = os.path.join(template_path, heat_insulator)
     
         fcooling = os.path.join(template_path, cooling_model)
         frobin = os.path.join(template_path, appcfg[method][time][geom][model]["cooling"]["robin"])
         fflux = os.path.join(template_path, flux_model)
         fstats_T = os.path.join(template_path, stats_T_model)
+
+    if 'mag' in model or 'mqs' in model :
+        magnetic_conductor = appcfg[method][time][geom][model]["models"]["magnetic-conductor"]
+        magnetic_insulator = appcfg[method][time][geom][model]["models"]["magnetic-insulator"]
+
+        fmagconductor = os.path.join(template_path, magnetic_conductor)
+        fmaginsulator = os.path.join(template_path, magnetic_insulator)
+
+    if 'magel' in model :
+        elastic_conductor = appcfg[method][time][geom][model]["models"]["elastic-conductor"]
+        elastic_insulator = appcfg[method][time][geom][model]["models"]["elastic-insulator"]
+        felasconductor = os.path.join(template_path, elastic_conductor)
+        felasinsulator = os.path.join(template_path, elastic_insulator)
+
+    if 'mqsel' in model :
+        elastic1_conductor = appcfg[method][time][geom][model]["models"]["elastic1-conductor"]
+        elastic1_insulator = appcfg[method][time][geom][model]["models"]["elastic1-insulator"]
+        elastic2_conductor = appcfg[method][time][geom][model]["models"]["elastic2-conductor"]
+        elastic2_insulator = appcfg[method][time][geom][model]["models"]["elastic2-insulator"]
+
+        felas1conductor = os.path.join(template_path, elastic1_conductor)
+        felas1insulator = os.path.join(template_path, elastic1_insulator)
+        felas2conductor = os.path.join(template_path, elastic2_conductor)
+        felas2insulator = os.path.join(template_path, elastic2_insulator)
 
     #if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
     stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
@@ -153,10 +183,26 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     }
 
     if 'th' in model:
+        dict["heat-conductor"] = fheatconductor
+        dict["heat-insulator"] = fheatinsulator
         dict["cooling"] = fcooling
         dict["robin"] = frobin
         dict["flux"] = fflux
         dict["stats"].append(fstats_T)
+
+    if 'mag' in model or 'mqs' in model :
+        dict["magnetic-conductor"] = fmagconductor
+        dict["magnetic-insulator"] = fmaginsulator
+
+    if 'magel' in model :
+        dict["elastic-conductor"] = felasconductor
+        dict["elastic-insulator"] = felasinsulator
+
+    if 'mqsel' in model :
+        dict["elastic1-conductor"] = felas1conductor
+        dict["elastic1-insulator"] = felas1insulator
+        dict["elastic2-conductor"] = felas2conductor
+        dict["elastic2-insulator"] = felas2insulator
     
     #if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
     dict["stats"].append(fstats_Power)

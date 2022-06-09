@@ -21,7 +21,7 @@
 	},
 	"cfpdes":
 	{
-    	"feelpp": "latest-feelpp-toolboxes-v0.110.0-alpha.3-ubuntu-20.04.sif",
+    	"feelpp": "feelpp-toolboxes-develop-v0.110.0-rc.1-ubuntu-20.04.sif",
     	"exec": "feelpp_toolbox_coefficientformpdes",
 		"static":
 		{
@@ -40,6 +40,11 @@
 					"conductor-linear": "conductor-linear-static.mustache",
 					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
 					"insulator": "insulator-static.mustache",
+					"models":
+					{
+						"heat-conductor":"heat-conductor.mustache",
+						"heat-insulator":"heat-insulator.mustache"
+					},
 					"cooling":
 					{
 						"robin": "T_robin.mustache",
@@ -75,6 +80,11 @@
 					"model-nonlinear": "json-nonlinear.mustache",
 					"conductor-linear": "conductor-linear-static.mustache",
 					"insulator": "insulator-static.mustache",
+					"models":
+					{
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache"
+					},
 					"filename":
 					{
 						"conductor": "conductor-static.json",
@@ -90,6 +100,11 @@
 					"model-nonlinear": "json-nonlinear.mustache",
 					"conductor-linear": "conductor-linear-static.mustache",
 					"insulator": "insulator-static.mustache",
+					"models":
+					{
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache"
+					},
 					"filename":
 					{
 						"conductor": "conductor-static.json",
@@ -106,6 +121,13 @@
 					"conductor-linear": "conductor-linear-static.mustache",
 					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
 					"insulator": "insulator-static.mustache",
+					"models":
+					{
+						"heat-conductor":"heat-conductor.mustache",
+						"heat-insulator":"heat-insulator.mustache",
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache"
+					},
 					"cooling":
 					{
 						"robin": "T_robin.mustache",
@@ -138,6 +160,13 @@
 					"conductor-linear": "conductor-linear-static.mustache",
 					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
 					"insulator": "insulator-static.mustache",
+					"models":
+					{
+						"heat-conductor":"heat-conductor.mustache",
+						"heat-insulator":"heat-insulator.mustache",
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache"
+					},
 					"cooling":
 					{
 						"robin": "T_robin.mustache",
@@ -170,6 +199,15 @@
 					"conductor-linear": "conductor-linear-static.mustache",
 					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
 					"insulator": "insulator-static.mustache",
+					"models":
+					{
+						"heat-conductor":"heat-conductor.mustache",
+						"heat-insulator":"heat-insulator.mustache",
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache",
+						"elastic-conductor":"elastic-conductor.mustache",
+						"elastic-insulator":"elastic-insulator.mustache"
+					},
 					"cooling":
 					{
 						"robin": "T_robin.mustache",
@@ -202,6 +240,15 @@
 					"conductor-linear": "conductor-linear-static.mustache",
 					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
 					"insulator": "insulator-static.mustache",
+					"models":
+					{
+						"heat-conductor":"heat-conductor.mustache",
+						"heat-insulator":"heat-insulator.mustache",
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache",
+						"elastic-conductor":"elastic-conductor.mustache",
+						"elastic-insulator":"elastic-insulator.mustache"
+					},
 					"cooling":
 					{
 						"robin": "T_robin.mustache",
@@ -281,6 +328,11 @@
 					"conductor-linear": "conductor-linear-transient.mustache",
 					"conduct-nosource": "conduct-nosource.mustache",
 					"insulator": "insulator-transient.mustache",
+					"models":
+					{
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache"
+					},
 					"filename":
 					{
 						"conductor": "conductor-transient.json",
@@ -298,6 +350,11 @@
 					"conductor-linear": "conductor-linear-transient.mustache",
 					"conduct-nosource": "conduct-nosource.mustache",
 					"insulator": "insulator-transient.mustache",
+					"models":
+					{
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache"
+					},
 					"filename":
 					{
 						"conductor": "conductor-transient.json",
@@ -316,6 +373,13 @@
 					"conductor-nonlinear": "conductor-nonlinear.mustache",
 					"conduct-nosource": "conduct-nosource.mustache",
 					"insulator": "insulator-transient.mustache",
+					"models":
+					{
+						"heat-conductor":"heat-conductor.mustache",
+						"heat-insulator":"heat-insulator.mustache",
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache"
+					},
 					"cooling":
 					{
 						"robin": "T_robin.mustache",
@@ -350,6 +414,13 @@
 					"conductor-nonlinear": "conductor-nonlinear.mustache",
 					"conduct-nosource": "conduct-nosource.mustache",
 					"insulator": "insulator-transient.mustache",
+					"models":
+					{
+						"heat-conductor":"heat-conductor.mustache",
+						"heat-insulator":"heat-insulator.mustache",
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache"
+					},
 					"cooling":
 					{
 						"robin": "T_robin.mustache",
@@ -384,6 +455,17 @@
 					"conductor-nonlinear": "conductor-nonlinear-transient.mustache",
 					"conduct-nosource": "conduct-nosource-transient.mustache",
 					"insulator": "insulator-transient.mustache",
+					"models":
+					{
+						"heat-conductor":"heat-conductor.mustache",
+						"heat-insulator":"heat-insulator.mustache",
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache",
+						"elastic1-conductor":"elastic1-conductor.mustache",
+						"elastic1-insulator":"elastic1-insulator.mustache",
+						"elastic2-conductor":"elastic2-conductor.mustache",
+						"elastic2-insulator":"elastic2-insulator.mustache"
+					},
 					"cooling":
 					{
 						"robin": "T_robin.mustache",
@@ -418,6 +500,17 @@
 					"conductor-nonlinear": "conductor-nonlinear-transient.mustache",
 					"conduct-nosource": "conduct-nosource-transient.mustache",
 					"insulator": "insulator-transient.mustache",
+					"models":
+					{
+						"heat-conductor":"heat-conductor.mustache",
+						"heat-insulator":"heat-insulator.mustache",
+						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-insulator":"magnetic-insulator.mustache",
+						"elastic1-conductor":"elastic1-conductor.mustache",
+						"elastic1-insulator":"elastic1-insulator.mustache",
+						"elastic2-conductor":"elastic2-conductor.mustache",
+						"elastic2-insulator":"elastic2-insulator.mustache"
+					},
 					"cooling":
 					{
 						"robin": "T_robin.mustache",
