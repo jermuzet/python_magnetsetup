@@ -18,24 +18,7 @@
 				}
 			},
 			"models":[
-				{
-                    "name":"heat_conductor",
-                    "materials":{{part_conductor}},
-                    "setup":{
-                        "coefficients":{
-							"c":"materials_k*x:materials_k:x",
-                            "f":"materials_sigma*materials_U/(2*pi)*materials_U/(2*pi)/x:materials_sigma:materials_U:x"
-                        }
-                    }
-                },{
-					"name":"heat_insulator",
-					"materials":{{part_insulator}},
-					"setup":{
-						"coefficients":{
-							"c":"materials_k*x:materials_k:x"
-						}
-					}
-				}
+				
 			]
 		},
 		"magnetic":{
@@ -51,25 +34,6 @@
 			},
 			"models":[
 				{
-                    "name":"magnetic_conductor",
-                    "materials":{{part_conductor}},
-                    "setup":{
-                        "coefficients":{
-							"c":"x/materials_mu:x:materials_mu",
-    						"beta":"{2/materials_mu,0}:materials_mu",
-                            "f":"materials_j_th*x*x:materials_j_th:x"
-                        }
-                    }
-                },{
-					"name":"magnetic_insulator",
-					"materials":{{part_insulator}},
-					"setup":{
-						"coefficients":{
-							"c":"x/materials_mu:x:materials_mu",
-    						"beta":"{2/materials_mu,0}:materials_mu"
-						}
-					}
-				},{
 					"name":"magnetic_Air",
 					"materials":"Air",
 					"setup":{
@@ -93,27 +57,7 @@
 				}
 			},
 			"models":[
-				{
-					"name":"elastic_conductor",
-					"materials":{{part_conductor}},
-					"setup":{
-						"coefficients":{
-							"c":"x*materials_Lame_mu:x:materials_Lame_mu",
-							"gamma":"{-materials_Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*materials_Lame_mu*elastic_grad_u_00-bool_dilatation*x*materials_sigma_T, -x*materials_Lame_mu*elastic_grad_u_10, -x*materials_Lame_mu*elastic_grad_u_01, -materials_Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*materials_Lame_mu*elastic_grad_u_11-bool_dilatation*x*materials_sigma_T}:bool_dilatation:x:materials_Lame_lambda:materials_Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11:materials_sigma_T",
-							"f":"{bool_laplace*x*materials_F_laplace_0-materials_Lame_lambda*elastic_grad_u_00-(materials_Lame_lambda+2*materials_Lame_mu)*elastic_u_0/x-materials_Lame_lambda*elastic_grad_u_11-bool_dilatation*materials_sigma_T, bool_laplace*x*materials_F_laplace_1}:bool_laplace:bool_dilatation:x:materials_F_laplace_0:materials_F_laplace_1:materials_Lame_mu:materials_Lame_lambda:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_11:materials_sigma_T"
-						}
-					}
-				},{
-					"name":"elastic_insulator",
-					"materials":{{part_insulator}},
-					"setup":{
-						"coefficients":{
-							"c":"x*materials_Lame_mu:x:materials_Lame_mu",
-							"gamma":"{-materials_Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*materials_Lame_mu*elastic_grad_u_00-bool_dilatation*x*materials_sigma_T, -x*materials_Lame_mu*elastic_grad_u_10, -x*materials_Lame_mu*elastic_grad_u_01, -materials_Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*materials_Lame_mu*elastic_grad_u_11-bool_dilatation*x*materials_sigma_T}:bool_dilatation:x:materials_Lame_lambda:materials_Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11:materials_sigma_T",
-							"f":"{-materials_Lame_lambda*elastic_grad_u_00-(materials_Lame_lambda+2*materials_Lame_mu)*elastic_u_0/x-materials_Lame_lambda*elastic_grad_u_11-bool_dilatation*materials_sigma_T, 0}:bool_dilatation:x:materials_Lame_mu:materials_Lame_lambda:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_11:materials_sigma_T"
-						}
-					}
-				}
+				
 			]
 		}
     },
