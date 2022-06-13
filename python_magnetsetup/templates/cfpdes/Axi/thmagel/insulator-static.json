@@ -2,7 +2,16 @@
     "Lame_lambda":"E*nu/(1-2*nu)/(1+nu):E:nu",
     "Lame_mu":"E/(2*(1+nu)):E:nu",
 
-    "sigma_T":"-(3*Lame_lambda+2*Lame_mu)*alphaT*(heat_T-T0):Lame_lambda:Lame_mu:alphaT:heat_T:T0"
+    "sigma_T":"-(3*Lame_lambda+2*Lame_mu)*alphaT*(heat_T-T0):Lame_lambda:Lame_mu:alphaT:heat_T:T0",
+
+    "sigma_rr":"(Lame_lambda+2*Lame_mu)*elastic_grad_u_00+Lame_lambda*elastic_u_0/x+Lame_lambda*elastic_grad_u_11+bool_dilatation*sigma_T:bool_dilatation:Lame_lambda:Lame_mu:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:elastic_grad_u_22:sigma_T",
+    "sigma_thth":"Lame_lambda*elastic_grad_u_00+(Lame_lambda+2*Lame_mu)*Lame_lambda*elastic_u_0/x+Lame_lambda*elastic_grad_u_11+bool_dilatation*sigma_T:bool_dilatation:Lame_lambda:Lame_mu:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:elastic_grad_u_22:sigma_T",
+    "sigma_zz":"Lame_lambda*elastic_grad_u_00+Lame_lambda*Lame_lambda*elastic_u_0/x+(Lame_lambda+2*Lame_mu)*elastic_grad_u_11+bool_dilatation*sigma_T:bool_dilatation:Lame_lambda:Lame_mu:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:elastic_grad_u_22:sigma_T",
+    "sigma_rz":"Lame_mu*(elastic_grad_u_01+elastic_grad_u_10):Lame_mu:elastic_grad_u_01:elastic_grad_u_10",
+
+    "sigma1":"Lame_lambda/x*elastic_u_0+(Lame_lambda+Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*sigma_T+Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)):bool_dilatation:x:Lame_lambda:Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:elastic_grad_u_01:elastic_grad_u_10:sigma_T",
+    "sigma2":"Lame_lambda*elastic_grad_u_00+(Lame_lambda+2*Lame_mu)/x*elastic_u_0+Lame_lambda*elastic_grad_u_11+bool_dilatation*sigma_T:bool_dilatation:x:Lame_lambda:Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:sigma_T",
+    "sigma3":"Lame_lambda/x*elastic_u_0+(Lame_lambda+Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*sigma_T-Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)):bool_dilatation:x:Lame_lambda:Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:elastic_grad_u_01:elastic_grad_u_10:sigma_T"
 
 }
 

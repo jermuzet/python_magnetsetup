@@ -12,7 +12,7 @@
     "sigma_zz":"Lame_lambda*elastic1_grad_u_00+Lame_lambda/x*elastic1_u_0+(Lame_lambda+2*Lame_mu)*elastic1_grad_u_11+bool_dilatation*sigma_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:sigma_T",
     "sigma_rz":"Lame_mu*(elastic1_grad_u_01+elastic1_grad_u_10):Lame_mu:elastic1_grad_u_01:elastic1_grad_u_10",
 
-    "sigma_1":"1/2*(sigma_rr+sigma_zz+sqrt((sigma_rr-sigma_zz)*(sigma_rr-sigma_zz)+4*sigma_rz*sigma_rz)):sigma_rr:sigma_zz:sigma_rz",
-    "sigma_2":"sigma_thth:sigma_thth",
-    "sigma_3":"1/2*(sigma_rr+sigma_zz-sqrt((sigma_rr-sigma_zz)*(sigma_rr-sigma_zz)+4*sigma_rz*sigma_rz)):sigma_rr:sigma_zz:sigma_rz"
+    "sigma1":"1/2*(sigma_rr+sigma_zz+sqrt((sigma_rr-sigma_zz)*(sigma_rr-sigma_zz)+4*sigma_rz*sigma_rz)):sigma_rr:sigma_zz:sigma_rz",
+    "sigma2":"sigma_thth:sigma_thth",
+    "sigma3":"1/2*(sigma_rr+sigma_zz-sqrt((sigma_rr-sigma_zz)*(sigma_rr-sigma_zz)+4*sigma_rz*sigma_rz)):sigma_rr:sigma_zz:sigma_rz"
 }
