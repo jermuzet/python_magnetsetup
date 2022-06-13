@@ -148,19 +148,19 @@
 		    		},
 		    		"sigma_tr":
 		    		{
-						"expr":"max(abs(materials_sigma_1-materials_sigma_2),max(abs(materials_sigma_1-materials_sigma_3),abs(materials_sigma_2-materials_sigma_3))):materials_sigma_1:materials_sigma_2:materials_sigma_3",
+						"expr":"max(abs(materials_sigma1-materials_sigma2),max(abs(materials_sigma1-materials_sigma3),abs(materials_sigma2-materials_sigma3))):materials_sigma1:materials_sigma2:materials_sigma3",
                         "markers": {{part_electric}},
 						"representation":["element"]
 		    		},
 		    		"sigma_vm":
 		    		{
-						"expr":"sqrt(2/3*(materials_sigma_1*materials_sigma_1+materials_sigma_2*materials_sigma_2+materials_sigma_3*materials_sigma_3-materials_sigma_1*materials_sigma_2-materials_sigma_1*materials_sigma_3-materials_sigma_2*materials_sigma_3)):materials_sigma_1:materials_sigma_2:materials_sigma_3",
+						"expr":"sqrt(2/3*(materials_sigma1*materials_sigma1+materials_sigma2*materials_sigma2+materials_sigma3*materials_sigma3-materials_sigma1*materials_sigma2-materials_sigma1*materials_sigma3-materials_sigma2*materials_sigma3)):materials_sigma1:materials_sigma2:materials_sigma3",
                         "markers": {{part_electric}},
 						"representation":["element"]
 		    		},
 			    	"principle_stresses":
 			    	{
-						"expr":"{materials_sigma_1,materials_sigma_2,materials_sigma_3}:materials_sigma_1:materials_sigma_2:materials_sigma_3",
+						"expr":"{materials_sigma1,materials_sigma2,materials_sigma3}:materials_sigma1:materials_sigma2:materials_sigma3",
                         "markers": {{part_electric}},
 						"representation":["element"]
 		    		},
