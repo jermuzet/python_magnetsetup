@@ -3,44 +3,78 @@
     "ShortName":"FullAxiTrans",
     "Models":
     {
-		"equations":[
-	    {
-			"name":"heat",
-			"unknown":
-			{
-		    	"basis":"Pch1",
-		    	"name":"temperature",
-		    	"symbol":"T"
-			}
-	    },
-	    {
-			"name":"magnetic",
-			"unknown":
-			{
-			    "basis":"Pch2",
-			    "name":"phi",
-			    "symbol":"phi"
-			}
-	    },
-	    {
-			"name":"elastic1",
-			"unknown":
-			{
-			    "basis":"Pchv1",
-			    "name":"displacement",
-			    "symbol":"u"
-			}
-	    },
-	    {
-			"name":"elastic2",
-			"unknown":
-			{
-			    "basis":"Pchv1",
-			    "name":"speed",
-			    "symbol":"v"
-			}
-	    }
-		]
+		"cfpdes":{
+			"equations":["heat","magnetic","elastic1","elastic2"]
+		},
+		"heat":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"temperature",
+						"symbol":"T"
+					}
+				}
+			},
+			"models":[
+				
+			]
+		},
+		"magnetic":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch2",
+						"name":"phi",
+						"symbol":"phi"
+					}
+				}
+			},
+			"models":[
+				{
+					"name":"magnetic_Air",
+					"materials":"Air",
+					"setup":{
+						"coefficients":{
+							"c":"x/mu0:x:mu0",
+							"beta":"{2/mu0,0}:mu0"
+						}
+					}
+				}
+			]
+		},
+		"elastic1":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pchv1",
+						"name":"displacement",
+						"symbol":"u"
+					}
+				}
+			},
+			"models":[
+				
+			]
+		},
+		"elastic2":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pchv1",
+						"name":"speed",
+						"symbol":"v"
+					}
+				}
+			},
+			"models":[
+				
+			]
+		}
     },
     "Parameters":
     {
@@ -55,9 +89,6 @@
     {
 		"Air":
 		{
-	    	"physics":"magnetic",
-	    	"magnetic_c":"x/mu0:x:mu0",
-	    	"magnetic_beta":"{2/mu0,0}:mu0"
 		}
     },
     "BoundaryConditions":
@@ -157,19 +188,19 @@
 		    		},
 		    		"sigma_tr":
 		    		{
-						"expr":"max(abs(materials_sigma_1-materials_sigma_2),max(abs(materials_sigma_1-materials_sigma_3),abs(materials_sigma_2-materials_sigma_3))):materials_sigma_1:materials_sigma_2:materials_sigma_3",
+						"expr":"max(abs(materials_sigma1-materials_sigma2),max(abs(materials_sigma1-materials_sigma3),abs(materials_sigma2-materials_sigma3))):materials_sigma1:materials_sigma2:materials_sigma3",
                         "markers": {{part_electric}},
 						"representation":["element"]
 		    		},
 		    		"sigma_vm":
 		    		{
-						"expr":"sqrt(2/3*(materials_sigma_1*materials_sigma_1+materials_sigma_2*materials_sigma_2+materials_sigma_3*materials_sigma_3-materials_sigma_1*materials_sigma_2-materials_sigma_1*materials_sigma_3-materials_sigma_2*materials_sigma_3)):materials_sigma_1:materials_sigma_2:materials_sigma_3",
+						"expr":"sqrt(2/3*(materials_sigma1*materials_sigma1+materials_sigma2*materials_sigma2+materials_sigma3*materials_sigma3-materials_sigma1*materials_sigma2-materials_sigma1*materials_sigma3-materials_sigma2*materials_sigma3)):materials_sigma1:materials_sigma2:materials_sigma3",
                         "markers": {{part_electric}},
 						"representation":["element"]
 		    		},
 			    	"principle_stresses":
 			    	{
-						"expr":"{materials_sigma_1,materials_sigma_2,materials_sigma_3}:materials_sigma_1:materials_sigma_2:materials_sigma_3",
+						"expr":"{materials_sigma1,materials_sigma2,materials_sigma3}:materials_sigma1:materials_sigma2:materials_sigma3",
                         "markers": {{part_electric}},
 						"representation":["element"]
 		    		},

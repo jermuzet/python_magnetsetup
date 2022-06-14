@@ -275,6 +275,40 @@ def create_materials_insert(gdata: tuple, idata: Optional[List], confdata: dict,
     return materials_dict
 
 
+def create_models_insert(gdata: tuple, idata: Optional[List], confdata: dict, templates: dict, method_data: List[str], equation: str, debug: bool = False) -> dict:
+    # TODO loop for Plateau (Axi specific)
+    models_dict = {}
+        #"physic":equation }
+    if debug: print("create_models_insert:", confdata)
+
+    fconductor = templates[equation+"-conductor"]
+    finsulator = templates[equation+"-insulator"]
+    print('\n\nfconductor :', fconductor)
+
+    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+            
+    # Loop for Helix
+    for i in range(NHelices):
+        # section j==0:  treated as insulator in Axi
+        mdata = entry(finsulator, {'name': "H%d_Cu%d" % (i+1, 0)}, debug)
+        models_dict["H%d_Cu%d" % (i+1, 0)] = mdata
+    
+        # load conductor template
+        for j in range(1,Nsections[i]+1):
+            mdata = entry(fconductor, {'name': "H%d_Cu%d" % (i+1, j)}, debug)
+            models_dict["H%d_Cu%d" % (i+1, j)] = mdata
+
+        # section j==Nsections+1:  treated as insulator in Axi
+        mdata = entry(finsulator, {'name': "H%d_Cu%d" % (i+1, Nsections[i]+1)}, debug)
+        models_dict["H%d_Cu%d" % (i+1, Nsections[i]+1)] = mdata
+
+    # loop for Rings
+    for i in range(NRings):
+        mdata = entry(finsulator, {'name': "R%d" % (i+1)}, debug)
+        models_dict["R%d" % (i+1)] = mdata
+
+    return models_dict
+
 def create_bcs_supra(boundary_meca: List, 
                boundary_maxwell: List,
                boundary_electric: List,
@@ -415,7 +449,7 @@ def create_bcs_insert(boundary_meca: List,
             
     return {}
 
-def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: dict, method_data: List[str], debug: bool = False):
+def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: dict, templates: dict, method_data: List[str], debug: bool = False):
     """
     Create a json model file
     """
@@ -433,6 +467,30 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     else:
         data["Materials"] = mmat
     if debug: print("create_json/Materials data:", data)
+
+    # models section
+    if 'th' in method_data[3]:
+        heat = mmodels["heat"]
+        for key in heat:
+            data["Models"]["heat"]["models"].append(heat[key])
+
+    if 'mag' in method_data[3] or 'mqs' in method_data[3] :
+        magnetic = mmodels["magnetic"]
+        for key in magnetic:
+            data["Models"]["magnetic"]["models"].append(magnetic[key])
+    
+    if 'magel' in method_data[3] :
+        elastic = mmodels["elastic"]
+        for key in elastic:
+            data["Models"]["elastic"]["models"].append(elastic[key])
+
+    if 'mqsel' in method_data[3] :
+        elastic1 = mmodels["elastic1"]
+        elastic2 = mmodels["elastic2"]
+        for key in elastic1:
+            data["Models"]["elastic1"]["models"].append(elastic1[key])
+        for key in elastic2:
+            data["Models"]["elastic2"]["models"].append(elastic2[key])
 
     # postprocess
     # print("=== FORCE DEBUG to True ===")
