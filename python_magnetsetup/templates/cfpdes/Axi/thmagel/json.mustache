@@ -168,25 +168,25 @@
 		    		},
 		    		"sigma":
 		    		{
-						"expr":"{materials_sigma_rr,0,materials_sigma_rz, 0,materials_sigma_thth,0, materials_sigma_rz,0,materials_sigma_zz}:materials_sigma_rr:materials_sigma_rz:materials_sigma_thth:materials_sigma_zz",
+						"expr":"{materials_stress_rr,0,materials_stress_rz, 0,materials_stress_thth,0, materials_stress_rz,0,materials_stress_zz}:materials_stress_rr:materials_stress_rz:materials_stress_thth:materials_stress_zz",
 						"markers": {{part_electric}},
 						"representation":["element"]
 		    		},
-		    		"sigma_tr":
+		    		"stress_tr":
 		    		{
-						"expr":"max(abs(materials_sigma1-materials_sigma2),max(abs(materials_sigma1-materials_sigma3),abs(materials_sigma2-materials_sigma3))):materials_sigma1:materials_sigma2:materials_sigma3",
+						"expr":"max(abs(materials_stress1-materials_stress2),max(abs(materials_stress1-materials_stress3),abs(materials_stress2-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
                         "markers": {{part_electric}},
 						"representation":["element"]
 		    		},
-		    		"sigma_vm":
+		    		"stress_vm":
 		    		{
-						"expr":"sqrt(2/3*(materials_sigma1*materials_sigma1+materials_sigma2*materials_sigma2+materials_sigma3*materials_sigma3-materials_sigma1*materials_sigma2-materials_sigma1*materials_sigma3-materials_sigma2*materials_sigma3)):materials_sigma1:materials_sigma2:materials_sigma3",
+						"expr":"sqrt(2/3*(materials_stress1*materials_stress1+materials_stress2*materials_stress2+materials_stress3*materials_stress3-materials_stress1*materials_stress2-materials_stress1*materials_stress3-materials_stress2*materials_stress3)):materials_stress1:materials_stress2:materials_stress3",
                         "markers": {{part_electric}},
 						"representation":["element"]
 		    		},
 			    	"principle_stresses":
 			    	{
-						"expr":"{materials_sigma1,materials_sigma2,materials_sigma3}:materials_sigma1:materials_sigma2:materials_sigma3",
+						"expr":"{materials_stress1,materials_stress2,materials_stress3}:materials_stress1:materials_stress2:materials_stress3",
                         "markers": {{part_electric}},
 						"representation":["element"]
 		    		},
