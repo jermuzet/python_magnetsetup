@@ -183,31 +183,31 @@
 		    		"sigma":
 		    		{
 						"expr":"{materials_stress_rr,0,materials_stress_rz, 0,materials_stress_thth,0, materials_stress_rz,0,materials_stress_zz}:materials_stress_rr:materials_stress_rz:materials_stress_thth:materials_stress_zz",
-						"markers": {{part_electric}},
+						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"stress_tr":
 		    		{
 						"expr":"max(abs(materials_stress1-materials_stress2),max(abs(materials_stress1-materials_stress3),abs(materials_stress2-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
-                        "markers": {{part_electric}},
+                        			"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"stress_vm":
 		    		{
 						"expr":"sqrt(2/3*(materials_stress1*materials_stress1+materials_stress2*materials_stress2+materials_stress3*materials_stress3-materials_stress1*materials_stress2-materials_stress1*materials_stress3-materials_stress2*materials_stress3)):materials_stress1:materials_stress2:materials_stress3",
-                        "markers": {{part_electric}},
+                        			"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 			    	"principle_stresses":
 			    	{
 						"expr":"{materials_stress1,materials_stress2,materials_stress3}:materials_stress1:materials_stress2:materials_stress3",
-                        "markers": {{part_electric}},
+						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"epsilon":
 		    		{
 						"expr":"{elastic1_grad_u_00,0,1/2*(elastic1_grad_u_01+elastic1_grad_u_10), 0,elastic1_u_0/x,0, 1/2*(elastic1_grad_u_01+elastic1_grad_u_10),0,elastic1_grad_u_11}:x:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_01:elastic1_grad_u_10:elastic1_grad_u_11",
-                        "markers": {{part_electric}},
+                        			"markers": {{part_thermic}},
 						"representation":["element"]
 		    		}
 				}
