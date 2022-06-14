@@ -106,6 +106,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
 
     mdict = {}
     mmat = {}
+    mmodels = {}
     mpost = {}
 
     if "Helix" in confdata:
@@ -119,7 +120,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
         with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         # if isinstance(cad, Insert):
-        (mdict, mmat, mpost) = Insert_setup(MyEnv, confdata, cad, method_data, templates, debug)
+        (mdict, mmat, mmodels, mpost) = Insert_setup(MyEnv, confdata, cad, method_data, templates, debug)
 
     for mtype in ["Bitter", "Supra"]:
         if mtype in confdata:
@@ -155,7 +156,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
 
     if debug:
         print("magnet_setup: mdict=", mdict)
-    return (mdict, mmat, mpost)
+    return (mdict, mmat, mmodels, mpost)
 
 def msite_simfile(MyEnv, confdata: str, session=None, addAir: bool = False):
     """
@@ -202,6 +203,7 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
     
     mdict = {}
     mmat = {}
+    mmodels = {}
     mpost = {}
 
     for magnet in confdata["magnets"]:
@@ -218,7 +220,7 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
         if debug:
             print("mconfdata[geom]:", mconfdata["geom"])
 
-        (tdict, tmat, tpost) = magnet_setup(MyEnv, mconfdata, method_data, templates, debug)
+        (tdict, tmat, tmodels, tpost) = magnet_setup(MyEnv, mconfdata, method_data, templates, debug)
             
         # print("tdict[part_electric]:", tdict['part_electric'])
         # print("tdict[part_thermic]:", tdict['part_thermic'])
@@ -230,13 +232,15 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
         mmat = NMerge(tmat, mmat, debug, "msite_setup/tmat")
         # print("NewMerge:", NMerge(tmat, mmat))
         # print("mmat:", mmat)
-            
+        
+        mmodels = NMerge(tmodels, mmodels, debug, "msite_setup/tmat")
+
         # print("tpost:", tpost)
         mpost = NMerge(tpost, mpost, debug, "msite_setup/tpost") #debug)
         # print("NewMerge:", mpost)
     
     # print("mdict:", mdict)
-    return (mdict, mmat, mpost)
+    return (mdict, mmat, mmodels, mpost)
 
 def setup(MyEnv, args, confdata, jsonfile, session=None):
     """
@@ -292,7 +296,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
                         # print(f"try to create {confdata['geom']} done")
                         pass
 
-        (mdict, mmat, mpost) = magnet_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)
+        (mdict, mmat, mmodels, mpost) = magnet_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)
     else:
         print("Load a msite %s" % confdata["name"], "debug:", args.debug)
         # print("confdata:", confdata)
@@ -310,7 +314,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
                 yaml.dump(confdata, out)
             print(f"try to create {confdata['name']}.yaml done")
         
-        (mdict, mmat, mpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose, session)
+        (mdict, mmat, mmodels, mpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose, session)
         # print(f"setup: msite mpost={mpost['current_H']}")        
         
     name = jsonfile
@@ -351,7 +355,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     create_cfg(cfgfile, name, meshfile, args.nonlinear, jsonfile, templates["cfg"], method_data, args.debug)
             
     # create json
-    create_json(jsonfile, mdict, mmat, mpost, templates, method_data, args.debug)
+    create_json(jsonfile, mdict, mmat, mmodels, mpost, templates, method_data, args.debug)
 
     # copy some additional json file 
     material_generic_def = ["conductor", "insulator"]

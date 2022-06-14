@@ -7,7 +7,7 @@ import yaml
 from python_magnetgeo import Insert
 from python_magnetgeo import python_magnetgeo
 
-from .jsonmodel import create_params_insert, create_bcs_insert, create_materials_insert
+from .jsonmodel import create_params_insert, create_bcs_insert, create_materials_insert, create_models_insert
 from .utils import Merge, NMerge
 from .file_utils import MyOpen, findfile, search_paths
 
@@ -101,8 +101,6 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     print("Insert_setup: %s" % cad.name)
     part_thermic = []
     part_electric = []
-    part_conductor = []
-    part_insulator = []
     index_Helices = []
     index_Helices_e = []
     index_Insulators = []
@@ -128,12 +126,9 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
         if method_data[2] == "Axi":
             for j in range(1, Nsections[i]+1):
                 part_electric.append("H{}_Cu{}".format(i+1,j))
-                part_conductor.append("H{}_Cu{}".format(i+1,j))
             for j in range(Nsections[i]+2):
                 if 'th' in method_data[3]:
                     part_thermic.append("H{}_Cu{}".format(i+1,j))
-                if "H{}_Cu{}".format(i+1,j) not in part_electric :
-                    part_insulator.append("H{}_Cu{}".format(i+1,j))
             for j in range(Nsections[i]):
                 index_Helices.append(["0:{}".format(Nsections[i]+2)])
                 index_Helices_e.append(["1:{}".format(Nsections[i]+1)])
@@ -149,7 +144,6 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
                 part_thermic.append(insulator_name)
 
     for i in range(NRings):
-        part_insulator.append("R{}".format(i+1))
         if 'th' in method_data[3]:
             part_thermic.append("R{}".format(i+1))
         if method_data[2] == "3D":
@@ -199,8 +193,6 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     if debug:
         print("insert part_electric:", part_electric)
         print("insert part_thermic:", part_thermic)
-        print("insert part_conductor:", part_conductor)
-        print("insert part_insulator:", part_insulator)
 
     # params section
     params_data = create_params_insert(gdata + (turns_h,), method_data, debug)
@@ -218,8 +210,6 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     main_data = {
         "part_thermic": part_thermic,
         "part_electric": part_electric,
-        "part_conductor": part_conductor,
-        "part_insulator": part_insulator,
         "index_V0": boundary_electric,
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5"
@@ -278,7 +268,23 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     # check mpost output
     # print(f"insert: mpost={mpost}")
     mmat = create_materials_insert(gdata, index_Insulators, confdata, templates, method_data, debug)
+    
+    mmodels = {}
+    if 'th' in method_data[3]:
+        mmodels["heat"] = create_models_insert(gdata, index_Insulators, confdata, templates, method_data, "heat", debug)
 
+    if 'mag' in method_data[3] or 'mqs' in method_data[3] :
+        mmodels["magnetic"] = create_models_insert(gdata, index_Insulators, confdata, templates, method_data, "magnetic", debug)
+    
+    if 'magel' in method_data[3] :
+        mmodels["elastic"] = create_models_insert(gdata, index_Insulators, confdata, templates, method_data, "elastic", debug)
+
+    if 'mqsel' in method_data[3] :
+        mmodels["elastic1"] = create_models_insert(gdata, index_Insulators, confdata, templates, method_data, "elastic1", debug)
+        mmodels["elastic2"] = create_models_insert(gdata, index_Insulators, confdata, templates, method_data, "elastic2", debug)
+
+
+    
     # update U and hw, dTw param
     print("Update U for I0=31kA")
     # print(f"insert: mmat: {mmat}")
@@ -306,4 +312,4 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
                 params[index] = item
                 
     
-    return (mdict, mmat, mpost)
+    return (mdict, mmat, mmodels, mpost)

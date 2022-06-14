@@ -19,26 +19,6 @@
 			},
 			"models":[
 				{
-                    "name":"magnetic_conductor",
-                    "materials":{{part_conductor}},
-                    "setup":{
-                        "coefficients":{
-							"c":"x/materials_mu:x:materials_mu",
-    						"a":"materials_mu/x:x:materials_mu",
-                            "f":"materials_j_th*x*x:materials_j_th:x",
-    						"d":"materials_sigma*x:x:materials_sigma"
-                        }
-                    }
-                },{
-					"name":"magnetic_insulator",
-					"materials":{{part_insulator}},
-					"setup":{
-						"coefficients":{
-							"c":"x/materials_mu:x:materials_mu",
-    						"a":"materials_mu/x:x:materials_mu"
-						}
-					}
-				},{
 					"name":"magnetic_Air",
 					"materials":"Air",
 					"setup":{

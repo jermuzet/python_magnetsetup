@@ -1,9 +1,4 @@
 {
-    "heat_c":"k*x:k:x",
-
-    "magnetic_c":"x/mu:x:mu",
-    "magnetic_beta":"{2/mu,0}:mu",
-    
     "Lame_lambda":"E*nu/(1-2*nu)/(1+nu):E:nu",  
     "Lame_mu":"E/(2*(1+nu)):E:nu",
 
@@ -14,7 +9,8 @@
     "sigma_zz":"Lame_lambda*elastic1_grad_u_00+Lame_lambda/x*elastic1_u_0+(Lame_lambda+2*Lame_mu)*elastic1_grad_u_11+bool_dilatation*sigma_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:sigma_T",
     "sigma_rz":"Lame_mu*(elastic1_grad_u_01+elastic1_grad_u_10):Lame_mu:elastic1_grad_u_01:elastic1_grad_u_10",
 
-    "elastic1_gamma":"{-sigma_rr*x,-sigma_rz*x,- sigma_rz*x, -sigma_zz*x}:x:sigma_rr:sigma_rz:sigma_zz",
-    "elastic1_f":"{- sigma_thth,0}:sigma_thth"
+    "sigma1":"1/2*(sigma_rr+sigma_zz+sqrt((sigma_rr-sigma_zz)*(sigma_rr-sigma_zz)+4*sigma_rz*sigma_rz)):sigma_rr:sigma_zz:sigma_rz",
+    "sigma2":"sigma_thth:sigma_thth",
+    "sigma3":"1/2*(sigma_rr+sigma_zz-sqrt((sigma_rr-sigma_zz)*(sigma_rr-sigma_zz)+4*sigma_rz*sigma_rz)):sigma_rr:sigma_zz:sigma_rz"
 }
 
