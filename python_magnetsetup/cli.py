@@ -41,7 +41,7 @@ def fabric(machine: str, workingdir: str, geodir: str, args, cfgfile: str, jsonf
                     connection_.run(f"cd {homedir}/{workingdir} && {cmds['Pre']} && {cmds[cmd]}")
 
             # TODO store simu in db????
-            connection_.run(f"cd {homedir}/{workingdir} && {cmds['Save']}")
+            # connection_.run(f"cd {homedir}/{workingdir} && {cmds['Save']}")
         else:
             raise Exception(f'python_magnetsetup/cli: {workingdir} already exists on {machine}')
 
