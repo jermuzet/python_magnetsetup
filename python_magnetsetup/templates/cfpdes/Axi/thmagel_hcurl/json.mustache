@@ -166,7 +166,7 @@
 						"expr":"{materials_F_laplace_0,materials_F_laplace_1}:materials_F_laplace_0:materials_F_laplace_1",
 						"markers": {{part_electric}}
 		    		},
-		    		"sigma":
+		    		"stress":
 		    		{
 						"expr":"{materials_stress_rr,0,materials_stress_rz, 0,materials_stress_thth,0, materials_stress_rz,0,materials_stress_zz}:materials_stress_rr:materials_stress_rz:materials_stress_thth:materials_stress_zz",
 						"markers": {{part_electric}},
@@ -174,19 +174,19 @@
 		    		},
 		    		"stress_tr":
 		    		{
-						"expr":"max(abs(materials_sigmas1-materials_stress2),max(abs(materials_sigmas1-materials_stress3),abs(materials_stress2-materials_stress3))):materials_sigmas1:materials_stress2:materials_stress3",
+						"expr":"max(abs(materials_stress1-materials_stress2),max(abs(materials_stress1-materials_stress3),abs(materials_stress2-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
                         			"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"stress_vm":
 		    		{
-						"expr":"sqrt(2/3*(materials_sigmas1*materials_sigmas1+materials_stress2*materials_stress2+materials_stress3*materials_stress3-materials_sigmas1*materials_stress2-materials_sigmas1*materials_stress3-materials_stress2*materials_stress3)):materials_sigmas1:materials_stress2:materials_stress3",
+						"expr":"sqrt(1/2((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
                         			"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 			    	"principle_stresses":
 			    	{
-						"expr":"{materials_sigmas1,materials_stress2,materials_stress3}:materials_sigmas1:materials_stress2:materials_stress3",
+						"expr":"{materials_stress1,materials_stress2,materials_stress3}:materials_stress1:materials_stress2:materials_stress3",
                        	 			"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
