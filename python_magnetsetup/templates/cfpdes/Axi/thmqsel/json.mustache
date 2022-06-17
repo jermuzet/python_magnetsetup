@@ -181,33 +181,33 @@
 						"expr":"{materials_F_laplace_0,materials_F_laplace_1}:materials_F_laplace_0:materials_F_laplace_1",
 						"markers": {{part_electric}}
 		    		},
-		    		""sigma":
+		    		"stress":
 		    		{
-						"expr":"{materials_sigma_rr,0,materials_sigma_rz, 0,materials_sigma_thth,0, materials_sigma_rz,0,materials_sigma_zz}:materials_sigma_rr:materials_sigma_rz:materials_sigma_thth:materials_sigma_zz",
+						"expr":"{materials_stress_rr,0,materials_stress_rz, 0,materials_stress_thth,0, materials_stress_rz,0,materials_stress_zz}:materials_stress_rr:materials_stress_rz:materials_stress_thth:materials_stress_zz",
 						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
-		    		"sigma_tr":
+		    		"stress_tr":
 		    		{
-						"expr":"max(abs(materials_sigma1-materials_sigma2),max(abs(materials_sigma1-materials_sigma3),abs(materials_sigma2-materials_sigma3))):materials_sigma1:materials_sigma2:materials_sigma3",
+						"expr":"max(abs(materials_stress1-materials_stress2),max(abs(materials_stress1-materials_stress3),abs(materials_stress2-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
                         "markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
-		    		"sigma_vm":
+		    		"stress_vm":
 		    		{
-						"expr":"sqrt(1/2((materials_sigma1-materials_sigma2)*(materials_sigma1-materials_sigma2)+(materials_sigma2-materials_sigma3)*(materials_sigma2-materials_sigma3)+(materials_sigma1-materials_sigma3)*(materials_sigma1-materials_sigma3))):materials_sigma1:materials_sigma2:materials_sigma3",
-						"markers": {{part_thermic}},
+						"expr":"sqrt(2/3*(materials_stress1*materials_stress1+materials_stress2*materials_stress2+materials_stress3*materials_stress3-materials_stress1*materials_stress2-materials_stress1*materials_stress3-materials_stress2*materials_stress3)):materials_stress1:materials_stress2:materials_stress3",
+                        "markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 			    	"principle_stresses":
 			    	{
-						"expr":"{materials_sigma1,materials_sigma2,materials_sigma3}:materials_sigma1:materials_sigma2:materials_sigma3",
-                        "markers": {{part_thermic}},
+						"expr":"{materials_stress1,materials_stress2,materials_stress3}:materials_stress1:materials_stress2:materials_stress3",
+						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
-		    		"epsilon":
+		    		"strain":
 		    		{
-						"expr":"{elastic_grad_u_00,0,1/2*(elastic_grad_u_01+elastic_grad_u_10), 0,elastic_u_0/x,0, 1/2*(elastic_grad_u_01+elastic_grad_u_10),0,elastic_grad_u_11}:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11",
+						"expr":"{elastic1_grad_u_00,0,1/2*(elastic1_grad_u_01+elastic1_grad_u_10), 0,elastic1_u_0/x,0, 1/2*(elastic1_grad_u_01+elastic1_grad_u_10),0,elastic1_grad_u_11}:x:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_01:elastic1_grad_u_10:elastic1_grad_u_11",
                         "markers": {{part_thermic}},
 						"representation":["element"]
 		    		}
@@ -216,6 +216,13 @@
 		},
 		"magnetic":
 		{
+	    	"Save":
+	    	{
+				"Fields":
+				{
+		    		"names":["phi"]
+				}
+	    	},
 	    	"Measures": 
 	    	{
 				"Statistics":
@@ -253,6 +260,26 @@
 						"type":["min","max","mean"], 
 						"field":"temperature" 
 		    		}
+				}
+	    	}
+		},
+		"elastic1":
+		{
+	    	"Save":
+	    	{
+				"Fields":
+				{
+		    		"names":["displacement"]
+				}
+	    	}
+		},
+		"elastic2":
+		{
+	    	"Save":
+	    	{
+				"Fields":
+				{
+		    		"names":["speed"]
 				}
 	    	}
 		}
