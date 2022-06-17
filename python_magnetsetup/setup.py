@@ -359,10 +359,10 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
         material_generic_def.append("conduct-nosource") # only for transient with mqs
 
     # create list of files to be archived
-    from shutil import copyfile
     sim_files = [cfgfile, jsonfile]
     if args.method == "cfpdes":
         if args.debug: print("cwd=", cwd)
+        from shutil import copyfile
         for jfile in material_generic_def:
             filename = AppCfg[args.method][args.time][args.geom][args.model]["filename"][jfile]
             src = os.path.join(MyEnv.template_path(), args.method, args.geom, args.model, filename)
@@ -496,9 +496,11 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     scale = ""
     if args.method != "HDG":
         scale = "--mesh.scale=0.001"
-    h5file = xaofile.replace(".xao", "_p.json")
-    partcmd = f"{partitioner} --ifile {gmshfile} --ofile {h5file} --part {NP} {scale}"
-
+    h5file = xaofile.replace(".xao", f"_p{NP}.json")
+    partcmd = f"{partitioner} --ifile {gmshfile} --odir {workingdir} --part {NP} {scale}"
+    if args.geom == "Axi":
+        partcmd = f"{partitioner} --nochdir --dim 2 --ifile {workingdir}/{gmshfile} --odir {workingdir} --part {NP} {scale}"
+        
     tarfile = cfgfile.replace("cfg", "tgz")
     # TODO if cad exist do not print CAD command
     cmds = {
@@ -517,32 +519,27 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     if meshconvert:
         cmds["Convert"] = f"singularity exec {simage_path}/{salome} {meshconvert}"
     
-    if args.geom == "3D":
-        cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
-        meshfile = h5file
-        update_partition = f"perl -pi -e \'s|gmsh.partition=.*|gmsh.partition = 0|\' {cfgfile}" 
+    cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
+    meshfile = h5file
+    update_partition = f"perl -pi -e \'s|gmsh.partition=.*|gmsh.partition = 0|\' {cfgfile}" 
 
     # TODO add command to change mesh.filename in cfgfile    
     update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/{workingdir}/{meshfile}|\' {cfgfile}"
-    if args.geom =="Axi":
-        update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale =|' {cfgfile}"
-        cmds["Update_cfg"] = update_cfg
 
     cmds["Update_Mesh"] = update_cfgmesh
-    if args.geom == "3D":
-        cmds["Update_Partition"] = update_partition
+    cmds["Update_Partition"] = update_partition
 
     if server.smp:
-        feelcmd = f"{exec} --config-file {cfgfile}"
-        pyfeelcmd = f"python {pyfeel}"
-        cmds["Run"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {feelcmd}"
-        cmds["Workflow"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd} {cfgfile}"
-    
-    else:
         feelcmd = f"mpirun -np {NP} {exec} --config-file {cfgfile}"
         pyfeelcmd = f"mpirun -np {NP} python {pyfeel} {cfgfile}"
         cmds["Run"] = f"singularity exec {simage_path}/{feelpp} {feelcmd}"
         cmds["Workflow"] = f"singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
+    
+    else:
+        feelcmd = f"{exec} --config-file {cfgfile}"
+        pyfeelcmd = f"python {pyfeel}"
+        cmds["Run"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {feelcmd}"
+        cmds["Workflow"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd} {cfgfile}"
 
     # compute resultdir:
     with open(cfgfile, 'r') as f:
@@ -558,12 +555,10 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     if "post" in AppCfg[args.method][args.time][args.geom][args.model]:
         postdata = AppCfg[args.method][args.time][args.geom][args.model]["post"]
         for key in postdata:
-            pyparaview = f'/usr/lib/python3/dist-packages/python_magnetsetup/postprocessing/pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"{postdata[key]}\" --resultdir {result_dir}'
+            pyparaview = f'pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"{postdata[key]}\" --resultdir ${result_dir}'
             pyparaviewcmd = f"pvpython {pyparaview}"
             cmds["Postprocessing"] = f"singularity exec {simage_path}/{paraview} {pyparaviewcmd}"
-
-        cmds["Save"] = f"tmpdir=$(pwd) && pushd {result_dir}/.. && tar zcf $tmpdir/{result_arch} np_{NP} && popd"
-        
+    
     # TODO jobmanager if server.manager != JobManagerType.none
     # Need user email at this point
     # Template for oar and slurm
