@@ -17,14 +17,19 @@ Homepage: https://github.com/Trophime/python_magnetsetup
 #Testsuite: autopkgtest-pkg-python
 Rules-Requires-Root: no
 
-Package: python3-python-magnetsetup
+Package: python3-magnetsetup
 Architecture: all
-Depends: ${python3:Depends}, ${misc:Depends}
+Depends: ${python3:Depends},
+ python3-decouple,
+ python3-chevron,
+ python3-requests,
+ python3-magnettools,
+ ${misc:Depends}
 Suggests: python-python-magnetsetup-doc
 Description: Magnet Geometry Python module (Python 3)
  This module enable to perform the following operations
  * Define Magnet geometry as yaml file
- * Load/Create CA and Mesh with Salome (see hifimanget.salome)
+ * Load/Create CA and Mesh with Salome (see hifimagnet.salome)
  * Create Gmsh mesh from Salome XAO format
  .
  This package installs the library for Python 3.
@@ -33,7 +38,7 @@ Package: python-magnetsetup-doc
 Architecture: all
 Section: doc
 Depends: ${sphinxdoc:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description> (common documentation)
+Description: Magnet Geometry Python module (Python 3) (common documentation)
  This module enable to perform the following operations
  * Define Magnet geometry as yaml file
  * Load/Create CA and Mesh with Salome (see hifimanget.salome)

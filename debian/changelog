@@ -1,5 +1,80 @@
-python-magnetsetup (0.1.0-4) UNRELEASED; urgency=medium
+python-magnetsetup (0.1.0-8.10) unstable; urgency=medium
+
+  * add Run and Postprocessing to auto
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Tue, 17 May 2022 17:58:07 +0200
+
+python-magnetsetup (0.1.0-8.9) unstable; urgency=medium
+
+  * fix syntax
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Thu, 21 Apr 2022 11:37:27 +0200
+
+python-magnetsetup (0.1.0-8.8) unstable; urgency=medium
+
+  * add geomdir.patch
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Tue, 19 Apr 2022 14:30:28 +0200
+
+python-magnetsetup (0.1.0-8.7) unstable; urgency=medium
+
+  * fix flow_params name in archive
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Tue, 19 Apr 2022 13:09:09 +0200
+
+python-magnetsetup (0.1.0-8.6) unstable; urgency=medium
+
+  * fix path for flwo_params.json
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Tue, 19 Apr 2022 11:54:06 +0200
+
+python-magnetsetup (0.1.0-8.5) unstable; urgency=medium
+
+  * up flow-params.json path
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Tue, 19 Apr 2022 11:09:09 +0200
+
+python-magnetsetup (0.1.0-8.4) unstable; urgency=medium
+
+  * install flow_params.json
+  * hack for loading flow_params.json in archive for simu setup
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Fri, 15 Apr 2022 16:45:27 +0200
+
+python-magnetsetup (0.1.0-8.3) unstable; urgency=medium
+
+  * add workflows to install
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Tue, 22 Mar 2022 16:50:59 +0100
+
+python-magnetsetup (0.1.0-8.2) unstable; urgency=medium
+
+  * update to rev 7ee1ccbd76
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Tue, 22 Mar 2022 14:22:17 +0100
+
+python-magnetsetup (0.1.0-8.1) unstable; urgency=medium
+
+  * update to rev 8dd1c38abb73
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Mon, 14 Mar 2022 12:50:24 +0100
+
+python-magnetsetup (0.1.0-8) unstable; urgency=medium
+
+  * update to rev 1eda99f6c63
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Mon, 14 Mar 2022 10:12:54 +0100
+
+
+python-magnetsetup (0.1.0-7.1) unstable; urgency=medium
+
+  * up ana.py
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Thu, 20 Jan 2022 10:03:13 +0100
+
+python-magnetsetup (0.1.0-7) unstable; urgency=medium
 
   * Initial release (Closes: #nnnn) 
+  * update to git rev 4c3caff79f
 
- -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Mon, 06 Oct 2021 16:10:45 +0200
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Tue, 18 Jan 2022 14:55:17 +0100

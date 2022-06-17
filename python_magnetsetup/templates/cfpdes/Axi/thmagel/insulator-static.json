@@ -12,6 +12,5 @@
     "sigma1":"Lame_lambda/x*elastic_u_0+(Lame_lambda+Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*sigma_T+Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)):bool_dilatation:x:Lame_lambda:Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:elastic_grad_u_01:elastic_grad_u_10:sigma_T",
     "sigma2":"Lame_lambda*elastic_grad_u_00+(Lame_lambda+2*Lame_mu)/x*elastic_u_0+Lame_lambda*elastic_grad_u_11+bool_dilatation*sigma_T:bool_dilatation:x:Lame_lambda:Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:sigma_T",
     "sigma3":"Lame_lambda/x*elastic_u_0+(Lame_lambda+Lame_mu)*(elastic_grad_u_00+elastic_grad_u_11)+bool_dilatation*sigma_T-Lame_mu*sqrt((elastic_grad_u_00-elastic_grad_u_11)*(elastic_grad_u_00-elastic_grad_u_11)+4*(elastic_grad_u_01+elastic_grad_u_10)*(elastic_grad_u_01+elastic_grad_u_10)):bool_dilatation:x:Lame_lambda:Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:elastic_grad_u_01:elastic_grad_u_10:sigma_T"
-
 }
 

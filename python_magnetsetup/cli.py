@@ -37,22 +37,11 @@ def fabric(machine: str, workingdir: str, geodir: str, args, cfgfile: str, jsonf
             connection_.put(f'{tarfilename}', remote=f'{homedir}/{workingdir}')
             connection_.run(f'cd {homedir}/{workingdir} && tar -zxvf {tarfilename}')
             for cmd in cmds:
-                if not cmd in ['Pre', 'Run', 'Python', 'Workflow']:
+                if not cmd in ['Pre', 'Python', 'Workflow']:
                     connection_.run(f"cd {homedir}/{workingdir} && {cmds['Pre']} && {cmds[cmd]}")
 
-            # TODO data/geometries aka MyEnv.yaml_repo
-            connection_.run(f'ls -lrth {homedir}/{workingdir}/{geodir}/{meshfile}')
-            
-            # TODO change NP for cmds Run depending on method and meshfile size
-            connection_.run(f"cd {homedir}/{workingdir} && {cmds['Run']}")
-
-            #
-            # could also do something like:
-            # if cmd in ['CAD', 'Mesh']:
-            #    connection_.run(f"cd {homedir}/{workingdir} && {cmds[cmd]}", env={'HIFIMAGNET': f'{hifimagnet}'})
-
-            # TODO some basic post operation
             # TODO store simu in db????
+            # connection_.run(f"cd {homedir}/{workingdir} && {cmds['Save']}")
         else:
             raise Exception(f'python_magnetsetup/cli: {workingdir} already exists on {machine}')
 
@@ -61,6 +50,12 @@ def fabric(machine: str, workingdir: str, geodir: str, args, cfgfile: str, jsonf
             print(f'Remove {f} ({type(f)}')
             os.unlink(os.path.join(cwd, f))
 
+        # get result_arch, pngs, csv (included in result_arch)
+        # result_arch = cfgfile.replace('.cfg', f'_res.tgz' 
+        # connection_.get(remote=f'{homedir}/{workingdir}/{result_arch}')
+        # connection_.get(remote=f'{homedir}/{workingdir}/\*.png')
+        # connection_.get(remote=f'{homedir}/{workingdir}/{csvs}')
+        
     return 0
     
 def main():
@@ -176,14 +171,15 @@ def main():
     workingdir = cfgfile.replace(".cfg", "")
     geodir = MyEnv.yaml_repo.replace('/','',1)
 
-    print("\n\n=== Guidelines for running a simu on {args.machine} ===")
+    print(f"\n\n=== Guidelines for running a simu on {args.machine} ===")
     print(f"Edit {cfgfile} to fix the meshfile, scale, partition and solver props")
     print(f"If you do change {cfgfile}, remember to include the new file in {tarfilename}")
     # TODO re-create a tgz archive if you modify cfgfile or jsonfile
-    print(f"Create a {workingdir} directory on {machine}: ssh {args.machine} mkdir -p {workingdir}")
-    print(f"Transfert {tarfilename} to {args.machine}: scp {tarfilename} {args.machine}:./{workingdir}")
-    print(f"Install worflow in {args.machine}: scp -r {os.path.dirname(os.path.abspath(__file__))}'/workflows {args.machine}:./{workingdir}")
-    print(f"Connect on {machine}: ssh -Y {args.machine}")
+    print(f"Create a {workingdir} directory on {args.machine}: ssh {args.machine} mkdir -p {workingdir}")
+    print(f"Transfert {tarfilename} to {machine.name}: scp {tarfilename} {args.machine}:./{workingdir}")
+    print(f"Install worflow in {args.machine}: scp -r {os.path.dirname(os.path.abspath(__file__))}/workflows {args.machine}:./{workingdir}")
+    print(f"Install postprocessing in {args.machine}: scp -r {os.path.dirname(os.path.abspath(__file__))}/postprocessing {args.machine}:./{workingdir}")
+    print(f"Connect on {args.machine}: ssh -Y {args.machine}")
     print(f"Once connected on {args.machine} run the following commands")
     print(f"cd {workingdir}")
     for key in cmds:

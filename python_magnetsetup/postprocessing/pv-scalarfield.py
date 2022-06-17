@@ -33,6 +33,8 @@ parser.add_argument("--resultdir", help="set result directory (default is empty,
 parser.add_argument("--wd", help="set a working directory (default is $PWD)", type=str, default="")
 args = parser.parse_args()
 
+print(f'args.cfgfile={args.cfgfile}')
+
 # Get current dir
 cwd = os.getcwd()
 if args.wd:
@@ -73,15 +75,18 @@ postdata = data['PostProcess'][method_params[0]]['Exports']
 
 pfields = {}
 for expr in postdata['expr']:
-    pfields[expr] = [f'{method_params[0]}.expr.{expr}', f'{method_params[0]}{expr}']
+    print(f'expr={expr} ({type(expr)})')
+    pfields[expr] = [f'{method_params[0]}.expr.{expr}', f'{method_params[0]}expr{expr}']
+print(f'pfiels: {pfields}')
 
 for field in postdata['fields']:
     print(f'field={field}, type={type(field)}')
-    pfields[field] = [ f'{method_params[0]}.{field}', f'{method_params[0]}{field}']
+    pfields[field] = [ f'{method_params[0]}.{field}', f'{method_params[0]}{field.replace(".","")}']
+print(f'pfiels: {pfields}')
 
 exportcase.PointArrays = [ pfields[key][0] for key in sorted(pfields.keys()) ]
 expr0 = sorted(pfields.keys())[0]
-print(f'1st expr: {expr0}')
+print(f'1st expr: {expr0} --> {pfields[expr0][1]}')
 
 if not args.expr in pfields:
     print(f'{args.expr} is not a valid field')
@@ -132,7 +137,7 @@ exportcaseDisplay.ExtractedBlockIndex = 1
 exportcaseDisplay.ScaleTransferFunction.Points = [-393612608.0, 0.0, 0.5, 0.0, 0.0, 1.0, 0.5, 0.0]
 
 # init the 'PiecewiseFunction' selected for 'OpacityTransferFunction'
-# exportcaseDisplay.OpacityTransferFunction.Points = [-393612608.0, 0.0, 0.5, 0.0, 0.0, 1.0, 0.5, 0.0]
+exportcaseDisplay.OpacityTransferFunction.Points = [-393612608.0, 0.0, 0.5, 0.0, 0.0, 1.0, 0.5, 0.0]
 
 # reset view to fit data
 renderView1.ResetCamera()
@@ -161,16 +166,17 @@ exportcaseDisplay.RescaleTransferFunctionToDataRange(True, False)
 exportcaseDisplay.SetScalarBarVisibility(renderView1, True)
 
 # get color transfer function/color map for 'cfpdesheattemperature'
+print(f'cfpdesheattemperatureLUT = GetColorTransferFunction({pfields[args.expr][1]})')
 cfpdesheattemperatureLUT = GetColorTransferFunction(pfields[args.expr][1])
 
 # get opacity transfer function/opacity map for 'cfpdesheattemperature'
 cfpdesheattemperaturePWF = GetOpacityTransferFunction(pfields[args.expr][1])
 
 # get color legend/bar for cfpdesheattemperatureLUT in view renderView1
-cfpdesheattemperatureLUTColorBar = GetScalarBar(cfpdesexprJthLUT, renderView1)
+cfpdesheattemperatureLUTColorBar = GetScalarBar(cfpdesheattemperatureLUT, renderView1)
 
 # Properties modified on cfpdesheattemperatureLUTColorBar
-cfpdesheattemperatureLUTColorBar.WindowLocation = 'UpperLeftCorner'
+cfpdesheattemperatureLUTColorBar.WindowLocation = 'UpperRightCorner'
 cfpdesheattemperatureLUTColorBar.Title = args.exprlegend # TODO custom 
 cfpdesheattemperatureLUTColorBar.TitleFontSize = 24
 

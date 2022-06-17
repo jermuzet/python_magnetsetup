@@ -33,10 +33,12 @@ def Insert_simfile(MyEnv, confdata: dict, cad: Insert, addAir: bool = False):
         f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
         files.append(f)
     except:
-        for helix in cad.Helices:
-            with MyOpen(helix+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
-                hhelix = yaml.load(f, Loader = yaml.FullLoader)
-                files.append(f.name)
+        pass
+
+    for helix in cad.Helices:
+        with MyOpen(helix+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
+            hhelix = yaml.load(f, Loader = yaml.FullLoader)
+            files.append(f.name)
 
             # TODO: get xao and brep if they exist otherwise _salome.data
             try:
@@ -49,43 +51,49 @@ def Insert_simfile(MyEnv, confdata: dict, cad: Insert, addAir: bool = False):
                 files.append(f)
 
             except:
-                if hhelix.m3d.with_shapes:
-                    with MyOpen(hhelix.name + str("_cut_with_shapes_salome.dat"), "r", paths=search_paths(MyEnv, "geom")) as fcut:
-                        files.append(fcut.name)
-                    with MyOpen(hhelix.shape.profile, "r", paths=search_paths(MyEnv, "geom")) as fshape:
-                        files.append(fshape.name)
-                else:
-                    with MyOpen(hhelix.name + str("_cut_salome.dat"), "r", paths=search_paths(MyEnv, "geom")) as fcut:
-                        files.append(fcut.name)
+                pass
+            
+            if hhelix.m3d.with_shapes:
+                with MyOpen(hhelix.name + str("_cut_with_shapes_salome.dat"), "r", paths=search_paths(MyEnv, "geom")) as fcut:
+                    files.append(fcut.name)
+                with MyOpen(hhelix.shape.profile, "r", paths=search_paths(MyEnv, "geom")) as fshape:
+                    files.append(fshape.name)
+            else:
+                with MyOpen(hhelix.name + str("_cut_salome.dat"), "r", paths=search_paths(MyEnv, "geom")) as fcut:
+                    files.append(fcut.name)
 
-            for ring in cad.Rings:
-                try:
-                    xaofile = ring.name + ".xao"
-                    f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
-                    files.append(f)
+    for ring in cad.Rings:
+        try:
+            xaofile = ring.name + ".xao"
+            f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
+            files.append(f)
                 
-                    brepfile = ring.name + ".brep"
-                    f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
-                    files.append(f)
+            brepfile = ring.name + ".brep"
+            f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
+            files.append(f)
 
-                except:
-                    with MyOpen(ring+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
-                        files.append(f.name)
+        except:
+            pass
+        
+        with MyOpen(ring+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
+            files.append(f.name)
 
-        if cad.CurrentLeads:
-            for lead in cad.CurrentLeads:
-                try:
-                    xaofile = lead.name + ".xao"
-                    f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
-                    files.append(f)
+    if cad.CurrentLeads:
+        for lead in cad.CurrentLeads:
+            try:
+                xaofile = lead.name + ".xao"
+                f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
+                files.append(f)
 
-                    brepfile = lead.name + ".brep"
-                    f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
-                    files.append(f)
+                brepfile = lead.name + ".brep"
+                f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
+                files.append(f)
 
-                except:
-                    with MyOpen(lead+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
-                        files.append(f.name)
+            except:
+                pass
+            
+            with MyOpen(lead+".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
+                files.append(f.name)
 
     return files
 

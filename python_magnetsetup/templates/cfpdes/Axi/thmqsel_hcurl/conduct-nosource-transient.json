@@ -1,4 +1,5 @@
-{   
+
+{
     "Lame_lambda":"E*nu/(1-2*nu)/(1+nu):E:nu",  
     "Lame_mu":"E/(2*(1+nu)):E:nu",
 
