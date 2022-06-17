@@ -1,0 +1,10 @@
+{
+    "name":"elastic1_{{name}}",
+    "materials":"{{name}}",
+    "setup":{
+        "coefficients":{
+            "gamma":"{-materials_{{name}}_sigma_rr*x,-materials_{{name}}_sigma_rz*x,- materials_{{name}}_sigma_rz*x, -materials_{{name}}_sigma_zz*x}:x:materials_{{name}}_sigma_rr:materials_{{name}}_sigma_rz:materials_{{name}}_sigma_zz",
+            "f":"{- materials_{{name}}_sigma_thth,0}:materials_{{name}}_sigma_thth"
+        }
+    }
+}
