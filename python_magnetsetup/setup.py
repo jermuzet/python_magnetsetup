@@ -363,10 +363,10 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
         material_generic_def.append("conduct-nosource") # only for transient with mqs
 
     # create list of files to be archived
-    from shutil import copyfile
     sim_files = [cfgfile, jsonfile]
     if args.method == "cfpdes":
         if args.debug: print("cwd=", cwd)
+        from shutil import copyfile
         for jfile in material_generic_def:
             filename = AppCfg[args.method][args.time][args.geom][args.model]["filename"][jfile]
             src = os.path.join(MyEnv.template_path(), args.method, args.geom, args.model, filename)
@@ -406,13 +406,18 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     else:
         tar = tarfile.open(tarfilename, "w:gz")
         for filename in sim_files:
-            if args.debug:
-                print(f"add {filename} to {tarfilename}")  
-            tar.add(filename)
-            for mname in material_generic_def:
-                if mname in filename:
-                    if args.debug: print(f"remove {filename}")
-                    os.unlink(filename)
+            # TODO skip xao and brep if Axi args.geom?
+            if args.geom == 'Axi' and ( filename.endswith('.xao') or filename.endswith('.brep') ) :
+                if args.debug:
+                    print(f"skip {filename}")  
+            else:
+                if args.debug:
+                    print(f"add {filename} to {tarfilename}")  
+                tar.add(filename)
+                for mname in material_generic_def:
+                    if mname in filename:
+                        if args.debug: print(f"remove {filename}")
+                        os.unlink(filename)
         tar.add('flow_params.json')
         os.unlink('flow_params.json')
         tar.close()
@@ -441,7 +446,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     # if server is SMP mpirun outside otherwise inside singularity
 
     server = loadmachine(args.machine)
-    print(f'setup_cmds: {server}')
+    # print(f'setup_cmds: {server}')
     NP = server.cores
     if server.multithreading:
         NP = int(NP/2)
@@ -458,7 +463,9 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     salome = AppCfg["mesh"]["salome"]
     feelpp = AppCfg[args.method]["feelpp"]
     partitioner = AppCfg["mesh"]["partitioner"]
-    workingdir = MyEnv.yaml_repo.replace('/','',1)
+    workingdir = MyEnv.yaml_repo
+    if workingdir.startswith('/'):
+        workingdir = MyEnv.yaml_repo.replace('/','',1)
     print(f"setup_cmds: workingdir={workingdir}")
 
     if "exec" in AppCfg[args.method]:
@@ -466,6 +473,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     if "exec" in AppCfg[args.method][args.time][args.geom][args.model]:
         exec = AppCfg[args.method][args.time][args.geom][args.model]
     pyfeel = ' -m workflows.cli' # commisioning, fixcooling
+    # TODO add current specs, depends on 
 
     if "mqs" in args.model or "mag" in args.model:
         geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--air,2,2,--wd,{workingdir}"
@@ -492,9 +500,11 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     scale = ""
     if args.method != "HDG":
         scale = "--mesh.scale=0.001"
-    h5file = xaofile.replace(".xao", "_p.json")
-    partcmd = f"{partitioner} --ifile {gmshfile} --ofile {h5file} --part {NP} {scale}"
-
+    h5file = xaofile.replace(".xao", f"_p{NP}.json")
+    partcmd = f"{partitioner} --ifile {gmshfile} --odir {workingdir} --part {NP} {scale}"
+    if args.geom == "Axi":
+        partcmd = f"{partitioner} --nochdir --dim 2 --ifile {workingdir}/{gmshfile} --odir {workingdir} --part {NP} {scale}"
+        
     tarfile = cfgfile.replace("cfg", "tgz")
     # TODO if cad exist do not print CAD command
     cmds = {
@@ -513,39 +523,35 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     if meshconvert:
         cmds["Convert"] = f"singularity exec {simage_path}/{salome} {meshconvert}"
     
-    if args.geom == "3D":
-        cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
-        meshfile = h5file
-        update_partition = f"perl -pi -e \'s|gmsh.partition=.*|gmsh.partition = 0|\' {cfgfile}" 
+    cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
+    meshfile = h5file
+    update_partition = f"perl -pi -e \'s|gmsh.partition=.*|gmsh.partition = 0|\' {cfgfile}" 
 
     # TODO add command to change mesh.filename in cfgfile    
     update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/{workingdir}/{meshfile}|\' {cfgfile}"
-    if args.geom =="Axi":
-        update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale =|' {cfgfile}"
-        cmds["Update_cfg"] = update_cfg
 
     cmds["Update_Mesh"] = update_cfgmesh
-    if args.geom == "3D":
-        cmds["Update_Partition"] = update_partition
+    cmds["Update_Partition"] = update_partition
 
     if server.smp:
-        feelcmd = f"{exec} --config-file {cfgfile}"
-        pyfeelcmd = f"python {pyfeel}"
-        cmds["Run"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {feelcmd}"
-        cmds["Workflow"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd} {cfgfile}"
-    
-    else:
         feelcmd = f"mpirun -np {NP} {exec} --config-file {cfgfile}"
         pyfeelcmd = f"mpirun -np {NP} python {pyfeel} {cfgfile}"
         cmds["Run"] = f"singularity exec {simage_path}/{feelpp} {feelcmd}"
         cmds["Workflow"] = f"singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
+    
+    else:
+        feelcmd = f"{exec} --config-file {cfgfile}"
+        pyfeelcmd = f"python {pyfeel}"
+        cmds["Run"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {feelcmd}"
+        cmds["Workflow"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd} {cfgfile}"
 
     # compute resultdir:
     with open(cfgfile, 'r') as f:
         directory = re.sub('directory=', '', f.readline(),  flags=re.DOTALL)
-    result_dir = f'{directory.rstrip()}/np_{NP}'
     home_env = 'HOME'
-    print(f'result_dir={os.getenv(home_env)}/feelppdb/{result_dir}')
+    result_dir = f'{os.getenv(home_env)}/feelppdb/{directory.rstrip()}/np_{NP}'
+    result_arch = cfgfile.replace('.cfg', f'_res.tgz')
+    print(f'result_dir={result_dir}')
 
     paraview = AppCfg["post"]["paraview"]
 
@@ -553,7 +559,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     if "post" in AppCfg[args.method][args.time][args.geom][args.model]:
         postdata = AppCfg[args.method][args.time][args.geom][args.model]["post"]
         for key in postdata:
-            pyparaview = f'pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"postdata[key]\" --resultdir ${result_dir}'
+            pyparaview = f'pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"{postdata[key]}\" --resultdir ${result_dir}'
             pyparaviewcmd = f"pvpython {pyparaview}"
             cmds["Postprocessing"] = f"singularity exec {simage_path}/{paraview} {pyparaviewcmd}"
     
