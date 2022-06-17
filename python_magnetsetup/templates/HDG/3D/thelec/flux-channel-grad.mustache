@@ -6,7 +6,7 @@
       "type": "integrate",
       "expr": "hw*(heat_T-(Tw*(z<Zmin%1%) + (dTw/(Zmax%1%-Zmin%1%)*(z-Zmin%1%)+Tw)*(z>Zmin%1%)*(z<Zmax%1%) + (Tw+dTw)*(z>Zmax%1%))):z:heat_T:hw:Tw:dTw:Zmin%1%,Zmax%1%",
       "markers": "Channel%1%",
-      "index1": {{index_h}}
+      "index1": "{{index_h}}"
    }
    }
 }
