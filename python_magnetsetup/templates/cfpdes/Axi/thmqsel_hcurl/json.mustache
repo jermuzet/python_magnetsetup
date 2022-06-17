@@ -152,31 +152,32 @@
 		    		"sigma":
 		    		{
 						"expr":"{materials_sigma_rr,0,materials_sigma_rz, 0,materials_sigma_thth,0, materials_sigma_rz,0,materials_sigma_zz}:materials_sigma_rr:materials_sigma_rz:materials_sigma_thth:materials_sigma_zz",
-						"markers": {{part_electric}},
+						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"sigma_tr":
 		    		{
+
 						"expr":"max(abs(materials_sigma1-materials_sigma2),max(abs(materials_sigma1-materials_sigma3),abs(materials_sigma2-materials_sigma3))):materials_sigma1:materials_sigma2:materials_sigma3",
-                        "markers": {{part_electric}},
+                        "markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"sigma_vm":
 		    		{
-						"expr":"sqrt(2/3*(materials_sigma1*materials_sigma1+materials_sigma2*materials_sigma2+materials_sigma3*materials_sigma3-materials_sigma1*materials_sigma2-materials_sigma1*materials_sigma3-materials_sigma2*materials_sigma3)):materials_sigma1:materials_sigma2:materials_sigma3",
-                        "markers": {{part_electric}},
+						"expr":"sqrt(1/2((materials_sigma1-materials_sigma2)*(materials_sigma1-materials_sigma2)+(materials_sigma2-materials_sigma3)*(materials_sigma2-materials_sigma3)+(materials_sigma1-materials_sigma3)*(materials_sigma1-materials_sigma3))):materials_sigma1:materials_sigma2:materials_sigma3",
+						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 			    	"principle_stresses":
 			    	{
 						"expr":"{materials_sigma1,materials_sigma2,materials_sigma3}:materials_sigma1:materials_sigma2:materials_sigma3",
-                        "markers": {{part_electric}},
+                        "markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"epsilon":
 		    		{
-						"expr":"{elastic1_grad_u_00,0,1/2*(elastic1_grad_u_01+elastic1_grad_u_10), 0,elastic1_u_0/x,0, 1/2*(elastic1_grad_u_01+elastic1_grad_u_10),0,elastic1_grad_u_11}:x:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_01:elastic1_grad_u_10:elastic1_grad_u_11",
-                        "markers": {{part_electric}},
+						"expr":"{elastic_grad_u_00,0,1/2*(elastic_grad_u_01+elastic_grad_u_10), 0,elastic_u_0/x,0, 1/2*(elastic_grad_u_01+elastic_grad_u_10),0,elastic_grad_u_11}:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11",
+                        "markers": {{part_thermic}},
 						"representation":["element"]
 		    		}
 				}
