@@ -521,15 +521,19 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     if meshconvert:
         cmds["Convert"] = f"singularity exec {simage_path}/{salome} {meshconvert}"
     
-    cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
-    meshfile = h5file
-    update_partition = f"perl -pi -e \'s|gmsh.partition=.*|gmsh.partition = 0|\' {cfgfile}" 
-
+    if args.geom == '3D':
+        cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd}"
+        meshfile = h5file
+        update_partition = f"perl -pi -e \'s|gmsh.partition=.*|gmsh.partition = 0|\' {cfgfile}" 
+        cmds["Update_Partition"] = update_partition
+    if args.geom =="Axi":
+        update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale =|' {cfgfile}"
+        cmds["Update_cfg"] = update_cfg
+        
     # TODO add command to change mesh.filename in cfgfile    
     update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/{workingdir}/{meshfile}|\' {cfgfile}"
 
     cmds["Update_Mesh"] = update_cfgmesh
-    cmds["Update_Partition"] = update_partition
 
     if server.smp:
         feelcmd = f"mpirun -np {NP} {exec} --config-file {cfgfile}"
