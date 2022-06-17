@@ -1,17 +1,17 @@
-
 {    
     "Lame_lambda":"E*nu/(1-2*nu)/(1+nu):E:nu",  
     "Lame_mu":"E/(2*(1+nu)):E:nu",
 
-    "sigma_T":"-(3*Lame_lambda+2*Lame_mu)*alphaT*(heat_T-T0):Lame_lambda:Lame_mu:alphaT:heat_T:T0",   
+    "stress_T":"-(3*Lame_lambda+2*Lame_mu)*alphaT*(heat_T-T0):Lame_lambda:Lame_mu:alphaT:heat_T:T0",   
 
-    "sigma_rr":"(Lame_lambda+2*Lame_mu)*elastic1_grad_u_00+Lame_lambda/x*elastic1_u_0+Lame_lambda*elastic1_grad_u_11+bool_dilatation*sigma_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:sigma_T",
-    "sigma_thth":"Lame_lambda*elastic1_grad_u_00+(Lame_lambda+2*Lame_mu)/x*elastic1_u_0+Lame_lambda*elastic1_grad_u_11+bool_dilatation*sigma_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:sigma_T",
-    "sigma_zz":"Lame_lambda*elastic1_grad_u_00+Lame_lambda/x*elastic1_u_0+(Lame_lambda+2*Lame_mu)*elastic1_grad_u_11+bool_dilatation*sigma_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:sigma_T",
-    "sigma_rz":"Lame_mu*(elastic1_grad_u_01+elastic1_grad_u_10):Lame_mu:elastic1_grad_u_01:elastic1_grad_u_10",
+    "stress_rr":"(Lame_lambda+2*Lame_mu)*elastic1_grad_u_00+Lame_lambda/x*elastic1_u_0+Lame_lambda*elastic1_grad_u_11+bool_dilatation*stress_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:stress_T",
+    "stress_thth":"Lame_lambda*elastic1_grad_u_00+(Lame_lambda+2*Lame_mu)/x*elastic1_u_0+Lame_lambda*elastic1_grad_u_11+bool_dilatation*stress_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:stress_T",
+    "stress_zz":"Lame_lambda*elastic1_grad_u_00+Lame_lambda/x*elastic1_u_0+(Lame_lambda+2*Lame_mu)*elastic1_grad_u_11+bool_dilatation*stress_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:stress_T",
+    "stress_rz":"Lame_mu*(elastic1_grad_u_01+elastic1_grad_u_10):Lame_mu:elastic1_grad_u_01:elastic1_grad_u_10",
 
-    "sigma1":"1/2*(sigma_rr+sigma_zz+sqrt((sigma_rr-sigma_zz)*(sigma_rr-sigma_zz)+4*sigma_rz*sigma_rz)):sigma_rr:sigma_zz:sigma_rz",
-    "sigma2":"sigma_thth:sigma_thth",
-    "sigma3":"1/2*(sigma_rr+sigma_zz-sqrt((sigma_rr-sigma_zz)*(sigma_rr-sigma_zz)+4*sigma_rz*sigma_rz)):sigma_rr:sigma_zz:sigma_rz"
+    "stress1":"1/2.*(stress_rr + stress_rz) +sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz):stress_rr:stress_zz:stress_rz",
+    "stress2":"stress_thth:stress_thth",
+    "stress3":"1/2.*(stress_rr + stress_rz) -sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz):stress_rr:stress_zz:stress_rz"
+
 }
 

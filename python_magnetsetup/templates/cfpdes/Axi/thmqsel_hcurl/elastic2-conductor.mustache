@@ -4,8 +4,8 @@
     "setup":{
         "coefficients":{
             "d":"x:x",
-            "gamma":"{-materials_{{name}}_sigma_rr*x,-materials_{{name}}_sigma_rz*x,- materials_{{name}}_sigma_rz*x, -materials_{{name}}_sigma_zz*x}:x:materials_{{name}}_sigma_rr:materials_{{name}}_sigma_rz:materials_{{name}}_sigma_zz",
-            "f":"{bool_laplace*x*materials_{{name}}_F_laplace_0 - materials_{{name}}_sigma_thth,bool_laplace*x*materials_{{name}}_F_laplace_1}:x:bool_laplace:materials_{{name}}_F_laplace_0:materials_{{name}}_sigma_thth:materials_{{name}}_F_laplace_1"
+            "gamma":"{-materials_{{name}}_stress_rr*x,-materials_{{name}}_stress_rz*x,- materials_{{name}}_stress_rz*x, -materials_{{name}}_stress_zz*x}:x:materials_{{name}}_stress_rr:materials_{{name}}_stress_rz:materials_{{name}}_stress_zz",
+            "f":"{bool_laplace*x*materials_{{name}}_F_laplace_0 - materials_{{name}}_stress_thth,bool_laplace*x*materials_{{name}}_F_laplace_1}:x:bool_laplace:materials_{{name}}_F_laplace_0:materials_{{name}}_stress_thth:materials_{{name}}_F_laplace_1"
         }
     }
 }
