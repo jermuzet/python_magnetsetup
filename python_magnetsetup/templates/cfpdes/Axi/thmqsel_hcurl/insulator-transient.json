@@ -9,8 +9,8 @@
     "stress_zz":"Lame_lambda*elastic1_grad_u_00+Lame_lambda/x*elastic1_u_0+(Lame_lambda+2*Lame_mu)*elastic1_grad_u_11+bool_dilatation*stress_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:stress_T",
     "stress_rz":"Lame_mu*(elastic1_grad_u_01+elastic1_grad_u_10):Lame_mu:elastic1_grad_u_01:elastic1_grad_u_10",
 
-    "stress1":"1/2*(stress_rr+stress_zz+sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz)):stress_rr:stress_zz:stress_rz",
+    "stress1":"1/2.*(stress_rr + stress_rz) +sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz):stress_rr:stress_zz:stress_rz",
     "stress2":"stress_thth:stress_thth",
-    "stress3":"1/2*(stress_rr+stress_zz-sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz)):stress_rr:stress_zz:stress_rz"
+    "stress3":"1/2.*(stress_rr + stress_rz) -sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz):stress_rr:stress_zz:stress_rz"
 }
 
