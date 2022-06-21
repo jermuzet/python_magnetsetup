@@ -26,7 +26,7 @@
                 "setup":{
 					"unknown":
 					{
-						"basis":"Pch2",
+						"basis":"Pch1",
 						"name":"Atheta",
 						"symbol":"Atheta"
 					}
@@ -168,34 +168,34 @@
 		    		},
 		    		"stress":
 		    		{
-						"expr":"{materials_stress_rr,0,materials_stress_rz, 0,materials_stress_thth,0, materials_stress_rz,0,materials_stress_zz}:materials_stress_rr:materials_stress_rz:materials_stress_thth:materials_stress_zz",
+						"expr":"{materials_stress_rr,materials_stress_rz, materials_stress_rz,materials_stress_zz}:materials_stress_rr:materials_stress_rz:materials_stress_zz",
 						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
-		    		"stress_tr":
+		    		"HoopStress":
 		    		{
-						"expr":"max(abs(materials_stress1-materials_stress2),max(abs(materials_stress1-materials_stress3),abs(materials_stress2-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
+						"expr":"materials_stress_thth:materials_stress_thth",
+						"markers": {{part_thermic}},
+						"representation":["element"]
+		    		},
+		    		"Vonmises":
+		    		{
+ 				                "expr": "sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
                         			"markers": {{part_thermic}},
-						"representation":["element"]
-		    		},
-		    		"stress_vm":
-		    		{
-						"expr":"sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
-						"markers": {{part_thermic}},
-						"representation":["element"]
-		    		},
-			    	"principle_stresses":
-			    	{
-						"expr":"{materials_stress1,materials_stress2,materials_stress3}:materials_stress1:materials_stress2:materials_stress3",
-						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"strain":
 		    		{
-						"expr":"{elastic_grad_u_00,0,1/2*(elastic_grad_u_01+elastic_grad_u_10), 0,elastic_u_0/x,0, 1/2*(elastic_grad_u_01+elastic_grad_u_10),0,elastic_grad_u_11}:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11",
+						"expr":"{elastic_grad_u_00,1/2*(elastic_grad_u_01+elastic_grad_u_10), 1/2*(elastic_grad_u_01+elastic_grad_u_10),elastic_grad_u_11}:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11",
                         			"markers": {{part_thermic}},
 						"representation":["element"]
-		    		}
+		    		},
+				"HoopStrain":
+				{
+						"expr": "elastic_u_0/x:x:elastic_u_0",
+                        			"markers": {{part_thermic}},
+						"representation":["element"]
+				}
 				}
 	    	}
 		},
