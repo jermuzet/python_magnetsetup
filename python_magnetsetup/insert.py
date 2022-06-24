@@ -285,7 +285,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
                 item = {"name": "U_" + marker, "value":"1"}
                 index = params.index(item)
                 mat = mmat[marker]
-                print(f"mat[{marker}]: {mat}")
+                # print(f"mat[{marker}]: {mat}")
                 # print("U=", params[index], mat['sigma'], R1[i], pitch_h[j])
                 sigma = float(mat['sigma'])
                 I_s = I0 * turns_h[i][j]
