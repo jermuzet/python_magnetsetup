@@ -138,7 +138,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
                 if isinstance(cad, Bitter.Bitter):
                     (tdict, tmat, tpost) = Bitter_setup(MyEnv, obj, cad, method_data, templates, debug)
                     # print("Bitter tpost:", tpost)
-                elif isinstance(cad, Supra):
+                elif isinstance(cad, Supra.Supra):
                     (tdict, tmat, tpost) = Supra_setup(MyEnv, obj, cad, method_data, templates, debug)
                 else:
                     raise Exception(f"setup: unexpected cad type {str(type(cad))}")
