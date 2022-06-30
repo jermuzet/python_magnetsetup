@@ -85,7 +85,7 @@ def magnet_simfile(MyEnv, confdata: str, addAir: bool = False):
     
                 if isinstance(cad, Bitter.Bitter):
                     files.append(cfgdata.name)
-                elif isinstance(cad, Supra):
+                elif isinstance(cad, Supra.Supra):
                     files.append(cfgdata.name)
                     struct = Supra_simfile(MyEnv, obj, cad)
                     if struct:
@@ -137,7 +137,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
                 if isinstance(cad, Bitter.Bitter):
                     (tdict, tmat, tpost) = Bitter_setup(MyEnv, obj, cad, method_data, templates, debug)
                     # print("Bitter tpost:", tpost)
-                elif isinstance(cad, Supra):
+                elif isinstance(cad, Supra.Supra):
                     (tdict, tmat, tpost) = Supra_setup(MyEnv, obj, cad, method_data, templates, debug)
                 else:
                     raise Exception(f"setup: unexpected cad type {str(type(cad))}")

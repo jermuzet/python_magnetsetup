@@ -288,7 +288,8 @@ def create_bcs_supra(boundary_meca: List,
     meca_bcs_dir = { 'boundary_Meca_Dir': []} # name, value
     maxwell_bcs_dir = { 'boundary_Maxwell_Dir': []} # name, value
     
-    fcooling = templates["cooling"]
+    if 'th' in method_data[3]:
+        fcooling = templates["cooling"]
     
     return {}
 
