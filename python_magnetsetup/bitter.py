@@ -5,7 +5,7 @@ import yaml
 from python_magnetgeo import Bitter
 from python_magnetgeo import python_magnetgeo
 
-from .jsonmodel import create_params_bitter, create_bcs_bitter, create_materials_bitter
+from .jsonmodel import create_params_bitter, create_bcs_bitter, create_materials_bitter, create_models_bitter
 from .utils import Merge, NMerge
 
 import os
@@ -118,6 +118,20 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     # print(f"bitter {name}: mpost={mpost}")
     mmat = create_materials_bitter(gdata, confdata, templates, method_data, debug)
     
+    mmodels = {}
+    if 'th' in method_data[3]:
+        mmodels["heat"] = create_models_bitter(gdata, confdata, templates, method_data, "heat", debug)
+
+    if 'mag' in method_data[3] or 'mqs' in method_data[3] :
+        mmodels["magnetic"] = create_models_bitter(gdata, confdata, templates, method_data, "magnetic", debug)
+    
+    if 'magel' in method_data[3] :
+        mmodels["elastic"] = create_models_bitter(gdata, confdata, templates, method_data, "elastic", debug)
+
+    if 'mqsel' in method_data[3] :
+        mmodels["elastic1"] = create_models_bitter(gdata, confdata, templates, method_data, "elastic1", debug)
+        mmodels["elastic2"] = create_models_bitter(gdata, confdata, templates, method_data, "elastic2", debug)
+
     # update U and hw, dTw param
     print("Update U for I0=31kA")
     # print(f"insert: mmat: {mmat}")
@@ -145,4 +159,4 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
             params[index] = item
                 
     
-    return (mdict, mmat, mpost)
+    return (mdict, mmat, mmodels, mpost)

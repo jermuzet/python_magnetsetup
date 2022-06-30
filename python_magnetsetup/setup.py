@@ -136,10 +136,10 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
                 print(f"load a {mtype} insert: {cad.name} ****")
     
                 if isinstance(cad, Bitter.Bitter):
-                    (tdict, tmat, tpost) = Bitter_setup(MyEnv, obj, cad, method_data, templates, debug)
+                    (tdict, tmat, tmodels, tpost) = Bitter_setup(MyEnv, obj, cad, method_data, templates, debug)
                     # print("Bitter tpost:", tpost)
                 elif isinstance(cad, Supra.Supra):
-                    (tdict, tmat, tpost) = Supra_setup(MyEnv, obj, cad, method_data, templates, debug)
+                    (tdict, tmat, tmodels, tpost) = Supra_setup(MyEnv, obj, cad, method_data, templates, debug)
                 else:
                     raise Exception(f"setup: unexpected cad type {str(type(cad))}")
 
@@ -148,6 +148,9 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
             
                 if debug: print("tmat:", tmat)
                 mmat = NMerge(tmat, mmat, debug, "magnet_setup Bitter/Supra mmat")
+
+                if debug: print("tmodels:", tmodels)
+                mmodels = NMerge(tmodels, mmodels, debug, "magnet_setup Bitter/Supra mmodels")
             
                 if debug: print("tpost:", tpost)
                 # print(f"magnet_setup {cad.name}: tpost[current_H]={tpost['current_H']}")
