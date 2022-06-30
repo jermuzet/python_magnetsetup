@@ -150,7 +150,33 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
                 mmat = NMerge(tmat, mmat, debug, "magnet_setup Bitter/Supra mmat")
 
                 if debug: print("tmodels:", tmodels)
-                mmodels = NMerge(tmodels, mmodels, debug, "magnet_setup Bitter/Supra mmodels")
+                if 'th' in method_data[3]:
+                    if "heat" in mmodels :
+                        mmodels["heat"] = NMerge(tmodels["heat"], mmodels["heat"], debug, "magnet_setup Bitter/Supra mmodels heat")
+                    else :
+                        mmodels["heat"] = tmodels["heat"]
+
+                if 'mag' in method_data[3] or 'mqs' in method_data[3] :
+                    if "magnetic" in mmodels :
+                        mmodels["magnetic"] = NMerge(tmodels["magnetic"], mmodels["magnetic"], debug, "magnet_setup Bitter/Supra mmodels magnetic")
+                    else :
+                        mmodels["magnetic"] = tmodels["magnetic"]
+                
+                if 'magel' in method_data[3] :
+                    if "elastic" in mmodels :
+                        mmodels["elastic"] = NMerge(tmodels["elastic"], mmodels["elastic"], debug, "magnet_setup Bitter/Supra mmodels elastic")
+                    else :
+                        mmodels["elastic"] = tmodels["elastic"]
+
+                if 'mqsel' in method_data[3] :
+                    if "elastic1" in mmodels :
+                        mmodels["elastic1"] = NMerge(tmodels["elastic1"], mmodels["elastic1"], debug, "magnet_setup Bitter/Supra mmodels elastic1")
+                    else :
+                        mmodels["elastic1"] = tmodels["elastic1"]
+                    if "elastic2" in mmodels :
+                        mmodels["elastic2"] = NMerge(tmodels["elastic2"], mmodels["elastic2"], debug, "magnet_setup Bitter/Supra mmodels elastic2")
+                    else :
+                        mmodels["elastic2"] = tmodels["elastic2"]
             
                 if debug: print("tpost:", tpost)
                 # print(f"magnet_setup {cad.name}: tpost[current_H]={tpost['current_H']}")
@@ -236,7 +262,7 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
         # print("NewMerge:", NMerge(tmat, mmat))
         # print("mmat:", mmat)
         
-        mmodels = NMerge(tmodels, mmodels, debug, "msite_setup/tmat")
+        mmodels = NMerge(tmodels, mmodels, debug, "msite_setup/tmodels")
 
         # print("tpost:", tpost)
         mpost = NMerge(tpost, mpost, debug, "msite_setup/tpost") #debug)
