@@ -43,7 +43,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     if debug: print(cad)
 
     snames = []
-    name = cad.name.replace('Bitter_','')
+    name = cad.name#.replace('Bitter_','')
     if method_data[2] == "Axi":
         for i in range(len(cad.axi.turns)):
             snames.append(name + "_B%d" % (i+1))

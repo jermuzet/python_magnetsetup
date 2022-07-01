@@ -42,7 +42,7 @@ def Supra_setup(MyEnv, confdata: dict, cad: Supra, method_data: List, templates:
     mpost = {}
 
     snames = []
-    name = cad.name.replace('Supra_','')
+    name = cad.name#.replace('Supra_','')
     # TODO eventually get details
     part_electric.append(name)
         
