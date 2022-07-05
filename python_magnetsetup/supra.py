@@ -5,7 +5,7 @@ import yaml
 from python_magnetgeo import Supra
 from python_magnetgeo import python_magnetgeo
 
-from .jsonmodel import create_params_supra, create_bcs_supra, create_materials_supra
+from .jsonmodel import create_params_supra, create_bcs_supra, create_materials_supra, create_models_supra
 from .utils import NMerge
 
 from .file_utils import MyOpen, findfile
@@ -38,10 +38,11 @@ def Supra_setup(MyEnv, confdata: dict, cad: Supra, method_data: List, templates:
         
     mdict = {}
     mmat = {}
+    mmodels = {}
     mpost = {}
 
     snames = []
-    name = cad.name.replace('Supra_','')
+    name = cad.name#.replace('Supra_','')
     # TODO eventually get details
     part_electric.append(name)
         
@@ -85,5 +86,5 @@ def Supra_setup(MyEnv, confdata: dict, cad: Supra, method_data: List, templates:
     meanT_data = []
 
     mpost = {}
-    return (mdict, mmat, mpost)
+    return (mdict, mmat, mmodels, mpost)
 

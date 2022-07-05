@@ -12,5 +12,6 @@
     "stress1":"1/2.*(stress_rr + stress_rz) +sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz):stress_rr:stress_zz:stress_rz",
     "stress2":"stress_thth:stress_thth",
     "stress3":"1/2.*(stress_rr + stress_rz) -sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz):stress_rr:stress_zz:stress_rz"
+
 }
 
