@@ -67,13 +67,17 @@ def BMagnet(struct: Bitter, material: dict, fillingfactor: float=1, debug: bool=
     """
     create view of this insert as a Bitter Magnet
 
-    b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, fillingfactor, rho)
+    struct: geometry of the bitter stack
+    material: physical properties of copper alloy
+    fillingfactor: ratio of copper alloy volume over total volume
+
+    b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, 1/float(n), rho)
     """
     
     BMagnets = mt.VectorOfBitters()
     
     rho = 1/ material["ElectricalConductivity"]
-    f = fillingfactor # 1/struct.get_Nturns() # struct.getFillingFactor()
+    # f = fillingfactor # 1/struct.get_Nturns() # struct.getFillingFactor()
         
     r1 = struct.r[0]*1.e-3
     r2 = struct.r[1]*1.e-3
@@ -81,6 +85,7 @@ def BMagnet(struct: Bitter, material: dict, fillingfactor: float=1, debug: bool=
 
     for (n, pitch) in zip(struct.axi.turns, struct.axi.pitch):
         dz = n * pitch*1.e-3
+        f = 1/float(n) # struct.getFillingFactor()
         if f != 1:
             j = n / (r1 * math.log(r2/r1) * dz)
         else:
