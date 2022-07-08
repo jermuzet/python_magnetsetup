@@ -125,7 +125,7 @@
                 "myic":
                 {
                     "markers": {{part_thermic}},
-		    		"expr":"Tinit:Tinit"
+		    "expr":"Tinit:Tinit"
                 }
             }
         }
@@ -180,20 +180,20 @@
 		    		},
 		    		"Vonmises":
 		    		{
- 				                "expr": "sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
-                        			"markers": {{part_thermic}},
+						"expr": "sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
+						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"strain":
 		    		{
 						"expr":"{elastic_grad_u_00,1/2*(elastic_grad_u_01+elastic_grad_u_10), 1/2*(elastic_grad_u_01+elastic_grad_u_10),elastic_grad_u_11}:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11",
-                        			"markers": {{part_thermic}},
+						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 				"HoopStrain":
 				{
 						"expr": "elastic_u_0/x:x:elastic_u_0",
-                        			"markers": {{part_thermic}},
+						"markers": {{part_thermic}},
 						"representation":["element"]
 				}
 				}

@@ -15,13 +15,20 @@ ksp-monitor=1
 snes-monitor=1
 snes-maxit=40
 
-# Fieldsplit
-pc-type=fieldsplit
-fieldsplit-type=additive #additive, multiplicative, symmetric-multiplicative
-[cfpdes.fieldsplit-0]
-pc-type=gamg
-[cfpdes.fieldsplit-1]
-pc-type=gamg
-[cfpdes.fieldsplit-2]
-pc-type=gamg
+snes-line-search-type=basic
+# snes-line-search-type=l2
+solver.nonlinear.apply-dof-elimination-on-initial-guess=0
+
+ksp-type=preonly
+pc-type=lu
+
+# # Fieldsplit
+# pc-type=fieldsplit
+# fieldsplit-type=additive #additive, multiplicative, symmetric-multiplicative
+# [cfpdes.fieldsplit-0]
+# pc-type=gamg
+# [cfpdes.fieldsplit-1]
+# pc-type=gamg
+# [cfpdes.fieldsplit-2]
+# pc-type=gamg
 

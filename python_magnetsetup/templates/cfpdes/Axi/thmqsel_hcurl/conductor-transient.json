@@ -1,15 +1,6 @@
 {
     "j_th":"-sigma*U/2/pi/x:sigma:U:x",
 
-    "magnetic_c":"x/mu:x:mu",
-    "magnetic_a":"1/mu/x:x:mu",
-    "magnetic_f":"j_th*x:j_th:x",
-    "magnetic_d":"sigma*x:x:sigma",
-
-    "heat_c":"k*x:k:x",
-    "heat_f":"sigma*(U/(2*pi)+magnetic_dAtheta_dt*x)*(U/(2*pi)+magnetic_dAtheta_dt*x)/x:sigma:U:magnetic_dAtheta_dt:x",
-    "heat_d":"rho*Cp*x:rho:Cp:x",
-    
     "Lame_lambda":"E*nu/(1-2*nu)/(1+nu):E:nu",  
     "Lame_mu":"E/(2*(1+nu)):E:nu",
 

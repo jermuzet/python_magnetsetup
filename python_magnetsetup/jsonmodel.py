@@ -274,6 +274,48 @@ def create_materials_insert(gdata: tuple, idata: Optional[List], confdata: dict,
 
     return materials_dict
 
+def create_models_supra(gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False) -> dict:
+    models_dict = {}
+    if debug: print("create_models_supra:", confdata)
+
+    fconductor = templates["conductor"]
+    
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = method_data[5] # "meter"
+    units = load_units(unit_Length)
+    for prop in ["ThermalConductivity", "Young", "VolumicMass", "ElectricalConductivity"]:
+        confdata["material"][prop] = convert_data(units, confdata["material"][prop], prop)
+
+    if method_data[2] == "Axi":
+        pass
+    else:
+        pass
+
+    return models_dict
+
+def create_models_bitter(gdata: tuple, confdata: dict, templates: dict, method_data: List[str], equation: str, debug: bool = False) -> dict:
+    models_dict = {}
+    if debug: print("create_model_bitter:", confdata)
+
+    fconductor = templates[equation+"-conductor"]
+    
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = method_data[5] # "meter"
+    units = load_units(unit_Length)
+
+    (name, snames, turns) = gdata
+    for sname in snames:
+        if method_data[2] == "Axi":
+            if debug: print("create_model_bitter:", sname)
+            mdata = entry(fconductor, Merge({'name': "%s" % sname}, confdata["material"]) , debug)
+            models_dict["%s" % sname] = mdata
+        else:
+            return {}
+
+    if debug:
+        print(models_dict)
+    return models_dict
+
 
 def create_models_insert(gdata: tuple, idata: Optional[List], confdata: dict, templates: dict, method_data: List[str], equation: str, debug: bool = False) -> dict:
     # TODO loop for Plateau (Axi specific)
@@ -283,7 +325,7 @@ def create_models_insert(gdata: tuple, idata: Optional[List], confdata: dict, te
 
     fconductor = templates[equation+"-conductor"]
     finsulator = templates[equation+"-insulator"]
-    print('\n\nfconductor :', fconductor)
+    # print('\n\nfconductor :', fconductor)
 
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
             
@@ -322,7 +364,8 @@ def create_bcs_supra(boundary_meca: List,
     meca_bcs_dir = { 'boundary_Meca_Dir': []} # name, value
     maxwell_bcs_dir = { 'boundary_Maxwell_Dir': []} # name, value
     
-    fcooling = templates["cooling"]
+    if 'th' in method_data[3]:
+        fcooling = templates["cooling"]
     
     return {}
 

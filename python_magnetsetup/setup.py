@@ -136,10 +136,10 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
                 print(f"load a {mtype} insert: {cad.name} ****")
     
                 if isinstance(cad, Bitter.Bitter):
-                    (tdict, tmat, tpost) = Bitter_setup(MyEnv, obj, cad, method_data, templates, debug)
+                    (tdict, tmat, tmodels, tpost) = Bitter_setup(MyEnv, obj, cad, method_data, templates, debug)
                     # print("Bitter tpost:", tpost)
-                elif isinstance(cad, Supra):
-                    (tdict, tmat, tpost) = Supra_setup(MyEnv, obj, cad, method_data, templates, debug)
+                elif isinstance(cad, Supra.Supra):
+                    (tdict, tmat, tmodels, tpost) = Supra_setup(MyEnv, obj, cad, method_data, templates, debug)
                 else:
                     raise Exception(f"setup: unexpected cad type {str(type(cad))}")
 
@@ -148,6 +148,14 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
             
                 if debug: print("tmat:", tmat)
                 mmat = NMerge(tmat, mmat, debug, "magnet_setup Bitter/Supra mmat")
+
+                if debug: print("tmodels:", tmodels)
+                for key in tmodels:
+                    if key in mmodels :
+                        mmodels[key] = NMerge(tmodels[key], mmodels[key], debug, "magnet_setup Bitter/Supra mmodels "+key)
+                    else :
+                        if debug: print("Merge tmodels["+key+"] with empty mmodels["+key+"]")
+                        mmodels[key] = tmodels[key]
             
                 if debug: print("tpost:", tpost)
                 # print(f"magnet_setup {cad.name}: tpost[current_H]={tpost['current_H']}")
@@ -233,7 +241,7 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
         # print("NewMerge:", NMerge(tmat, mmat))
         # print("mmat:", mmat)
         
-        mmodels = NMerge(tmodels, mmodels, debug, "msite_setup/tmat")
+        mmodels = NMerge(tmodels, mmodels, debug, "msite_setup/tmodels")
 
         # print("tpost:", tpost)
         mpost = NMerge(tpost, mpost, debug, "msite_setup/tpost") #debug)
@@ -501,6 +509,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     if args.method != "HDG":
         scale = "--mesh.scale=0.001"
     h5file = xaofile.replace(".xao", f"_p{NP}.json")
+
     partcmd = f"{partitioner} --ifile $PWD/{workingdir}/{gmshfile} --odir $PWD/{workingdir} --part {NP} {scale}"
         
     tarfile = cfgfile.replace("cfg", "tgz")
@@ -530,6 +539,7 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
         update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale =|' {cfgfile}"
         cmds["Update_cfg"] = update_cfg
         
+
     # TODO add command to change mesh.filename in cfgfile    
     update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/{workingdir}/{meshfile}|\' {cfgfile}"
 
@@ -565,8 +575,9 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
             pyparaviewcmd = f"pvpython {pyparaview}"
             cmds["Postprocessing"] = f"singularity exec {simage_path}/{paraview} {pyparaviewcmd}"
 
+
     cmds["Save"] = f"tmpdir=$(pwd) && pushd {result_dir}/.. && tar zcf $tmpdir/{result_arch} np_{NP} && popd"
-        
+
     # TODO jobmanager if server.manager != JobManagerType.none
     # Need user email at this point
     # Template for oar and slurm

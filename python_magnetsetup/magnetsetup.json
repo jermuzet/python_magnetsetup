@@ -331,6 +331,7 @@
 					"models":
 					{
 						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
 						"magnetic-insulator":"magnetic-insulator.mustache"
 					},
 					"filename":
@@ -353,6 +354,7 @@
 					"models":
 					{
 						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
 						"magnetic-insulator":"magnetic-insulator.mustache"
 					},
 					"filename":
@@ -376,8 +378,10 @@
 					"models":
 					{
 						"heat-conductor":"heat-conductor.mustache",
+						"heat-conduct-nosource":"heat-conduct-nosource.mustache",
 						"heat-insulator":"heat-insulator.mustache",
 						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
 						"magnetic-insulator":"magnetic-insulator.mustache"
 					},
 					"cooling":
@@ -417,8 +421,10 @@
 					"models":
 					{
 						"heat-conductor":"heat-conductor.mustache",
+						"heat-conduct-nosource":"heat-conduct-nosource.mustache",
 						"heat-insulator":"heat-insulator.mustache",
 						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
 						"magnetic-insulator":"magnetic-insulator.mustache"
 					},
 					"cooling":
@@ -458,12 +464,16 @@
 					"models":
 					{
 						"heat-conductor":"heat-conductor.mustache",
+						"heat-conduct-nosource":"heat-conduct-nosource.mustache",
 						"heat-insulator":"heat-insulator.mustache",
 						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
 						"magnetic-insulator":"magnetic-insulator.mustache",
 						"elastic1-conductor":"elastic1-conductor.mustache",
+						"elastic1-conduct-nosource":"elastic1-conduct-nosource.mustache",
 						"elastic1-insulator":"elastic1-insulator.mustache",
 						"elastic2-conductor":"elastic2-conductor.mustache",
+						"elastic2-conduct-nosource":"elastic2-conduct-nosource.mustache",
 						"elastic2-insulator":"elastic2-insulator.mustache"
 					},
 					"cooling":
@@ -503,12 +513,16 @@
 					"models":
 					{
 						"heat-conductor":"heat-conductor.mustache",
+						"heat-conduct-nosource":"heat-conduct-nosource.mustache",
 						"heat-insulator":"heat-insulator.mustache",
 						"magnetic-conductor":"magnetic-conductor.mustache",
+						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
 						"magnetic-insulator":"magnetic-insulator.mustache",
 						"elastic1-conductor":"elastic1-conductor.mustache",
+						"elastic1-conduct-nosource":"elastic1-conduct-nosource.mustache",
 						"elastic1-insulator":"elastic1-insulator.mustache",
 						"elastic2-conductor":"elastic2-conductor.mustache",
+						"elastic2-conduct-nosource":"elastic2-conduct-nosource.mustache",
 						"elastic2-insulator":"elastic2-insulator.mustache"
 					},
 					"cooling":
