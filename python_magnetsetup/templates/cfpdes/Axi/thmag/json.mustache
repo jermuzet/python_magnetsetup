@@ -91,17 +91,19 @@
     },
     "InitialConditions":
     {
-        "temperature":
-        {
-            "Expression":
-            {
-                "myic":
-                {
-                    "markers": {{part_thermic}},
-                    "expr":"Tinit:Tinit"
-                }
-            }
-        }
+		"heat":{
+			"temperature":
+			{
+				"Expression":
+				{
+					"myic":
+					{
+						"markers": {{part_thermic}},
+						"expr":"Tinit:Tinit"
+					}
+				}
+			}
+		}
     },
     "PostProcess":
     {
