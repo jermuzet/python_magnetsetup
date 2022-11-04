@@ -22,9 +22,9 @@ def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter):
         return cfgdata
 
 def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, templates: dict, debug: bool=False):
-    print("Bitter_setup: %s" % cad.name) #, "debug=", debug, "confdata:", confdata)
-    if debug: 
-        print("Bitter_setup/Bitter confdata: %s" % confdata)
+    print(f'Bitter_setup: {cad.name}') #, "debug=", debug, "confdata:", confdata)
+    if debug:
+        print(f'Bitter_setup/Bitter confdata: {confdata}')
 
     part_thermic = []
     part_electric = []
@@ -36,11 +36,11 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
 
     yamlfile = confdata["geom"]
     if debug: 
-        print("Bitter_setup/Bitter yamlfile: %s" % yamlfile)
+        print(f'Bitter_setup/Bitter yamlfile: {yamlfile}')
 
-    print("cad:", cad, type(cad))
     NSections = len(cad.axi.turns)
-    if debug: print(cad)
+    if debug:
+        print(f"cad: {cad} tpe: {type(cad)}")
 
     snames = []
     name = cad.name#.replace('Bitter_','')

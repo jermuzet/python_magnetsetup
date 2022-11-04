@@ -88,10 +88,9 @@ def loadmachine(server: str):
         return server_defs[server]
     else:
         raise ValueError(f"loadmachine: {server} no such server defined")
-
     pass
 
-def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear: bool=True, debug: bool=False):
+def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: bool=False):
     """
     Load templates into a dict
 
@@ -103,7 +102,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     cooling
 
     """
-    
+
     [method, time, geom, model, cooling, units_def] = method_data
     template_path = os.path.join(appenv.template_path(), method, geom, model)
 
@@ -112,7 +111,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     if linear:
         conductor_model = appcfg[method][time][geom][model]["conductor-linear"]
     else:
-        if geom == "3D": 
+        if geom == "3D":
             json_model = appcfg[method][time][geom][model]["model-nonlinear"]
         conductor_model = appcfg[method][time][geom][model]["conductor-nonlinear"]
     insulator_model = appcfg[method][time][geom][model]["insulator"]
@@ -212,7 +211,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     if check_templates(dict):
         pass
 
-    return dict    
+    return dict
 
 def check_templates(templates: dict):
     """
@@ -229,7 +228,7 @@ def check_templates(templates: dict):
                 print(key, s)
                 with open(s, "r") as f: pass
     print("==========================\n\n")
-    
+
     return True
 
 def supported_models(Appcfg, method: str, geom: str, time: str) -> List:

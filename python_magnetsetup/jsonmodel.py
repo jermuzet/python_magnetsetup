@@ -496,12 +496,13 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
     """
     Create a json model file
     """
-    
-    if debug: 
+
+    if debug:
         print("create_json jsonfile=", jsonfile)
         print("create_json mdict=", mdict)
-    data = entry(templates["model"], mdict, debug)   
-    if debug: print("create_json/data model:", data)
+    data = entry(templates["model"], mdict, debug)
+    if debug:
+        print(f"create_json/data model: {data}")
     
     # material section
     if "Materials" in data:

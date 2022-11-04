@@ -217,7 +217,7 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
     
                 if isinstance(cad, Bitter.Bitter):
-                    fillingfactor = 1/cad.axi.get_Nturns() # TODO get from confdata
+                    fillingfactor = 1/cad.axi.get_Nturns()
                     tmp = BMagnet(cad, obj["material"], fillingfactor, debug)
                     for item in tmp:
                         BMagnets.append(item)
@@ -253,9 +253,9 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False, session=None):
     """
     Creating MagnetTools data struct for setup for msite
     """
-    print("msite_setup:", "debug=", debug)
-    print("msite_setup:", "confdata=", confdata)
-    print("miste_setup: confdata[magnets]=", confdata["magnets"])
+    if debug:
+        print(f"msite_setup: confdata={confdata}")
+        print(f"msite_setup: confdata[magnets]={confdata['magnets']}")
     
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
@@ -265,19 +265,10 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False, session=None):
     Shims = mt.VectorOfShims()
 
     for magnet in confdata["magnets"]:
-        print("magnet:", magnet, "type(magnet)=", type(magnet), "debug=", debug)
-        try:
-            mconfdata = load_object(MyEnv, magnet + "-data.json", magnet, debug)
-        except:
-            print("setup: failed to load %s, look into magnetdb" % (magnet + "-data.json") )
-            try:
-                mconfdata = load_object_from_db(MyEnv, "magnet", magnet, debug, session)
-            except:
-                raise Exception(f"setup: failed to load {magnet} from magnetdb")
-                    
+        print(f"magnet: {magnet}, type={type(magnet)}={type(magnet)} debug={debug}")
         if debug:
-            print("mconfdata[geom]:", mconfdata["geom"])
-        tmp = magnet_setup(MyEnv, mconfdata, debug)
+            print(f"mconfdata[geom]: {magnet['geom']}")
+        tmp = magnet_setup(MyEnv, magnet, debug)
         
         # pack magnets
         for item in tmp[0]:

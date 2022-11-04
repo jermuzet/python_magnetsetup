@@ -135,7 +135,6 @@ def main():
             print("cannot specify both datafile and magnet or msite")
             sys.exit(1)
 
-
     # Get Object
     if args.datafile != None:
         confdata = load_object(MyEnv, args.datafile, args.debug)
