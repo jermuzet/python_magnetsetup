@@ -55,6 +55,8 @@ def fabric(machine: str, workingdir: str, geodir: str, args, cfgfile: str, jsonf
         # connection_.get(remote=f'{homedir}/{workingdir}/{result_arch}')
         # connection_.get(remote=f'{homedir}/{workingdir}/\*.png')
         # connection_.get(remote=f'{homedir}/{workingdir}/{csvs}')
+
+        result = connection_.run(f'rm -rf {homedir}/{workingdir}')
         
     return 0
     
