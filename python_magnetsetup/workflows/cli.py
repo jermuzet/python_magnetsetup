@@ -24,7 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description="Cfpdes HiFiMagnet Fully Coupled model")
     parser.add_argument("cfgfile", help="input cfg file (ex. HL-31.cfg)")
     parser.add_argument("--wd", help="set a working directory", type=str, default="")
-    parser.add_argument("--current", help="specify requested current (default: 31kA)", nargs='?', metavar='Current', type=float, default=[31.e+3])
+    parser.add_argument("--current", help="specify requested current (default: 31kA)", nargs='+', metavar='Current', type=float, default=31.e+3)
     parser.add_argument("--cooling", help="choose cooling type", type=str,
                     choices=['mean', 'grad', 'meanH', 'gradH'], default='mean')
     parser.add_argument("--eps", help="specify requested tolerance (default: 1.e-3)", type=float, default=1.e-3)
@@ -76,13 +76,13 @@ def main():
     params = {}
     bc_params = {}
     control_params = []
-    for p in targetdefs['I']['control_params']:
+    for p in targetdefs['IH']['control_params']:
         if args.debug: print(f"extract control params for {p[0]}")
         control_params.append(p[0])
         tmp = getparam(p[0], parameters, p[1], args.debug)
         params = Merge(tmp, params, args.debug)
 
-    for p in targetdefs['I']['params']:
+    for p in targetdefs['IH']['params']:
         if args.debug: print(f"extract compute params for {p[0]}")
         tmp = getparam(p[0], parameters, p[1], args.debug)
         params = Merge(tmp, params, args.debug)
@@ -110,14 +110,14 @@ def main():
     # insert: IH, params N_H\* control_params U_H\* 'Statistics_Intensity_H\w+_integrate'
     # bitter: IB, other U_\*, extract name from U_* to get N_*
     # supra: IS params from I_\*, ............. I_\* to get N_*
-    targets = setTarget('I', params, args.current[0], args.debug)
+    targets = setTarget('IH', params, args.current[0], args.debug)
     # print("targets:", targets)
     
     # init feelpp env
     (feelpp_env, feel_pb) = init(args)
     
     # solve (output params contains both control_params and bc_params values )
-    (params, bcparams) = solve(feelpp_env, feel_pb, args, 'I', params, control_params, bc_params, targets)
+    (params, bcparams) = solve(feelpp_env, feel_pb, args, 'IH', params, control_params, bc_params, targets)
     
     # update
     update(cwd, jsonmodel, params, control_params, bcparams, args.current[0], args.debug)
