@@ -20,17 +20,17 @@ from .real_methods import *
 # TODO create/modify targetdefs on the fly
 
 targetdefs = {
-    "I": {
+    "IH": {
         "csv": 'heat.measures/values.csv', 
-        "rematch": 'Statistics_Intensity_\w+_integrate', 
-        "params": [('N','N_\w+')],
-        "control_params": [('U', 'U_\w+', update_U)],
+        "rematch": 'Statistics_Intensity_H\w+_integrate', 
+        "params": [('N','N_H\w+')],
+        "control_params": [('U', 'U_H\w+', update_U)],
         "value": (getCurrent, setCurrent),
         "unit": "Current"
         },
     "PowerH": {
         "csv": 'heat.measures/values.csv', 
-        "rematch": 'Statistics_Power_\w+_integrate', 
+        "rematch": 'Statistics_Power_H\w+_integrate', 
         "params": [],
         "control_params": [],
         "value": (getPower, setPower),
@@ -46,7 +46,7 @@ targetdefs = {
     },
     "MeanTH": {
         "csv": 'heat.measures/values.csv', 
-        "rematch": 'Statistics_MeanT_\w+_mean', 
+        "rematch": 'Statistics_MeanT_H\w+_mean', 
         "params": [],
         "control_params": [],
         "value": (getMeanT, setMeanT),
@@ -62,7 +62,7 @@ targetdefs = {
     },
     "MaxTH": {
         "csv": 'heat.measures/values.csv', 
-        "rematch": 'Statistics_MeanT_\w+_max', 
+        "rematch": 'Statistics_MeanT_H\w+_max', 
         "params": [],
         "control_params": [],
         "value": (getMaxT, setMaxT),
