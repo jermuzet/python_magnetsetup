@@ -1,42 +1,43 @@
+import json
+import os
 from typing import List, Optional
 
-import sys
-import os
-import json
+from decouple import Config, RepositoryEnv
 
-from .machines import load_machines
 
 class appenv():
     
-    def __init__(self, debug: bool = False):
-        self.url_api: str = None
-        self.yaml_repo: Optional[str] = None
-        self.cad_repo: Optional[str] = None
-        self.mesh_repo: Optional[str] = None
-        self.template_repo: Optional[str] = None
-        self.simage_repo: Optional[str] = None
-        self.mrecord_repo: Optional[str] = None
-        self.optim_repo: Optional[str] = None
+    def __init__(self, envfile: str = "settings.env", debug: bool = False, url_api: str = None,
+                 yaml_repo: str = None, cad_repo: str = None, mesh_repo: str = None, template_repo: str = None,
+                 simage_repo: str = None, mrecord_repo: str = None, optim_repo: str = None):
+        self.url_api: str = url_api
+        self.yaml_repo: Optional[str] = yaml_repo
+        self.cad_repo: Optional[str] = cad_repo
+        self.mesh_repo: Optional[str] = mesh_repo
+        self.template_repo: Optional[str] = template_repo
+        self.simage_repo: Optional[str] = simage_repo
+        self.mrecord_repo: Optional[str] = mrecord_repo
+        self.optim_repo: Optional[str] = optim_repo
 
-        from decouple import Config, RepositoryEnv
-        envdata = RepositoryEnv("settings.env")
-        data = Config(envdata)
-        if debug:
-            print("appenv:", RepositoryEnv("settings.env").data)
+        if envfile is not None:
+            envdata = RepositoryEnv(envfile)
+            data = Config(envdata)
+            if debug:
+                print("appenv:", RepositoryEnv("settings.env").data)
 
-        self.url_api = data.get('URL_API')
-        self.compute_server = data.get('COMPUTE_SERVER')
-        self.visu_server = data.get('VISU_SERVER')
-        if 'TEMPLATE_REPO' in envdata:
-            self.template_repo = data.get('TEMPLATE_REPO')
-        if 'SIMAGE_REPO' in envdata:
-            self.simage_repo = data.get('SIMAGE_REPO')
-        if 'DATA_REPO' in envdata:
-            self.yaml_repo = data.get('DATA_REPO') + "/geometries"
-            self.cad_repo = data.get('DATA_REPO') + "/cad"
-            self.mesh_repo = data.get('DATA_REPO') + "/meshes"
-            self.mrecord_repo = data.get('DATA_REPO') + "/mrecords"
-            self.optim_repo = data.get('DATA_REPO') + "/optims"
+            self.url_api = data.get('URL_API')
+            self.compute_server = data.get('COMPUTE_SERVER')
+            self.visu_server = data.get('VISU_SERVER')
+            if 'TEMPLATE_REPO' in envdata:
+                self.template_repo = data.get('TEMPLATE_REPO')
+            if 'SIMAGE_REPO' in envdata:
+                self.simage_repo = data.get('SIMAGE_REPO')
+            if 'DATA_REPO' in envdata:
+                self.yaml_repo = data.get('DATA_REPO') + "/geometries"
+                self.cad_repo = data.get('DATA_REPO') + "/cad"
+                self.mesh_repo = data.get('DATA_REPO') + "/meshes"
+                self.mrecord_repo = data.get('DATA_REPO') + "/mrecords"
+                self.optim_repo = data.get('DATA_REPO') + "/optims"
         if debug:
             print(f"DATA: {self.yaml_repo}")
 
@@ -78,18 +79,6 @@ def loadconfig():
         magnetsetup = json.load(appcfg)
     return magnetsetup
 
-def loadmachine(server: str):
-    """
-    Load app server config (aka machines.json)
-    """
-
-    server_defs = load_machines()
-    if server in server_defs:
-        return server_defs[server]
-    else:
-        raise ValueError(f"loadmachine: {server} no such server defined")
-    pass
-
 def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: bool=False):
     """
     Load templates into a dict
@@ -103,12 +92,14 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
 
     """
 
-    [method, time, geom, model, cooling, units_def] = method_data
+    [method, time, geom, model, cooling, units_def, nonlinear] = method_data
+    print(f"time: {time}")
+    print(f"nonlinear: {nonlinear} type={type(nonlinear)}")
     template_path = os.path.join(appenv.template_path(), method, geom, model)
 
     cfg_model = appcfg[method][time][geom][model]["cfg"]
     json_model = appcfg[method][time][geom][model]["model"]
-    if linear:
+    if not nonlinear:
         conductor_model = appcfg[method][time][geom][model]["conductor-linear"]
     else:
         if geom == "3D":
@@ -118,7 +109,7 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
     
     fcfg = os.path.join(template_path, cfg_model)
     if debug:
-        print("fcfg:", fcfg, type(fcfg))
+        print(f"fcfg: {fcfg} type={type(fcfg)}")
     fmodel = os.path.join(template_path, json_model)
     fconductor = os.path.join(template_path, conductor_model)
     finsulator = os.path.join(template_path, insulator_model)
@@ -145,11 +136,15 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
         fmagconductor = os.path.join(template_path, magnetic_conductor)
         fmaginsulator = os.path.join(template_path, magnetic_insulator)
 
+        plot_model = appcfg[method][time][geom][model]["plots_B"]
+        plots_B =  os.path.join(template_path, plot_model)
+
     if 'magel' in model :
         elastic_conductor = appcfg[method][time][geom][model]["models"]["elastic-conductor"]
         elastic_insulator = appcfg[method][time][geom][model]["models"]["elastic-insulator"]
         felasconductor = os.path.join(template_path, elastic_conductor)
         felasinsulator = os.path.join(template_path, elastic_insulator)
+        stats_Stress_model = appcfg[method][time][geom][model]["stats_Stress"]
 
     if 'mqsel' in model :
         elastic1_conductor = appcfg[method][time][geom][model]["models"]["elastic1-conductor"]
@@ -161,6 +156,8 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
         felas1insulator = os.path.join(template_path, elastic1_insulator)
         felas2conductor = os.path.join(template_path, elastic2_conductor)
         felas2insulator = os.path.join(template_path, elastic2_insulator)
+
+        stats_Stress_model = appcfg[method][time][geom][model]["stats_Stress"]
 
     #if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
     stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
@@ -179,6 +176,7 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
         "conductor": fconductor,
         "insulator": finsulator,
         "stats": [],
+        "plots":[],
         "material_def" : material_generic_def
     }
 
@@ -193,6 +191,7 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
     if 'mag' in model or 'mqs' in model :
         dict["magnetic-conductor"] = fmagconductor
         dict["magnetic-insulator"] = fmaginsulator
+        dict["plots"].append(plots_B)
 
     if 'magel' in model :
         dict["elastic-conductor"] = felasconductor

@@ -6,7 +6,7 @@
         "mesh":
 	{
 		"hifimagnet": "/opt/SALOME-9.8.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome",
-		"salome": "hifimagnet-salome-9.8.0.sif",
+		"salome": "hifimagnet-salome-9.8.2.sif",
 		"partitioner": "feelpp_mesh_partitioner",
 		"3D": 
 		{
@@ -21,7 +21,7 @@
 	},
 	"cfpdes":
 	{
-    	        "feelpp": "feelpp-toolboxes-develop-v0.110.0-rc.1-ubuntu-20.04.sif",
+    	        "feelpp": "feelpp-v0.110.2-ubuntu-20.04.sif",
     	        "exec": "feelpp_toolbox_coefficientformpdes",
 		"static":
 		{
@@ -70,7 +70,7 @@
 				        "stats_Current": "stats_Current.mustache",
 				        "post":
 				        {
-					    "heat.temperature": "T[K]"
+					        "heat.temperature": "T[K]"
 				        }
 				},
 				"mag_hcurl":
@@ -91,7 +91,8 @@
 						"insulator": "insulator-static.json"
 					},
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "plots_B": "plot_B.mustache" 
 				},
 				"mag":
 				{
@@ -111,7 +112,8 @@
 						"insulator": "insulator-static.json"
 					},
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "plots_B": "plot_B.mustache" 
 				},
 				"thmag_hcurl":
 				{
@@ -150,7 +152,8 @@
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "plots_B": "plot_B.mustache" 
 				},
 				"thmag":
 				{
@@ -189,7 +192,8 @@
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "plots_B": "plot_B.mustache" 
 				},
 				"thmagel_hcurl":
 				{
@@ -230,7 +234,10 @@
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+				        "stats_Current": "stats_Current.mustache",
+				        "stats_Stress": "stats_Stress.mustache",
+				        "plots_B": "plot_B.mustache" 
+				        
 				},
 				"thmagel":
 				{
@@ -271,7 +278,9 @@
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "stats_Stress": "stats_Stress.mustache",
+				        "plots_B": "plot_B.mustache" 
 				}
 			},
 			"3D":
@@ -306,7 +315,8 @@
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "stats_Stress": "stats_Stress.mustache"
 				},
 				"thmag":
 				{
@@ -341,7 +351,8 @@
 						"insulator": "insulator-transient.json"
 					},
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "plots_B": "plot_B.mustache" 
 				},
 				"mqs":
 				{
@@ -364,7 +375,8 @@
 						"insulator": "insulator-transient.json"
 					},
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "plots_B": "plot_B.mustache" 
 				},
 				"thmqs_hcurl":
 				{
@@ -407,7 +419,8 @@
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "plots_B": "plot_B.mustache" 
 				},
 				"thmqs":
 				{
@@ -450,7 +463,8 @@
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "plots_B": "plot_B.mustache" 
 				},
 				"thmqsel_hcurl":
 				{
@@ -499,7 +513,9 @@
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "stats_Stress": "stats_Stress.mustache",
+				        "plots_B": "plot_B.mustache" 
 				},
 				"thmqsel":
 				{
@@ -548,7 +564,9 @@
 					},
 					"stats_T": "stats_T.mustache",
 					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"
+					"stats_Current": "stats_Current.mustache",
+				        "stats_Stress": "stats_Stress.mustache",
+				        "plots_B": "plot_B.mustache" 
 				}
 			},
 			"3D":
@@ -565,7 +583,7 @@
 	"CG":
 	{
 		"feelpp": "feelpp-toolboxes-v0.110.0-alpha.3.sif",
-    	"static":
+    	        "static":
 		{
 			"3D":
 		        {

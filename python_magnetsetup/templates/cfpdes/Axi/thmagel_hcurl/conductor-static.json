@@ -7,10 +7,15 @@
     "F_laplace":"{1/x*j_th*(x*magnetic_grad_Atheta_0+magnetic_Atheta), j_th*magnetic_grad_Atheta_1}:magnetic_Atheta:x:j_th:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1",
     "stress_T":"-(3*Lame_lambda+2*Lame_mu)*alphaT*(heat_T-T0):Lame_lambda:Lame_mu:alphaT:heat_T:T0",
 
-    "stress_rr":"(Lame_lambda+2*Lame_mu)*elastic_grad_u_00+Lame_lambda*elastic_u_0/x+Lame_lambda*elastic_grad_u_11+bool_dilatation*stress_T:bool_dilatation:Lame_lambda:Lame_mu:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:stress_T",
-    "stress_thth":"Lame_lambda*elastic_grad_u_00+(Lame_lambda+2*Lame_mu)*Lame_lambda*elastic_u_0/x+Lame_lambda*elastic_grad_u_11+bool_dilatation*stress_T:bool_dilatation:Lame_lambda:Lame_mu:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:stress_T",
-    "stress_zz":"Lame_lambda*elastic_grad_u_00+Lame_lambda*Lame_lambda*elastic_u_0/x+(Lame_lambda+2*Lame_mu)*elastic_grad_u_11+bool_dilatation*stress_T:bool_dilatation:Lame_lambda:Lame_mu:x:elastic_u_0:elastic_grad_u_00:elastic_grad_u_11:stress_T",
-    "stress_rz":"Lame_mu*(elastic_grad_u_01+elastic_grad_u_10):Lame_mu:elastic_grad_u_01:elastic_grad_u_10",
+    "strain_rr":"elastic_grad_u_00:elastic_grad_u_00",
+    "strain_rz":"1/2*(elastic_grad_u_01+elastic_grad_u_10):elastic_grad_u_01:elastic_grad_u_10",
+    "strain_thth":"1/x*elastic_u_0:x:elastic_u_0",
+    "strain_zz":"elastic_grad_u_11:elastic_grad_u_11",
+
+    "stress_rr":"(Lame_lambda+2*Lame_mu)*strain_rr+Lame_lambda*strain_thth+Lame_lambda*strain_zz+bool_dilatation*stress_T:bool_dilatation:Lame_lambda:Lame_mu:stress_T:strain_rr:strain_thth:strain_zz",
+    "stress_thth":"Lame_lambda*strain_rr+(Lame_lambda+2*Lame_mu)*strain_thth+Lame_lambda*strain_zz+bool_dilatation*stress_T:bool_dilatation:Lame_lambda:Lame_mu:stress_T:strain_rr:strain_thth:strain_zz",
+    "stress_zz":"Lame_lambda*strain_rr+Lame_lambda*strain_thth+(Lame_lambda+2*Lame_mu)*strain_zz+bool_dilatation*stress_T:bool_dilatation:Lame_lambda:Lame_mu:stress_T:strain_rr:strain_thth:strain_zz",
+    "stress_rz":"2*Lame_mu*strain_rz:Lame_mu:strain_rz",
 
     "stress1":"1/2.*((stress_rr + stress_rz) +sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz)):stress_rr:stress_zz:stress_rz",
     "stress2":"stress_thth:stress_thth",

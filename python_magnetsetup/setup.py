@@ -33,8 +33,7 @@ import yaml
 from python_magnetgeo import Insert, MSite, Bitter, Supra
 from python_magnetgeo import python_magnetgeo
 
-from .machines import load_machines
-from .config import appenv, loadconfig, loadtemplates, loadmachine
+from .config import appenv, loadconfig, loadtemplates
 from .objects import load_object, load_object_from_db
 from .utils import NMerge
 from .cfg import create_cfg
@@ -46,7 +45,7 @@ from .supra import Supra_setup, Supra_simfile
 
 from .file_utils import MyOpen, findfile, search_paths
 
-def magnet_simfile(MyEnv, confdata: str, addAir: bool = False, debug: bool = False):
+def magnet_simfile(MyEnv, confdata: str, addAir: bool=False, debug: bool=False, session=None):
     """
     create sim files for magnet
     """
@@ -209,9 +208,9 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
     """
     Creating dict for setup for msite
     """
-    print("msite_setup:", "debug=", debug)
-    print("msite_setup:", "confdata=", confdata)
-    print("msite_setup: confdata[magnets]=", confdata["magnets"])
+    if debug:
+        print("msite_setup:", "confdata=", confdata)
+        print("msite_setup: confdata[magnets]=", confdata["magnets"])
 
     mdict = {}
     mmat = {}
@@ -219,46 +218,40 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
     mpost = {}
 
     for magnet in confdata["magnets"]:
-        print(f"magnet:  {magnet}")
-        try:
-            mconfdata = load_object(MyEnv, magnet + "-data.json", debug)
-        except:
-            print(f"setup: failed to load {magnet}-data.json look into magnetdb")
-            try:
-                mconfdata = load_object_from_db(MyEnv, "magnet", magnet, debug, session)
-            except:
-                raise Exception(f"setup: failed to load {magnet} from magnetdb")
-
         if debug:
-            print("mconfdata[geom]:", mconfdata["geom"])
-
+            print(f"magnet:  {magnet}")
+        mname = list(magnet.keys())[0]
+        if debug:
+            print(f'msite_setup: magnet_setup[{list(magnet.keys())[0]}]: confdata={magnet}'),
+        mconfdata = magnet[mname]
         (tdict, tmat, tmodels, tpost) = magnet_setup(MyEnv, mconfdata, method_data, templates, debug)
 
-        # print("tdict[part_electric]:", tdict['part_electric'])
-        # print("tdict[part_thermic]:", tdict['part_thermic'])
+        if debug:
+            print("tdict[part_electric]:", tdict['part_electric'])
+            print("tdict[part_thermic]:", tdict['part_thermic'])
         mdict = NMerge(tdict, mdict, debug, "msite_setup/tdict")
-        # print("mdict[part_electric]:", mdict['part_electric'])
-        # print("mdict[part_thermic]:", mdict['part_thermic'])
+        if debug:
+            print("mdict[part_electric]:", mdict['part_electric'])
+            print("mdict[part_thermic]:", mdict['part_thermic'])
 
-        # print("tmat:", tmat)
         mmat = NMerge(tmat, mmat, debug, "msite_setup/tmat")
-        # print("NewMerge:", NMerge(tmat, mmat))
-        # print("mmat:", mmat)
+        if debug:
+            print("mmat:", mmat)
         
         mmodels = NMerge(tmodels, mmodels, debug, "msite_setup/tmodels")
 
-        # print("tpost:", tpost)
         mpost = NMerge(tpost, mpost, debug, "msite_setup/tpost") #debug)
-        # print("NewMerge:", mpost)
+        if debug:
+            print("NewMerge:", mpost)
 
-    # print("mdict:", mdict)
+    if debug:
+        print("mdict:", mdict)
     return (mdict, mmat, mmodels, mpost)
 
 def setup(MyEnv, args, confdata, jsonfile, session=None):
     """
     generate sim files
     """
-    print("setup/main")
 
     # loadconfig
     AppCfg = loadconfig()
@@ -267,6 +260,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     cwd = os.getcwd()
     if args.wd:
         os.chdir(args.wd)
+    print(f"setup/main: {os.getcwd()}")
 
     # load appropriate templates
     # TODO force millimeter when args.method == "HDG"
@@ -290,45 +284,62 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
                 cad_basename = cad.name
         except:
             cad_basename = confdata["geom"].replace(".yaml", "")
-            print(f'confdata: {confdata}')
+            if args.debug:
+                print(f'confdata: {confdata}')
             for mtype in ["Bitter", "Supra"]:
                 if mtype in confdata:
                     # why do I need that???
                     try:
                         findfile(confdata["geom"], search_paths(MyEnv, "geom"))
                     except FileNotFoundError as e:
-                        # print(f"try to create {MyEnv.yaml_repo + '/' + confdata['geom']}")
-                        # magnets = {}
-                        # magnets[mtype] = []
-                        # for obj in confdata[mtype]:
-                        #    magnets[mtype].append( obj["geom"] )
-
-                        # with open(MyEnv.yaml_repo + '/' + confdata["geom"], "x") as out:
-                        #    out.write(f"!<{mtype}>\n")
-                        #    yaml.dump(magnets, out)
-                        # print(f"try to create {confdata['geom']} done")
                         pass
 
         (mdict, mmat, mmodels, mpost) = magnet_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)
     else:
         print("Load a msite %s" % confdata["name"], "debug:", args.debug)
-        # print("confdata:", confdata)
         cad_basename = confdata["name"]
 
         # why do I need that???
         try:
             findfile(confdata["name"] + ".yaml", search_paths(MyEnv, "geom"))
         except FileNotFoundError as e:
-            print("confdata:", confdata)
+            if args.debug:
+                print("confdata:", confdata)
+            yamldata = {'name': confdata["name"]}
+            todict = {}
+            if 'magnets' in confdata:
+                for magnet in confdata['magnets']:
+                    if args.debug:
+                        print(f"magnet(type={type(magnet)}: {magnet}")
+                    mname = list(magnet.keys())[0]
+                    mconfdata = magnet[mname]
+                    # if args.debug:
+                    print(f"magnet[{mname}]: {mconfdata}")
+                    if "Helix" in mconfdata:
+                        todict[mname] = mconfdata['geom'].replace(".yaml","")
+                    else:
+                        todict[mname] = []
+                        if 'Bitter' in mconfdata:
+                            for obj in mconfdata['Bitter']:
+                                todict[mname].append(obj['geom'].replace(".yaml",""))
+                        if 'Supra' in mconfdata:
+                            for obj in mconfdata['Supra']:
+                                todict[mname].append(obj['geom'].replace(".yaml",""))
+            else:
+                raise Exception(f"setup: no magnet in site {confdata['name']}")
+
+            if args.debug:
+                print(f'todict: {todict}')
+            yamldata['magnets'] = todict
+
             print(f"try to create {MyEnv.yaml_repo + '/' + confdata['name'] + '.yaml'}")
             # for obj in confdata[mtype]:
             with open(MyEnv.yaml_repo + '/' + confdata["name"] + ".yaml", "x") as out:
                 out.write("!<MSite>\n")
-                yaml.dump(confdata, out)
+                yaml.dump(yamldata, out)
             print(f"try to create {confdata['name']}.yaml done")
 
         (mdict, mmat, mmodels, mpost) = msite_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose, session)
-        # print(f"setup: msite mpost={mpost['current_H']}")
 
     name = jsonfile
     if name in confdata:
@@ -370,13 +381,18 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     # create json
     create_json(jsonfile, mdict, mmat, mmodels, mpost, templates, method_data, args.debug)
 
+    if "geom" in confdata:
+        print(f'magnet geo: {confdata["geom"]}')
+        yamlfile = confdata["geom"]
+    else:
+        print(f'site geo: {confdata["name"]}')
+        yamlfile = confdata["name"] + ".yaml"
+
     # copy some additional json file
     material_generic_def = ["conductor", "insulator"]
     if args.time == "transient":
         material_generic_def.append("conduct-nosource") # only for transient with mqs
 
-    # create list of files to be archived
-    sim_files = [cfgfile, jsonfile]
     if args.method == "cfpdes":
         if args.debug:
             print("cwd=", cwd)
@@ -384,64 +400,14 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
         for jfile in material_generic_def:
             filename = AppCfg[args.method][args.time][args.geom][args.model]["filename"][jfile]
             src = os.path.join(MyEnv.template_path(), args.method, args.geom, args.model, filename)
-            dst = os.path.join(jfile + "-" + args.method + "-" + args.model + "-" + args.geom + ".json")
+            dst = os.path.join(os.getcwd(), f'{jfile}-{args.method}-{args.model}-{args.geom}.json')
             if args.debug:
                 print(jfile, "filename=", filename, "src=%s" % src, "dst=%s" % dst)
             copyfile(src, dst)
-            sim_files.append(dst)
 
-    # list files to be archived
+    return (yamlfile, cfgfile, jsonfile, xaofile, meshfile) #, tarfilename)
 
-    try:
-        mesh = findfile(meshfile, search_paths(MyEnv, "mesh"))
-        sim_files.append(mesh)
-    except:
-        if "geom" in confdata:
-            print(f'magnet geo: {confdata["geom"]}')
-            yamlfile = confdata["geom"]
-            sim_files += magnet_simfile(MyEnv, confdata, addAir)
-        else:
-            print(f'site geo: {confdata["name"]}')
-            yamlfile = confdata["name"] + ".yaml"
-            sim_files += msite_simfile(MyEnv, confdata, addAir, args.debug, session)
-
-    # TODO create a flow_params from records data
-    sdir = os.path.dirname(os.path.abspath(__file__))
-    # print("sdir:", sdir)
-    src = os.path.join(sdir, 'flow_params.json')
-    dst = 'flow_params.json'
-    copyfile(src, dst)
-
-    if args.debug:
-        print("List of simulations files:", sim_files)
-    import tarfile
-    tarfilename = cfgfile.replace('cfg','tgz')
-    if os.path.isfile(os.path.join(cwd, tarfilename)):
-        raise FileExistsError(f"{tarfilename} already exists")
-    else:
-        tar = tarfile.open(tarfilename, "w:gz")
-        for filename in sim_files:
-            # TODO skip xao and brep if Axi args.geom?
-            if args.geom == 'Axi' and ( filename.endswith('.xao') or filename.endswith('.brep') ) :
-                if args.debug:
-                    print(f"skip {filename}")  
-            else:
-                if args.debug:
-                    print(f"add {filename} to {tarfilename}")
-                print(f"add {filename} to {tarfilename}")
-                tar.add(filename)
-                for mname in material_generic_def:
-                    if mname in filename:
-                        if args.debug:
-                            print(f"remove {filename}")
-                        os.unlink(filename)
-        tar.add(args.flow_params)
-        os.unlink(args.flow_params)
-        tar.close()
-
-    return (yamlfile, cfgfile, jsonfile, xaofile, meshfile, tarfilename)
-
-def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
+def setup_cmds(MyEnv, args, node_spec, yamlfile, cfgfile, jsonfile, xaofile, meshfile, root_directory, currents):
     """
     create cmds
 
@@ -452,27 +418,16 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     # loadconfig
     AppCfg = loadconfig()
 
-    # Get current dir
-    cwd = os.getcwd()
-    if args.wd:
-        os.chdir(args.wd)
-
-    # get server from MyEnv,
-    # get NP from server (with an heuristic from meshsize)
     # TODO adapt NP to the size of the problem
     # if server is SMP mpirun outside otherwise inside singularity
-
-    server = loadmachine(args.machine)
-    if args.debug:
-        print(f'setup_cmds: {server}')
-    NP = server.cores
-    if server.multithreading:
+    NP = node_spec.cores
+    if node_spec.multithreading:
         NP = int(NP/2)
     if args.debug:
         print(f"NP={NP} {type(NP)}")
     if args.np > 0:
         if args.np > NP:
-            print(f'requested number of cores {args.np} exceed {server.name} capability (max: {NP})')
+            print(f'requested number of cores {args.np} exceed {node_spec.name} capability (max: {NP})')
         else:
             NP = args.np
 
@@ -481,36 +436,39 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     salome = AppCfg["mesh"]["salome"]
     feelpp = AppCfg[args.method]["feelpp"]
     partitioner = AppCfg["mesh"]["partitioner"]
-    workingdir = MyEnv.yaml_repo
-    if workingdir.startswith('/'):
-        workingdir = MyEnv.yaml_repo.replace('/','',1)
-    print(f"setup_cmds: workingdir={workingdir}")
-
     if "exec" in AppCfg[args.method]:
         exec = AppCfg[args.method]["exec"]
     if "exec" in AppCfg[args.method][args.time][args.geom][args.model]:
         exec = AppCfg[args.method][args.time][args.geom][args.model]
-    pyfeel = ' -m workflows.cli' # commisioning, fixcooling
-    # TODO add current specs, depends on 
 
-    if "mqs" in args.model or "mag" in args.model:
-        geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--air,2,2,--wd,{workingdir}"
-        meshcmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--air,2,2,--wd,$PWD,mesh,--group,CoolingChannels,Isolants"
+    if len([*currents]) > 1:
+        currents_v = [float(currents[key]) for key in currents]
     else:
-        geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},2,2,--wd,{workingdir}"
-        meshcmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},2,2,--wd,$PWD,mesh,--group,CoolingChannels,Isolants"
+        for key in currents:
+            currents_v = currents[key]
+
+    pyfeel = ' -m python_magnetworkflows.cli' # fix-current, commisioning, fixcooling
+    pyfeel_args = f'--current {currents_v} --cooling {args.cooling} --eps {1.e-5} --itermax {20} --flow_params {args.flow_params}'
+
+    # TODO infty as params
+    if "mqs" in args.model or "mag" in args.model:
+        geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--air,2,2"
+        meshcmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--air,2,2,--wd,$PWD,mesh,--group,CoolingChannels,Isolants" # -wd ??
+    else:
+        geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},2,2"
+        meshcmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},2,2,--wd,$PWD,mesh,--group,CoolingChannels,Isolants" # -wd ??
 
     gmshfile = meshfile.replace(".med", ".msh")
     meshconvert = ""
 
     if args.geom == "Axi" and args.method == "cfpdes":
         if "mqs" in args.model or "mag" in args.model:
-            geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--axi,--air,2,2,--wd,{workingdir}"
+            geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--axi,--air,2,2"
         else:
-            geocmd = f"salome -w1 -t $HIFIMAGNET/HIFIMAGNET_Cmd.py args:{name},--axi,--wd,{workingdir}"
-
-        # if gmsh:
-        meshcmd = f"python3 -m python_magnetgeo.xao {xaofile} --wd {workingdir} mesh --group CoolingChannels --geo {name} --lc=1"
+            geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--axi"
+        
+        # let xao decide mesh caracteristic length ??:
+        meshcmd = f"python3 -m python_magnetgeo.xao {xaofile} --wd data/geometries mesh --group CoolingChannels --geo {yamlfile}"
     else:
         gmshfile = meshfile.replace(".med", ".msh")
         meshconvert = f"gmsh -0 {meshfile} -bin -o {gmshfile}"
@@ -520,20 +478,20 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
         scale = "--mesh.scale=0.001"
     h5file = xaofile.replace(".xao", f"_p{NP}.json")
 
-    partcmd = f"{partitioner} --ifile $PWD/{workingdir}/{gmshfile} --odir $PWD/{workingdir} --part {NP} {scale}"
+    partcmd = f"{partitioner} --ifile $PWD/data/geometries/{gmshfile} --odir $PWD/data/geometries --part {NP} {scale}"
         
     tarfile = cfgfile.replace("cfg", "tgz")
     # TODO if cad exist do not print CAD command
     cmds = {
-        "Pre": f"export HIFIMAGNET={hifimagnet}",
         "Unpack": f"tar zxvf {tarfile}",
         "CAD": f"singularity exec {simage_path}/{salome} {geocmd}"
     }
 
     # TODO add mount point for MeshGems if 3D otherwise use gmsh for Axi 
     # to be changed in the future by using an entry from magnetsetup.conf MeshGems or gmsh
-    MeshGems_licdir = server.mgkeydir
-    cmds["Mesh"] = f"singularity exec -B {MeshGems_licdir}:/opt/DISTENE/license:ro {simage_path}/{salome} {meshcmd}"
+    # MeshGems_licdir = f"-B {node_spec.mgkeydir}:/opt/DISTENE/license:ro" if node_spec.mgkeydir is not None else ""
+    # cmds["Mesh"] = f"singularity exec {MeshGems_licdir} {simage_path}/{salome} {meshcmd}"
+    cmds["Mesh"] = f"singularity exec {simage_path}/{salome} {meshcmd}"
     # if gmsh:
     #    cmds["Mesh"] = f"singularity exec -B /opt/MeshGems:/opt/DISTENE/license:ro {simage_path}/{salome} {meshcmd}"
 
@@ -551,28 +509,30 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
         
 
     # TODO add command to change mesh.filename in cfgfile    
-    update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/{workingdir}/{meshfile}|\' {cfgfile}"
+    update_cfgmesh = f"perl -pi -e \'s|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|\' {cfgfile}"
 
     cmds["Update_Mesh"] = update_cfgmesh
 
-    if server.smp:
-        feelcmd = f"mpirun -np {NP} {exec} --config-file {cfgfile}"
-        pyfeelcmd = f"mpirun -np {NP} python {pyfeel} {cfgfile}"
+    feelcmd = f"{exec} --directory {root_directory} --config-file {cfgfile}"
+    pyfeelcmd = f"python {pyfeel} {cfgfile} {pyfeel_args}"
+    if node_spec.smp:
+        feelcmd = f"mpirun -np {NP} {feelcmd}"
+        pyfeelcmd = f"mpirun -np {NP} {pyfeelcmd}"
+        # feelcmd = f"mpirun --allow-run-as-root -np {NP} {exec} --config-file {cfgfile}"
+        # pyfeelcmd = f"mpirun --allow-run-as-root -np {NP} python {pyfeel} {cfgfile}"
         cmds["Run"] = f"singularity exec {simage_path}/{feelpp} {feelcmd}"
         cmds["Workflow"] = f"singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
-
     else:
-        feelcmd = f"{exec} --config-file {cfgfile}"
-        pyfeelcmd = f"python {pyfeel}"
         cmds["Run"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {feelcmd}"
-        cmds["Workflow"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd} {cfgfile}"
+        cmds["Workflow"] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
 
     # compute resultdir:
-    with open(cfgfile, 'r') as f:
-        directory = re.sub('directory=', '', f.readline(), flags=re.DOTALL)
-    home_env = 'HOME'
-    result_dir = f'{os.getenv(home_env)}/feelppdb/{directory.rstrip()}/np_{NP}'
-    result_arch = cfgfile.replace('.cfg', '_res.tgz')
+    # with open(cfgfile, 'r') as f:
+    #     directory = re.sub('directory=', '', f.readline(), flags=re.DOTALL)
+    # home_env = 'HOME'
+    # result_dir = f'{os.getenv(home_env)}/feelppdb/{directory.rstrip()}/np_{NP}'
+    # result_arch = cfgfile.replace('.cfg', '_res.tgz')
+    result_dir = f'{root_directory}/np_{NP}'
     print(f'result_dir={result_dir}')
 
     paraview = AppCfg["post"]["paraview"]
@@ -580,18 +540,22 @@ def setup_cmds(MyEnv, args, name, cfgfile, jsonfile, xaofile, meshfile):
     # get expr and exprlegend from method/model/...
     if "post" in AppCfg[args.method][args.time][args.geom][args.model]:
         postdata = AppCfg[args.method][args.time][args.geom][args.model]["post"]
+
+        # TODO: Get Path to pv-scalarfield.py:  /usr/lib/python3/dist-packages/python_magnetsetup/postprocessing/
         for key in postdata:
-            pyparaview = f'pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"{postdata[key]}\" --resultdir ${result_dir}'
+            pyparaview = f'/usr/lib/python3/dist-packages/python_magnetsetup/postprocessing//pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"{postdata[key]}\" --resultdir {result_dir}'
+            # pyparaview = f'pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"{postdata[key]}\" --resultdir {result_dir}'
             pyparaviewcmd = f"pvpython {pyparaview}"
             cmds["Postprocessing"] = f"singularity exec {simage_path}/{paraview} {pyparaviewcmd}"
 
 
-    cmds["Save"] = f"tmpdir=$(pwd) && pushd {result_dir}/.. && tar zcf $tmpdir/{result_arch} np_{NP} && popd"
+    # cmds["Save"] = f"pushd {result_dir}/.. && tar zcf {result_arch} np_{NP} && popd && mv {result_dir}/../{result_arch} ."
 
-    # TODO jobmanager if server.manager != JobManagerType.none
+    # TODO jobmanager if node_spec.manager != JobManagerType.none
     # Need user email at this point
     # Template for oar and slurm
-
+    
+    # TODO what about postprocess??
     # TODO get results (value.csv, png, raw data) to magnetdb 
 
     return cmds

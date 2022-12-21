@@ -1,45 +1,25 @@
-from typing import List, Optional
-
-import sys
-import os
-import json
-
 import enum
-
 from dataclasses import dataclass
 
-class JobManagerType(str, enum.Enum):
-    none = "none"
-    slurm = "slurm"
-    oar = "oar"
+from .job import JobManager, JobManagerType
 
-class MachineType(str, enum.Enum):
+
+class NodeType(str, enum.Enum):
     compute = "compute"
     visu = "visu"
-    
+
+
 @dataclass
-class jobmanager():
-    """
-    jobmanager definition
-    """
-    otype: JobManagerType = JobManagerType.none
-    queues: Optional[list] = None
-    
-@dataclass
-class machine():
-    """
-    machine definition
-    """
+class NodeSpec:
     name: str
     dns: str
-    otype: MachineType = MachineType.compute
+    otype: NodeType = NodeType.compute
     smp: bool = True
-    manager: jobmanager = jobmanager(JobManagerType.none)
+    manager: JobManager = JobManager(JobManagerType.none)
     cores: int = 2
     multithreading: bool = True
     mgkeydir: str = r"/opt/MeshGems"
-
-
+    
 def load_machines(debug: bool = False):
     """
     load machines definition as a dict
@@ -55,7 +35,7 @@ def load_machines(debug: bool = False):
     machines = {}
     for item in data:
         if debug: print(f"server: {item} type={data[item]['type']}")
-        server = machine(
+        server = NodeSpec(
             name=item,
             otype=MachineType[data[item]['type']],
             smp=data[item]['smp'],
@@ -69,15 +49,15 @@ def load_machines(debug: bool = False):
                 
     return machines
 
-def dump_machines(data: List[machine]):
-    with open('machines.json', 'w') as outfile:
-        json.dump(data, outfile)
-    pass
+def loadmachines(server: str):
+    """
+    Load app server config (aka machines.json)
+    """
 
-def mod_machine():
+    server_defs = load_machines()
+    if server in server_defs:
+        return server_defs[server]
+    else:
+        raise ValueError(f"loadmachine: {server} no such server defined")
     pass
-
-def add_machine():
-    pass
-
 

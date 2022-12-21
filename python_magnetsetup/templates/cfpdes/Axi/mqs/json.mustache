@@ -100,6 +100,18 @@
 						"expr":"-2*pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi+magnetic_dphi_dt):magnetic_phi:magnetic_dphi_dt:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 		    		}
+                                },
+				"Points":
+				{
+				"B0":
+				{
+                                    "coord":"{1e-7,0.}",
+                                    "fields":"Atheta",
+			            "expressions":
+                                    {
+                                          "Bz": "magnetic_grad_Atheta_0+magnetic_Atheta/x:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x"
+                                    }
+				}
 				}
 	    	}
 		}

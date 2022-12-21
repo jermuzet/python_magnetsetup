@@ -44,7 +44,7 @@ def create_cfg(cfgfile:str, name: str, mesh: str, nonlinear: bool, jsonfile: str
     if debug:
         print(f"create_cfg/mdata={mdata}")
 
-    with open(cfgfile, "x") as out:
+    with open(cfgfile, "w+") as out:
         out.write(mdata)
     
     pass

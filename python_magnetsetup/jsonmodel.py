@@ -86,12 +86,13 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5] # "meter"
     units = load_units(unit_Length)
-    print("unit_Length", unit_Length)
 
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh, turns_h) = gdata
     
-    if debug: print("R1:", R1)
-    print("Zmin:", Zmin)
+    if debug:
+        print("unit_Length", unit_Length)
+        print("R1:", R1)
+        print("Zmin:", Zmin)
     if unit_Length == 'meter':
         R1 = convert_data(units, R1, "Length")
         R2 = convert_data(units, R2, "Length")
@@ -101,10 +102,12 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
         Zmax = convert_data(units, Zmax, "Length")
         Dh = convert_data(units, Dh, "Length")
         Sh  = convert_data(units, Sh, "Area")
-    print("Zmin:", Zmin)
     
     # chech dim
-    if debug: print("corrected R1:", R1)
+    if debug:
+        print("corrected R1:", R1)
+        print("unit_Length", unit_Length)
+        print("R1:", R1, "R2:", R2, "Zmin:", Zmin, "Zmax:", Zmax)
     
     # Tini, Aini for transient cases??
     params_data = { 'Parameters': []}
@@ -548,7 +551,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
             odata = entry(templates["flux"], flux_data, debug)
             if debug: print(odata)
             for md in odata["Flux"]:
-                data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Flux"][md]
+                add[md] = odata["Flux"][md]
     
     if "meanT_H" in mpost:
         if "heat" in data["PostProcess"]:
@@ -559,7 +562,18 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
             odata = entry(templates["stats"][0], {'meanT_H': meanT_data}, debug)
             if debug: print("odata:", odata)
             for md in odata["Stats_T"]:
-                data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_T"][md]
+                add[md] = odata["Stats_T"][md]
+
+    if "meanStress_H" in mpost:
+        if "elastic" in data["PostProcess"]:
+            meanStress_data = mpost["meanStress_H"]
+            if debug: 
+                print("meanStress_H", type(meanStress_data))
+            add = data["PostProcess"]["elastic"]["Measures"]["Statistics"]
+            odata = entry(templates["stats"][0], {'meanStress_H': meanStress_data}, debug)
+            if debug: print("odata:", odata)
+            for md in odata["Stats_Stress"]:
+                add[md] = odata["Stats_Stress"][md]
 
     index_post_ = 0
     section = "electric"
@@ -581,7 +595,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
         odata = entry(templates["stats"][index_post_+1], {'Current_H': currentH_data}, debug)
         if debug: print(odata)
         for md in odata["Stats_Current"]:
-            data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Current"][md]
+            add[md] = odata["Stats_Current"][md]
     
     if "power_H" in mpost:
         if debug:
@@ -593,11 +607,28 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
         odata = entry(templates["stats"][index_post_], {'Power_H': powerH_data}, debug)
         if debug: print(odata)
         for md in odata["Stats_Power"]:
-            data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
-    
+            add[md] = odata["Stats_Power"][md]
+
+    # TODO: add data for B plots, aka Rinf, Zinf, NR and Nz?
+    if "plot_B" in mpost:
+        if debug:
+            print("plotB")
+            print("section:", "magnetic")
+            print("templates[plots]:", templates["plots"])
+        plotB_data = mpost["plot_B"]
+        print(f"plotB_data:{plotB_data}")
+        add = data["PostProcess"]["magnetic"]["Measures"]["Points"]
+        odata = entry(templates["plots"][0], {'Rinf': plotB_data['Rinf'], 'Zinf': plotB_data['Zinf'], 'NR': 100, 'NZ': 100}, debug)
+        # print(f"data[PostProcess][magnetic][Measures][Points]: {add}")
+        if debug: print(f"plot_B odata: {odata}")
+        for md in odata:
+            print(f"odata[{md}: {odata[md]}")
+            add[md] = odata[md]
+        # print(f"data[PostProcess][magnetic][Measures][Points]: {add}")
+
     mdata = json.dumps(data, indent = 4)
 
-    with open(jsonfile, "x") as out:
+    with open(jsonfile, "w+") as out:
         out.write(mdata)
     return
 
@@ -617,6 +648,8 @@ def entry(template: str, rdata: List, debug: bool = False) -> str:
     corrected = re.sub(r'},\s+}\n', '}\n}\n', corrected)
     # corrected = re.sub(r'},\s+}\n', '}\n}\n', corrected)
     corrected = corrected.replace("&quot;", "\"")
+    corrected = corrected.replace("&lt;", "<")
+    corrected = corrected.replace("&gt;", ">")
     if debug:
         print(f"entry/jsonfile: {jsonfile}")
         print(f"corrected: {corrected}")

@@ -8,7 +8,7 @@ import re
 
 from .setup import setup, setup_cmds
 from .objects import load_object, load_object_from_db
-from .config import appenv, loadconfig, loadmachine, load_machines, supported_methods, supported_models
+from .config import appenv, loadconfig, supported_methods, supported_models
 
 def fabric(machine: str, workingdir: str, geodir: str, args, cfgfile: str, jsonfile: str, meshfile: str, tarfilename:str, cmds: dict):
     """
@@ -83,6 +83,7 @@ def main():
              "" \
              "NB: for cfpdes you must use a linear case as a starting point for a nonlinear case"    
 
+    from .node import loadmachine, load_machines
     machines = [ key for key in load_machines()]
 
     # Manage Options
@@ -148,25 +149,12 @@ def main():
         confdata = load_object_from_db(MyEnv, "msite", args.msite, args.debug)
         jsonfile = args.msite
 
-    (yamlfile, cfgfile, jsonfile, xaofile, meshfile, tarfilename) = setup(MyEnv, args, confdata, jsonfile)
-    cmds = setup_cmds(MyEnv, args, yamlfile, cfgfile, jsonfile, xaofile, meshfile)
-    
     # Print command to run
     machine = loadmachine(args.machine)
-    # TODO
-    # select a machine
-    # select NP
-    NP = machine.cores
-    if machine.multithreading:
-        NP = int(NP/2)
-    if args.debug:
-        print(f"NP={NP} {type(NP)}")
-    if args.np > 0:
-        if args.np > NP:
-            print(f'requested number of cores {args.np} exceed {machine.name} capability (max: {NP})')
-        else:
-            NP = args.np
 
+    (yamlfile, cfgfile, jsonfile, xaofile, meshfile, tarfilename) = setup(MyEnv, args, confdata, jsonfile)
+    cmds = setup_cmds(MyEnv, args, machine, yamlfile, cfgfile, jsonfile, xaofile, meshfile)
+    
     workingdir = cfgfile.replace(".cfg", "")
     geodir = MyEnv.yaml_repo.replace('/','',1)
 
@@ -205,9 +193,6 @@ def main():
         # start post-processing
         # what about jobmanager??
         # start a workflow??
-
-
-    # TODO save results back to db?
 
     return status
 

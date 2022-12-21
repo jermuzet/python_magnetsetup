@@ -249,7 +249,7 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
     return (Tubes,Helices,OHelices,BMagnets,UMagnets,Shims)
 
 
-def msite_setup(MyEnv, confdata: str, debug: bool=False, session=None):
+def msite_setup(MyEnv, confdata: str, debug: bool=False):
     """
     Creating MagnetTools data struct for setup for msite
     """
