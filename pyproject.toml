@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "python_magnetsetup"
+version = "0.1.0"
+description = "Python helpers to setup and run HiFiMagnet simulations"
+authors = ["Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>",
+           "Romain Vallet <romain.vallet@lncmi.cnrs.fr>",
+           "Jeremie Muzet <jeremie.muzet@lncmi.cnrs.fr>",
+           "Remi Caumette <remicaumette@icloud.com>" 
+          ]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+python-magnetgeo = {path = "../python_magnetgeo"}
+fabric = "^2.7.0"
+Pint = "^0.18"
+numpy = "^1.22.3"
+python-decouple = "^3.6"
+requests = "^2.27.1"
+chevron = "^0.14.0"
+PyYAML = "^5.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
