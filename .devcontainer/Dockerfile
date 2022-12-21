@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ghcr.io/feelpp/feelpp:v0.110.2-focal
 
 USER root
 
