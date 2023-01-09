@@ -428,6 +428,7 @@ def setup_cmds(MyEnv, args, node_spec, yamlfile, cfgfile, jsonfile, xaofile, mes
     if args.np > 0:
         if args.np > NP:
             print(f'requested number of cores {args.np} exceed {node_spec.name} capability (max: {NP})')
+            print(f'keep {NP} cores'}
         else:
             NP = args.np
 
