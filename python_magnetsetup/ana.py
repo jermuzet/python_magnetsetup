@@ -25,7 +25,7 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
 
     b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, fillingfactor, rho)
     """
-    print("HMagnet:", data)
+    if debug: print("HMagnet:", data)
 
     # how to create Tubes??
     #Tube(const int n= len(struct.axi.turns), const MyDouble r1 = struct.r[0], const MyDouble r2 = struct.r[1], const MyDouble l = struct.axi.h??)
@@ -60,7 +60,8 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
             Helices.append(item)
         index += Tube.get_n_elem()
 
-    print("HMagnet:", struct.name, "Tubes:", len(Tubes), "Helices:", len(Helices))
+    if debug:
+        print("HMagnet:", struct.name, "Tubes:", len(Tubes), "Helices:", len(Helices))
     return (Tubes, Helices, OHelices)
 
 def BMagnet(struct: Bitter, material: dict, fillingfactor: float=1, debug: bool=False):
@@ -95,7 +96,8 @@ def BMagnet(struct: Bitter, material: dict, fillingfactor: float=1, debug: bool=
                 
         z += dz
 
-    print("BMagnet:", struct.name, len(BMagnets))
+    if debug:
+        print("BMagnet:", struct.name, len(BMagnets))
     return BMagnets
 
 def UMagnet(struct: Supra, debug: bool=False):
@@ -265,8 +267,8 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False):
     Shims = mt.VectorOfShims()
 
     for magnet in confdata["magnets"]:
-        print(f"magnet: {magnet}, type={type(magnet)}={type(magnet)} debug={debug}")
         if debug:
+            print(f"magnet: {magnet}, type={type(magnet)}={type(magnet)} debug={debug}")
             print(f"mconfdata[geom]: {magnet['geom']}")
         tmp = magnet_setup(MyEnv, magnet, debug)
         
