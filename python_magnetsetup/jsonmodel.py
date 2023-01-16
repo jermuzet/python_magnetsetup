@@ -575,6 +575,17 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
             for md in odata["Stats_Stress"]:
                 add[md] = odata["Stats_Stress"][md]
 
+    if "meanVonMises_H" in mpost:
+        if "elastic" in data["PostProcess"]:
+            meanVonMises_data = mpost["meanVonMises_H"]
+            if debug: 
+                print("meanVonMises_H", type(meanVonMises_data))
+            add = data["PostProcess"]["elastic"]["Measures"]["Statistics"]
+            odata = entry(templates["stats"][0], {'meanVonMises_H': meanVonMises_data}, debug)
+            if debug: print("odata:", odata)
+            for md in odata["Stats_Stress"]:
+                add[md] = odata["Stats_Stress"][md]
+
     index_post_ = 0
     section = "electric"
     if method_data[0] == "cfpdes" and method_data[2] == "Axi":
