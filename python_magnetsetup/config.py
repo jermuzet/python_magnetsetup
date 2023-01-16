@@ -145,6 +145,7 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
         felasconductor = os.path.join(template_path, elastic_conductor)
         felasinsulator = os.path.join(template_path, elastic_insulator)
         stats_Stress_model = appcfg[method][time][geom][model]["stats_Stress"]
+        stats_VonMises_model = appcfg[method][time][geom][model]["stats_VonMises"]
 
     if 'mqsel' in model :
         elastic1_conductor = appcfg[method][time][geom][model]["models"]["elastic1-conductor"]
@@ -158,6 +159,7 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
         felas2insulator = os.path.join(template_path, elastic2_insulator)
 
         stats_Stress_model = appcfg[method][time][geom][model]["stats_Stress"]
+        stats_VonMises_model = appcfg[method][time][geom][model]["stats_VonMises"]
 
     #if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
     stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
