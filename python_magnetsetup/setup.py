@@ -428,7 +428,7 @@ def setup_cmds(MyEnv, args, node_spec, yamlfile, cfgfile, jsonfile, xaofile, mes
     if args.np > 0:
         if args.np > NP:
             print(f'requested number of cores {args.np} exceed {node_spec.name} capability (max: {NP})')
-            print(f'keep {NP} cores'}
+            print(f'keep {NP} cores')
         else:
             NP = args.np
 
@@ -453,18 +453,18 @@ def setup_cmds(MyEnv, args, node_spec, yamlfile, cfgfile, jsonfile, xaofile, mes
 
     # TODO infty as params
     if "mqs" in args.model or "mag" in args.model:
-        geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--air,2,2"
-        meshcmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--air,2,2,--wd,$PWD,mesh,--group,CoolingChannels,Isolants" # -wd ??
+        geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--air,4,6"
+        meshcmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--air,4,6,--wd,$PWD,mesh,--group,CoolingChannels,Isolants" # -wd ??
     else:
-        geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},2,2"
-        meshcmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},2,2,--wd,$PWD,mesh,--group,CoolingChannels,Isolants" # -wd ??
+        geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},4,6"
+        meshcmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},4,6,--wd,$PWD,mesh,--group,CoolingChannels,Isolants" # -wd ??
 
     gmshfile = meshfile.replace(".med", ".msh")
     meshconvert = ""
 
     if args.geom == "Axi" and args.method == "cfpdes":
         if "mqs" in args.model or "mag" in args.model:
-            geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--axi,--air,2,2"
+            geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--axi,--air,4,6"
         else:
             geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--axi"
         
