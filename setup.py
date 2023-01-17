@@ -7,7 +7,15 @@ from setuptools import setup, find_packages
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-requirements = [ ]
+requirements = [
+    'fabric',
+    'Pint',
+    'python-decouple',
+    'requests==2.*,>=2.27.1',
+    'chevron>=0.14.0',
+    'PyYAML>=5.0',
+    'python_magnetgeo'
+]
 
 setup_requirements = [ ]
 
