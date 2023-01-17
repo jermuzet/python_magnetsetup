@@ -6,7 +6,7 @@
         "mesh":
 	{
 		"hifimagnet": "/opt/SALOME-9.8.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome",
-		"salome": "hifimagnet-salome-9.8.2.sif",
+		"salome": "hifimagnet-salome-9.8.3.sif",
 		"partitioner": "feelpp_mesh_partitioner",
 		"3D": 
 		{
@@ -21,19 +21,15 @@
 	},
 	"cfpdes":
 	{
-    	        "feelpp": "feelpp-v0.110.2-ubuntu-20.04.sif",
-    	        "exec": "feelpp_toolbox_coefficientformpdes",
+    	"feelpp": "feelpp-v0.110.2-ubuntu-20.04.sif",
+    	"exec": "feelpp_toolbox_coefficientformpdes",
 		"static":
 		{
 			"Axi":
 			{
 				"thelec":
 				{
-					"pyfeel":
-					{
-						"current": "cfpdes_insert_fixcurrent.py",
-						"commissioning": ""
-					},
+					"physic": ["heat"],
 					"cfg": "cfg.mustache",
 					"model": "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -65,16 +61,35 @@
 						"conductor": "conductor-static.json",
 						"insulator": "insulator-static.json"
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-				        "stats_Current": "stats_Current.mustache",
-				        "post":
-				        {
-					        "heat.temperature": "T[K]"
-				        }
+				    "stats":
+				    {
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"current_H":""}
+						}
+				    },
+				    "post":
+				    {
+					    "heat.temperature": "T[K]"
+				    }
 				},
 				"mag_hcurl":
 				{
+					"physic": ["magnetic"],
 					"cfg": "cfg.mustache",
 					"model":"json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -90,12 +105,14 @@
 						"conductor": "conductor-static.json",
 						"insulator": "insulator-static.json"
 					},
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "plots":
+				    {
+						"B": "plot_B.mustache"
+				    }
 				},
 				"mag":
 				{
+					"physic": ["magnetic"],
 					"cfg": "cfg.mustache",
 					"model":"json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -111,12 +128,35 @@
 						"conductor": "conductor-static.json",
 						"insulator": "insulator-static.json"
 					},
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "stats":
+				    {
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"Current_H":""}
+						}
+				    },
+				    "plots":
+				    {
+						"B": "plot_B.mustache"
+				    }
 				},
 				"thmag_hcurl":
 				{
+					"physic": ["heat", "magnetic"],
 					"cfg": "cfg.mustache",
 					"model": "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -150,13 +190,35 @@
 						"conductor": "conductor-static.json",
 						"insulator": "insulator-static.json"
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "stats":
+				    {
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"current_H":""}
+						}
+				    },
+				    "plots":
+				    {
+						"B": "plot_B.mustache"
+				    }
 				},
 				"thmag":
 				{
+					"physic": ["heat", "magnetic"],
 					"cfg": "cfg.mustache",
 					"model": "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -190,13 +252,35 @@
 						"conductor": "conductor-static.json",
 						"insulator": "insulator-static.json"
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "stats":
+				    {
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"current_H":""}
+						}
+			        },
+			        "plots":
+			        {
+						"B": "plot_B.mustache"
+			        }
 				},
 				"thmagel_hcurl":
 				{
+					"physic": ["heat", "magnetic", "elastic"],
 					"cfg": "cfg.mustache",
 					"model" : "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -232,15 +316,48 @@
 						"conductor": "conductor-static.json",
 						"insulator": "insulator-static.json"
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-				        "stats_Current": "stats_Current.mustache",
-				        "stats_Stress": "stats_Stress.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "stats":
+				    {
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"current_H":""}
+						},
+						"Stress":   {
+							"name": "Stats_Stress",
+							"template": "stats_Stress.mustache",
+							"physic": "heat",
+							"data": {"Stress_H":""}
+						},
+				    	"VonMises":    {
+							"name": "Stats_VonMises",
+							"template": "stats_VonMises.mustache",
+							"physic": "heat",
+							"data": {"VonMises_H":""}
+						}
+				    },
+				    "plots":
+				    {
+						"B": "plot_B.mustache"
+				    }
 				        
 				},
 				"thmagel":
 				{
+					"physic": ["heat", "magnetic", "elastic"],
 					"cfg": "cfg.mustache",
 					"model" : "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -276,17 +393,50 @@
 						"conductor": "conductor-static.json",
 						"insulator": "insulator-static.json"
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "stats_Stress": "stats_Stress.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "stats":
+				    {
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"current_H":""}
+						},
+						"Stress":   {
+							"name": "Stats_Stress",
+							"template": "stats_Stress.mustache",
+							"physic": "heat",
+							"data": {"Stress_H":""}
+						},
+				    	"VonMises":    {
+							"name": "Stats_VonMises",
+							"template": "stats_VonMises.mustache",
+							"physic": "heat",
+							"data": {"VonMises_H":""}
+						}
+				    },
+				    "plots":
+				    {
+						"B": "plot_B.mustache"
+				    }
 				}
 			},
 			"3D":
 			{
 				"thelec":
 				{
+					"physic": ["heat", "electric"],
 					"model": "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
 					"cfg": "cfg.mustache",
@@ -313,10 +463,27 @@
 						"conductor": "conductor-static.json",
 						"insulator": "insulator-static.json"
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "stats_Stress": "stats_Stress.mustache"
+				    "stats":
+				    {
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"current_H":""}
+						}
+				    }
 				},
 				"thmag":
 				{
@@ -332,6 +499,7 @@
 			{
 				"mqs_hcurl":
 				{
+					"physic": ["magnetic"],
 					"cfg": "cfg.mustache",
 					"model":"json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -350,12 +518,14 @@
 						"conduct-nosource": "conduct-nosource.json",
 						"insulator": "insulator-transient.json"
 					},
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "plots":
+				    {
+						"B": "plot_B.mustache"
+				    }
 				},
 				"mqs":
 				{
+					"physic": ["magnetic"],
 					"cfg": "cfg.mustache",
 					"model":"json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -374,12 +544,14 @@
 						"conduct-nosource": "conduct-nosource.json",
 						"insulator": "insulator-transient.json"
 					},
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "plots":
+				    {
+						"B": "plot_B.mustache"
+				    }
 				},
 				"thmqs_hcurl":
 				{
+					"physic": ["heat", "magnetic"],
 					"cfg": "cfg.mustache",
 					"model": "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -417,13 +589,20 @@
 						"conduct-nosource": "conduct-nosource.json",
 						"insulator": "insulator-transient.json"
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "stats":
+				    {
+						"T": "stats_T.mustache",
+						"Power": "stats_Power.mustache",
+				    	"Current": "stats_Current.mustache"
+				    },
+				    "plots":
+				    {
+						"B": "plot_B.mustache"
+				    }
 				},
 				"thmqs":
 				{
+					"physic": ["heat", "magnetic"],
 					"cfg": "cfg.mustache",
 					"model": "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -461,13 +640,35 @@
 						"conduct-nosource": "conduct-nosource.json",
 						"insulator": "insulator-transient.json"
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "stats":
+				    {
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"Current_H":""}
+						}
+				    },
+				    "plots":
+				    {
+						"B": "plot_B.mustache"
+				    }
 				},
 				"thmqsel_hcurl":
 				{
+					"physic": ["heat", "magnetic", "elastic1", "elastic2"],
 					"cfg": "cfg.mustache",
 					"model" : "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -511,14 +712,22 @@
 						"conduct-nosource": "conduct-nosource-transient.json",
 						"insulator": "insulator-transient.json"
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "stats_Stress": "stats_Stress.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "stats":
+				    {
+						"T": "stats_T.mustache",
+						"Power": "stats_Power.mustache",
+				    	"Current": "stats_Current.mustache",
+				    	"Stress": "stats_Stress.mustache",
+				    	"VonMises": "stats_VonMises.mustache"
+				    },
+				    "plots":
+					{
+						"B": "plot_B.mustache"
+				    }
 				},
 				"thmqsel":
 				{
+					"physic": ["heat", "magnetic", "elastic1", "elastic2"],
 					"cfg": "cfg.mustache",
 					"model" : "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
@@ -562,11 +771,18 @@
 						"conduct-nosource": "conduct-nosource-transient.json",
 						"insulator": "insulator-transient.json"
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache",
-				        "stats_Stress": "stats_Stress.mustache",
-				        "plots_B": "plot_B.mustache" 
+				    "stats":
+			        {
+						"T": "stats_T.mustache",
+						"Power": "stats_Power.mustache",
+			        	"Current": "stats_Current.mustache",
+			        	"Stress": "stats_Stress.mustache",
+			        	"VonMises": "stats_VonMises.mustache"
+			        },
+			        "plots":
+			        {
+						"B": "plot_B.mustache"
+			        }
 				}
 			},
 			"3D":
@@ -583,7 +799,7 @@
 	"CG":
 	{
 		"feelpp": "feelpp-toolboxes-v0.110.0-alpha.3.sif",
-    	        "static":
+    	"static":
 		{
 			"3D":
 		        {
@@ -612,9 +828,12 @@
 					"filename":
 					{
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": "stats_Current.mustache"		
+			        "stats":
+			        {
+						"T": "stats_T.mustache",
+						"Power": "stats_Power.mustache",
+			        	"Current": "stats_Current.mustache"
+			        }		
 			    }
 			}
 		},
@@ -658,9 +877,12 @@
 					"filename":
 					{
 					},
-					"stats_T": "stats_T.mustache",
-					"stats_Power": "stats_Power.mustache",
-					"stats_Current": ""
+			        "stats":
+			        {
+						"T": "stats_T.mustache",
+						"Power": "stats_Power.mustache",
+			        	"Current": "stats_Current.mustache"
+			        }
 				}
 			}
 		},

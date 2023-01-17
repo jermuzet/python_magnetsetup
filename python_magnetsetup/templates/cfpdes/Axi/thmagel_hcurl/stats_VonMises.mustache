@@ -1,14 +1,14 @@
 {
    "Stats_VonMises":
    {
-   {{#meanVonMises_H}}
+   {{#VonMises_H}}
    "{{header}}": 
    {
         "type": ["min", "max", "mean"],
         "expr": "sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
         "markers": {{markers}}
     },
-    {{/meanVonMises_H}}
+    {{/VonMises_H}}
    }
 }
                     

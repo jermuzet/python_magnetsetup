@@ -97,118 +97,111 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
     print(f"nonlinear: {nonlinear} type={type(nonlinear)}")
     template_path = os.path.join(appenv.template_path(), method, geom, model)
 
-    cfg_model = appcfg[method][time][geom][model]["cfg"]
-    json_model = appcfg[method][time][geom][model]["model"]
+    modelcfg = appcfg[method][time][geom][model]
+    cfg_model = modelcfg["cfg"]
+    json_model = modelcfg["model"]
     if not nonlinear:
-        conductor_model = appcfg[method][time][geom][model]["conductor-linear"]
+        conductor_model = modelcfg["conductor-linear"]
     else:
         if geom == "3D":
-            json_model = appcfg[method][time][geom][model]["model-nonlinear"]
-        conductor_model = appcfg[method][time][geom][model]["conductor-nonlinear"]
-    insulator_model = appcfg[method][time][geom][model]["insulator"]
+            json_model = modelcfg["model-nonlinear"]
+        conductor_model = modelcfg["conductor-nonlinear"]
+    insulator_model = modelcfg["insulator"]
     
     fcfg = os.path.join(template_path, cfg_model)
     if debug:
         print(f"fcfg: {fcfg} type={type(fcfg)}")
+
     fmodel = os.path.join(template_path, json_model)
     fconductor = os.path.join(template_path, conductor_model)
     finsulator = os.path.join(template_path, insulator_model)
-    if 'th' in model:
-        heat_conductor = appcfg[method][time][geom][model]["models"]["heat-conductor"]
-        heat_insulator = appcfg[method][time][geom][model]["models"]["heat-insulator"]
-
-        cooling_model = appcfg[method][time][geom][model]["cooling"][cooling]
-        flux_model = appcfg[method][time][geom][model]["cooling-post"][cooling]
-        stats_T_model = appcfg[method][time][geom][model]["stats_T"]
-
-        fheatconductor = os.path.join(template_path, heat_conductor)
-        fheatinsulator = os.path.join(template_path, heat_insulator)
-    
-        fcooling = os.path.join(template_path, cooling_model)
-        frobin = os.path.join(template_path, appcfg[method][time][geom][model]["cooling"]["robin"])
-        fflux = os.path.join(template_path, flux_model)
-        fstats_T = os.path.join(template_path, stats_T_model)
-
-    if 'mag' in model or 'mqs' in model :
-        magnetic_conductor = appcfg[method][time][geom][model]["models"]["magnetic-conductor"]
-        magnetic_insulator = appcfg[method][time][geom][model]["models"]["magnetic-insulator"]
-
-        fmagconductor = os.path.join(template_path, magnetic_conductor)
-        fmaginsulator = os.path.join(template_path, magnetic_insulator)
-
-        plot_model = appcfg[method][time][geom][model]["plots_B"]
-        plots_B =  os.path.join(template_path, plot_model)
-
-    if 'magel' in model :
-        elastic_conductor = appcfg[method][time][geom][model]["models"]["elastic-conductor"]
-        elastic_insulator = appcfg[method][time][geom][model]["models"]["elastic-insulator"]
-        felasconductor = os.path.join(template_path, elastic_conductor)
-        felasinsulator = os.path.join(template_path, elastic_insulator)
-        stats_Stress_model = appcfg[method][time][geom][model]["stats_Stress"]
-        stats_VonMises_model = appcfg[method][time][geom][model]["stats_VonMises"]
-
-    if 'mqsel' in model :
-        elastic1_conductor = appcfg[method][time][geom][model]["models"]["elastic1-conductor"]
-        elastic1_insulator = appcfg[method][time][geom][model]["models"]["elastic1-insulator"]
-        elastic2_conductor = appcfg[method][time][geom][model]["models"]["elastic2-conductor"]
-        elastic2_insulator = appcfg[method][time][geom][model]["models"]["elastic2-insulator"]
-
-        felas1conductor = os.path.join(template_path, elastic1_conductor)
-        felas1insulator = os.path.join(template_path, elastic1_insulator)
-        felas2conductor = os.path.join(template_path, elastic2_conductor)
-        felas2insulator = os.path.join(template_path, elastic2_insulator)
-
-        stats_Stress_model = appcfg[method][time][geom][model]["stats_Stress"]
-        stats_VonMises_model = appcfg[method][time][geom][model]["stats_VonMises"]
-
-    #if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
-    stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
-    stats_Current_model = appcfg[method][time][geom][model]["stats_Current"]
-
-    fstats_Power = os.path.join(template_path, stats_Power_model)
-    fstats_Current = os.path.join(template_path, stats_Current_model)
 
     material_generic_def = ["conductor", "insulator"]
     if time == "transient":
         material_generic_def.append("conduct-nosource") # only for transient with mqs
 
     dict = {
+        'physic': modelcfg["physic"],
         "cfg": fcfg,
         "model": fmodel,
         "conductor": fconductor,
         "insulator": finsulator,
-        "stats": [],
-        "plots":[],
+        "stats": {},
+        "plots":{},
         "material_def" : material_generic_def
     }
 
+    if 'stats' in modelcfg:
+        _cfg = modelcfg["stats"]
+        for field in _cfg:
+            print(f'stats[{field}]: {_cfg} (type={type(_cfg)})')
+            dict['stats'][field] = _cfg[field]
+            dict['stats'][field]['template'] = os.path.join(template_path, _cfg[field]['template'])
+        if debug:
+            print(f"dict[stats]={dict['stats']}")
+
+    if 'plots' in modelcfg:
+        _cfg = modelcfg["plots"]
+        for field in _cfg:
+            dict['plots'][field] = os.path.join(template_path, _cfg[field])
+        if debug:
+            print(f"dict[plots]={dict['plots']}")
+
     if 'th' in model:
+        heat_conductor = modelcfg["models"]["heat-conductor"]
+        heat_insulator = modelcfg["models"]["heat-insulator"]
+
+        cooling_model = modelcfg["cooling"][cooling]
+        flux_model = modelcfg["cooling-post"][cooling]
+
+        fheatconductor = os.path.join(template_path, heat_conductor)
+        fheatinsulator = os.path.join(template_path, heat_insulator)
+    
+        fcooling = os.path.join(template_path, cooling_model)
+        frobin = os.path.join(template_path, modelcfg["cooling"]["robin"])
+        fflux = os.path.join(template_path, flux_model)
+
         dict["heat-conductor"] = fheatconductor
         dict["heat-insulator"] = fheatinsulator
         dict["cooling"] = fcooling
         dict["robin"] = frobin
         dict["flux"] = fflux
-        dict["stats"].append(fstats_T)
 
     if 'mag' in model or 'mqs' in model :
+        magnetic_conductor = modelcfg["models"]["magnetic-conductor"]
+        magnetic_insulator = modelcfg["models"]["magnetic-insulator"]
+
+        fmagconductor = os.path.join(template_path, magnetic_conductor)
+        fmaginsulator = os.path.join(template_path, magnetic_insulator)
+
         dict["magnetic-conductor"] = fmagconductor
         dict["magnetic-insulator"] = fmaginsulator
-        dict["plots"].append(plots_B)
 
     if 'magel' in model :
+        elastic_conductor = modelcfg["models"]["elastic-conductor"]
+        elastic_insulator = modelcfg["models"]["elastic-insulator"]
+        felasconductor = os.path.join(template_path, elastic_conductor)
+        felasinsulator = os.path.join(template_path, elastic_insulator)
+
         dict["elastic-conductor"] = felasconductor
         dict["elastic-insulator"] = felasinsulator
 
     if 'mqsel' in model :
+        elastic1_conductor = modelcfg["models"]["elastic1-conductor"]
+        elastic1_insulator = modelcfg["models"]["elastic1-insulator"]
+        elastic2_conductor = modelcfg["models"]["elastic2-conductor"]
+        elastic2_insulator = modelcfg["models"]["elastic2-insulator"]
+
+        felas1conductor = os.path.join(template_path, elastic1_conductor)
+        felas1insulator = os.path.join(template_path, elastic1_insulator)
+        felas2conductor = os.path.join(template_path, elastic2_conductor)
+        felas2insulator = os.path.join(template_path, elastic2_insulator)
+
         dict["elastic1-conductor"] = felas1conductor
         dict["elastic1-insulator"] = felas1insulator
         dict["elastic2-conductor"] = felas2conductor
         dict["elastic2-insulator"] = felas2insulator
     
-    #if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
-    dict["stats"].append(fstats_Power)
-    dict["stats"].append(fstats_Current)
-
     if check_templates(dict):
         pass
 

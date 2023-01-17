@@ -421,8 +421,10 @@ def setup_cmds(MyEnv, args, node_spec, yamlfile, cfgfile, jsonfile, xaofile, mes
     # TODO adapt NP to the size of the problem
     # if server is SMP mpirun outside otherwise inside singularity
     NP = node_spec.cores
+    print(f"NP={NP}")
     if node_spec.multithreading:
         NP = int(NP/2)
+        print(f"NP={NP} multithreading on")
     if args.debug:
         print(f"NP={NP} {type(NP)}")
     if args.np > 0:
@@ -431,6 +433,7 @@ def setup_cmds(MyEnv, args, node_spec, yamlfile, cfgfile, jsonfile, xaofile, mes
             print(f'keep {NP} cores')
         else:
             NP = args.np
+    print(f"NP={NP}, args.np={args.np}")
 
     simage_path = MyEnv.simage_path()
     hifimagnet = AppCfg["mesh"]["hifimagnet"]

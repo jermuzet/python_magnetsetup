@@ -221,14 +221,13 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     powerH_data = []
     power_data = []
     meanT_data = []
-    meanStress_data = []
-    meanVonMises_data = []
+    Stress_data = []
+    VonMises_data = []
 
     
     from .units import load_units, convert_data
     unit_Length = method_data[5] # "meter"
     units = load_units(unit_Length)
-    print(f"insert: R2 type:{type(R2)} type(R2[-1]):{type(R2[-1])}")
     plotB_data = { "Rinf": convert_data(units, R2[-1], "Length"), "Zinf": convert_data(units, Zmax[-1], "Length")}
 
     currentH_data.append( {"part_electric": part_electric } )
@@ -239,8 +238,8 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
         for i in range(NHelices) :
             meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
             powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices_e[i]} } )
-            meanStress_data.append( {"header": "MeanStress_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
-            meanVonMises_data.append( {"header": "MeanVonMises_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
+            Stress_data.append( {"header": "Stress_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
+            VonMises_data.append( {"header": "VonMises_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
         
         for i in range(NRings) :
             meanT_data.append( {"header": "MeanT_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
@@ -249,8 +248,8 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
         for i in range(NHelices) :
             powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
             meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
-            meanStress_data.append( {"header": "MeanStress_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
-            meanVonMises_data.append( {"header": "MeanVonMises_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
+            Stress_data.append( {"header": "Stress_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
+            VonMises_data.append( {"header": "VonMises_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
 
         if cad.CurrentLeads:
             print("insert: 3D currentH, powerH, meanT for leads")
@@ -271,16 +270,13 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
 
     mpost = { 
         "power_H": powerH_data ,
-        "current_H": currentH_data        
+        "current_H": currentH_data,        
+        "flux": {'index_h': "0:%s" % str(NChannels)},
+        "T_H" : meanT_data,
+        "Stress_H": Stress_data,
+        "VonMises_H": VonMises_data,
     }
-    if 'th' in method_data[3]:
-        mpost["flux"] = {'index_h': "0:%s" % str(NChannels)}
-        mpost["meanT_H"] = meanT_data
-
-    if 'magel' in method_data[3] or 'mqsel' in method_data[3]:
-        mpost["meanStress_H"] = meanStress_data
-        mpost["meanVonMises_H"] = meanVonMises_data
-        
+       
     if 'mag' in method_data[3] or 'mqs' in method_data[3]:
         mpost["plot_B"] = plotB_data
 
