@@ -230,55 +230,55 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
     units = load_units(unit_Length)
     plotB_data = { "Rinf": convert_data(units, R2[-1], "Length"), "Zinf": convert_data(units, Zmax[-1], "Length")}
 
-    currentH_data.append( {"part_electric": part_electric } )
     power_data.append( {"part_electric": part_electric } )
 
     # if method_data[3] != 'mag' and method_data[3] != 'mag_hcurl':
     if method_data[2] == "Axi":
+        currentH_data.append( {"part_electric": part_electric } )
         for i in range(NHelices) :
-            meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
+            meanT_data.append( {"header": "T_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
             powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices_e[i]} } )
             Stress_data.append( {"header": "Stress_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
             VonMises_data.append( {"header": "VonMises_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
         
         for i in range(NRings) :
-            meanT_data.append( {"header": "MeanT_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
+            meanT_data.append( {"header": "T_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
 
     else:
         for i in range(NHelices) :
             powerH_data.append( {"header": "Power_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
-            meanT_data.append( {"header": "MeanT_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
+            meanT_data.append( {"header": "T_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
             Stress_data.append( {"header": "Stress_H{}".format(i+1), "markers": { "name": "H{}_Cu".format(i+1)} } )
             VonMises_data.append( {"header": "VonMises_H{}".format(i+1), "markers": { "name": "H{}_Cu%1%".format(i+1), "index1": index_Helices[i]} } )
 
         if cad.CurrentLeads:
             print("insert: 3D currentH, powerH, meanT for leads")
-            currentH_data.append( {"header": "Current_iL1", "markers": { "name:": "iL1_V0" } } )
-            currentH_data.append( {"header": "Current_oL2", "markers": { "name:": "oL2_V0" } } )
+            currentH_data.append( {"header": "Intensity_iL1", "markers": { "name:": "iL1_V0" } } )
+            currentH_data.append( {"header": "Intensity_oL2", "markers": { "name:": "oL2_V0" } } )
             powerH_data.append( {"header": "Power_iL1", "markers": { "name": "iL1"} } )
             powerH_data.append( {"header": "Power_oL2", "markers": { "name": "oL2"} } )
-            meanT_data.append( {"header": "MeanT_iL1", "markers": { "name": "iL1" } } )
-            meanT_data.append( {"header": "MeanT_oL2", "markers": { "name": "oL2" } } )
+            meanT_data.append( {"header": "T_iL1", "markers": { "name": "iL1" } } )
+            meanT_data.append( {"header": "T_oL2", "markers": { "name": "oL2" } } )
         else:
-            currentH_data.append( {"header": "Current_H1", "markers": { "name:": "H1_V0" } } )
-            currentH_data.append( {"header": "Current_H{}".format(NHelices), "markers": { "name:": "H{}_V0".format(NHelices) } } )
+            currentH_data.append( {"header": "Intensity_H1", "markers": { "name:": "H1_V0" } } )
+            currentH_data.append( {"header": "Intensity_H{}".format(NHelices), "markers": { "name:": "H{}_V0".format(NHelices) } } )
 
         print(f"insert: 3D powerH for {NRings} rings")
         for i in range(NRings) :
             powerH_data.append( {"header": "Power_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
-            meanT_data.append( {"header": "MeanT_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
+            meanT_data.append( {"header": "T_R{}".format(i+1), "markers": { "name": "R{}".format(i+1)} } )
 
     mpost = { 
-        "power_H": powerH_data ,
-        "current_H": currentH_data,        
-        "flux": {'index_h': "0:%s" % str(NChannels)},
-        "T_H" : meanT_data,
-        "Stress_H": Stress_data,
-        "VonMises_H": VonMises_data,
+        "Power": powerH_data ,
+        "Current": currentH_data,        
+        "Flux": {'index_h': f"0:{str(NChannels)}"},
+        "T" : meanT_data,
+        "Stress": Stress_data,
+        "VonMises": VonMises_data,
     }
        
     if 'mag' in method_data[3] or 'mqs' in method_data[3]:
-        mpost["plot_B"] = plotB_data
+        mpost["B"] = plotB_data
 
     # check mpost output
     # print(f"insert: mpost={mpost}")

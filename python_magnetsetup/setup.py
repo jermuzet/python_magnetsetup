@@ -536,7 +536,7 @@ def setup_cmds(MyEnv, args, node_spec, yamlfile, cfgfile, jsonfile, xaofile, mes
     # home_env = 'HOME'
     # result_dir = f'{os.getenv(home_env)}/feelppdb/{directory.rstrip()}/np_{NP}'
     # result_arch = cfgfile.replace('.cfg', '_res.tgz')
-    result_dir = f'{root_directory}/np_{NP}'
+    result_dir = f'{root_directory}/feelppdb/np_{NP}'
     print(f'result_dir={result_dir}')
 
     paraview = AppCfg["post"]["paraview"]

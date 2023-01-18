@@ -192,12 +192,12 @@
                     	"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
-				"HoopStrain":
-				{
+					"HoopStrain":
+					{
 						"expr": "elastic_u_0/x:x:elastic_u_0",
                         "markers": {{part_thermic}},
 						"representation":["element"]
-				}
+					}
 				}
 	    	}
 		},
@@ -219,20 +219,20 @@
 						"type":"integrate",
 						"expr":"-2*pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi):magnetic_Atheta:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
-				}
-                                },
+					}
+                },
 				"Points":
 				{
-				"B0":
-				{
-                                    "coord":"{1e-7,0.}",
-                                    "fields":"Atheta",
+					"B0":
+					{
+                        "coord":"{1e-7,0.}",
+                        "fields":"Atheta",
 			            "expressions":
-                                    {
-                                          "Bz": "magnetic_grad_Atheta_0+magnetic_Atheta/x:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x"
-                                    }
+                        {
+                            "Bz": "magnetic_grad_Atheta_0+magnetic_Atheta/x:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x"
+                        }
+					}
 				}
-			}
 	    	}
 		},
 		"heat":
@@ -254,7 +254,7 @@
         				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
         				"markers": {{part_electric}}
     				},
-					"MeanT": 
+					"Stat_T": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 
@@ -275,17 +275,17 @@
 	    	{
 				"Statistics":
 				{
-		    		"MeanDispl": 
+		    		"Stat_Displ": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"displacement" 
 		    		},
-		    		"MeanStress": 
+		    		"Stat_Stress": 
 		    		{
 						"type":["min","max","mean"], 
 						"expr":"materials_stress_thth:materials_stress_thth" 
 		    		},
-		    		"MeanVonMises": 
+		    		"Stat_VonMises": 
 		    		{
 						"type":["min","max","mean"], 
 						"expr":"sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3"

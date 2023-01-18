@@ -96,24 +96,36 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     currentH_data = []
     powerH_data = []
     meanT_data = []
+    Stress_data = []
+    VonMises_data = []
+
+    from .units import load_units, convert_data
+    unit_Length = method_data[5] # "meter"
+    units = load_units(unit_Length)
+    plotB_data = { "Rinf": convert_data(units, cad.r[-1], "Length"), "Zinf": convert_data(units, cad.z[-1], "Length")}
     
-    currentH_data.append( {"part_electric": part_electric } )
-        
     if method_data[2] == "Axi":
+        currentH_data.append( {"part_electric": part_electric } )
         powerH_data.append( {f"header": f"Power_{name}", "markers": { "name": f"{name}_B%1%", "index1": index_Bitters}} )
-        meanT_data.append( {f"header": f"MeanT_{name}", "markers":  { "name": f"{name}_B%1%", "index1": index_Bitters}} )
+        meanT_data.append( {f"header": f"T_{name}", "markers":  { "name": f"{name}_B%1%", "index1": index_Bitters}} )
+        Stress_data.append( {"header": f"Stress_{name}", "markers":  { "name": f"{name}_B%1%", "index1": index_Bitters}} )
+        VonMises_data.append( {"header": f"VonMises_{name}", "markers":  { "name": f"{name}_B%1%", "index1": index_Bitters}} )
+
     else:
         print("bitter3D post not implemented")
         
-    if debug: print("meanT_data:", meanT_data)
-    
     mpost = {
-        "power_H": powerH_data ,
-        "current_H": currentH_data
-    } 
-    if 'th' in method_data[3]:
-        mpost["meanT_H"] = meanT_data
-        
+        "Power": powerH_data ,
+        "Current": currentH_data,
+        "Flux": {},
+        "T" : meanT_data,
+        "Stress": Stress_data,
+        "VonMises": VonMises_data,
+    }
+
+    if 'mag' in method_data[3] or 'mqs' in method_data[3]:
+        mpost["B"] = plotB_data
+
     # check mpost output
     # print(f"bitter {name}: mpost={mpost}")
     mmat = create_materials_bitter(gdata, confdata, templates, method_data, debug)

@@ -534,26 +534,26 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
 
     post_keywords = {
         "Flux" : {
-            'name': 'flux',
+            'name': 'Flux',
             'physic': 'heat',
             'template': templates["flux"],
-            'data' : mpost['flux'] if 'flux' in mpost else {}
+            'data' : mpost['Flux'] if 'Flux' in mpost else {}
         },
     }
+    if debug:
+        print(f"mpost[Flux]={mpost['Flux']}")
 
     for field in templates['stats']:
         _data = templates["stats"][field]
         _name = f'Stats_{field}'
         post_keywords[_name] = {
-            'name': _data['name'],
+            'name': field, #_data['name'],
             'template': _data['template'],
             'physic': _data['physic'],
-            'data': _data['data'],
+            'data' : { _name : mpost[field] if field in mpost else {} }
         }
-        print(f"{field}: post_keywords[{_name}] data_key:{post_keywords[_name]['data'].keys()} (mpost keys={mpost.keys()})")
-        for pkey in post_keywords[_name]['data']:
-            post_keywords[_name]['data'][pkey] = mpost[pkey]
-    print(f'post_keywords: {post_keywords.keys()}')
+        if debug:
+            print(f"{field}: post_keywords[{_name}]={post_keywords[_name]}")
 
     for key in post_keywords:
         field = post_keywords[key]
@@ -562,26 +562,23 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
             _data = field['data']
             if debug:
                 print(f"{key} (type={type(_data)}): {_data}")
-            print(f"{key}: template={field['template']}")
-            print(f"{key}: _data={_data}")
-            print(f"{key}: data[PostProcess][{field['physic']}][Measures][Statistics]")
             add = data["PostProcess"][field['physic']]['Measures']['Statistics']
-            print(f"{key}: add={add}")
+            # print(f"{key}: add={add}")
             odata = entry(field['template'], _data, debug)
-            if debug: print(odata)
-            print(f'{key}: odata={odata}')
+            if debug:
+                print(f'{key}: odata={odata}')
             for md in odata[key]:
-                print(f'{key}: add[{md}], odata[{key}][{md}]={odata[key][md]}')
+                # print(f'{key}: add[{md}], odata[{key}][{md}]={odata[key][md]}')
                 add[md] = odata[key][md]
-            print(f"{key}: add={add}")
+            # print(f"{key}: add={add}")
 
     # TODO: add data for B plots, aka Rinf, Zinf, NR and Nz?
-    if "plot_B" in mpost:
+    if "B" in mpost:
         if debug:
             print("plotB")
             print("section:", "magnetic")
             print("templates[plots]:", templates["plots"])
-        plotB_data = mpost["plot_B"]
+        plotB_data = mpost["B"]
         print(f"plotB_data:{plotB_data}")
         add = data["PostProcess"]["magnetic"]["Measures"]["Points"]
         odata = entry(templates["plots"]['B'], {'Rinf': plotB_data['Rinf'], 'Zinf': plotB_data['Zinf'], 'NR': 100, 'NZ': 100}, debug)
