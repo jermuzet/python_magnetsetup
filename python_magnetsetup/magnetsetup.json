@@ -339,13 +339,13 @@
 						"Stress":   {
 							"name": "Stats_Stress",
 							"template": "stats_Stress.mustache",
-							"physic": "heat",
+							"physic": "elastic",
 							"data": {"Stress_H":""}
 						},
 				    	"VonMises":    {
 							"name": "Stats_VonMises",
 							"template": "stats_VonMises.mustache",
-							"physic": "heat",
+							"physic": "elastic",
 							"data": {"VonMises_H":""}
 						}
 				    },
@@ -591,9 +591,24 @@
 					},
 				    "stats":
 				    {
-						"T": "stats_T.mustache",
-						"Power": "stats_Power.mustache",
-				    	"Current": "stats_Current.mustache"
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"current_H":""}
+						}
 				    },
 				    "plots":
 				    {
@@ -714,11 +729,36 @@
 					},
 				    "stats":
 				    {
-						"T": "stats_T.mustache",
-						"Power": "stats_Power.mustache",
-				    	"Current": "stats_Current.mustache",
-				    	"Stress": "stats_Stress.mustache",
-				    	"VonMises": "stats_VonMises.mustache"
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"current_H":""}
+						},
+						"Stress":   {
+							"name": "Stats_Stress",
+							"template": "stats_Stress.mustache",
+							"physic": "elastic1",
+							"data": {"Stress_H":""}
+						},
+				    	"VonMises":    {
+							"name": "Stats_VonMises",
+							"template": "stats_VonMises.mustache",
+							"physic": "elastic1",
+							"data": {"VonMises_H":""}
+						}
 				    },
 				    "plots":
 					{
@@ -773,11 +813,36 @@
 					},
 				    "stats":
 			        {
-						"T": "stats_T.mustache",
-						"Power": "stats_Power.mustache",
-			        	"Current": "stats_Current.mustache",
-			        	"Stress": "stats_Stress.mustache",
-			        	"VonMises": "stats_VonMises.mustache"
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"current_H":""}
+						},
+						"Stress":   {
+							"name": "Stats_Stress",
+							"template": "stats_Stress.mustache",
+							"physic": "elastic2",
+							"data": {"Stress_H":""}
+						},
+				    	"VonMises":    {
+							"name": "Stats_VonMises",
+							"template": "stats_VonMises.mustache",
+							"physic": "elastic2",
+							"data": {"VonMises_H":""}
+						}
 			        },
 			        "plots":
 			        {
@@ -830,9 +895,24 @@
 					},
 			        "stats":
 			        {
-						"T": "stats_T.mustache",
-						"Power": "stats_Power.mustache",
-			        	"Current": "stats_Current.mustache"
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"current_H":""}
+						}
 			        }		
 			    }
 			}
@@ -879,9 +959,24 @@
 					},
 			        "stats":
 			        {
-						"T": "stats_T.mustache",
-						"Power": "stats_Power.mustache",
-			        	"Current": "stats_Current.mustache"
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {"T_H":""}
+						},
+						"Power":  {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {"power_H":""}
+						},
+				    	"Current":  {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {"current_H":""}
+						}
 			        }
 				}
 			}
