@@ -6,7 +6,7 @@
         "mesh":
 	{
 		"hifimagnet": "/opt/SALOME-9.8.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome",
-		"salome": "hifimagnet-salome-9.8.3.sif",
+		"salome": "hifimagnet-salome-9.8.4.sif",
 		"partitioner": "feelpp_mesh_partitioner",
 		"3D": 
 		{
