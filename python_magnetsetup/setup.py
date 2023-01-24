@@ -161,9 +161,18 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
             
                 if debug:
                     print(f'tpost: {tpost}')
-                # print(f"magnet_setup {cad.name}: tpost[current_H]={tpost['current_H']}")
+                print(f"magnet_setup {cad.name}: tpost[Current]={tpost['Current']}")
                 mpost = NMerge(tpost, mpost, debug, "magnet_setup Bitter/Supra mpost") # debug)
-                # print(f"magnet_setup {cad.name}: mpost[current_H]={mpost['current_H']}")
+                print(f"magnet_setup {cad.name}: mpost[Current]={mpost['Current']}")
+
+                list_current = []
+                for item in mpost['Current']:
+                    if isinstance(item, dict) and 'part_electric' in item:
+                        list_current = list(set(list_current+ item['part_electric']))
+                if list_current:
+                    mpost['Current'] = [{'part_electric': list_current}]
+                    print(f"magnet_setup {cad.name}: force mpost[Current]={mpost['Current']}")
+                    
 
     if debug:
         print(f'magnet_setup: mdict={mdict}')
@@ -222,10 +231,11 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
             print(f"magnet:  {magnet}")
         mname = list(magnet.keys())[0]
         if debug:
-            print(f'msite_setup: magnet_setup[{list(magnet.keys())[0]}]: confdata={magnet}'),
+            print(f'msite_setup: magnet_setup[{mname}]: confdata={magnet}'),
         mconfdata = magnet[mname]
         (tdict, tmat, tmodels, tpost) = magnet_setup(MyEnv, mconfdata, method_data, templates, debug)
-
+        print(f"tpost[{mname}][Current]: {tpost['Current']}")
+        
         if debug:
             print("tdict[part_electric]:", tdict['part_electric'])
             print("tdict[part_thermic]:", tdict['part_thermic'])
@@ -240,9 +250,18 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
         
         mmodels = NMerge(tmodels, mmodels, debug, "msite_setup/tmodels")
 
-        mpost = NMerge(tpost, mpost, debug, "msite_setup/tpost") #debug)
+        mpost = NMerge(tpost, mpost, debug, "msite_setup/tpost")
+        list_current = []
+        for item in mpost['Current']:
+            if isinstance(item, dict) and 'part_electric' in item:
+                list_current = list(set(list_current+ item['part_electric']))
+            if list_current:
+                mpost['Current'] = [{'part_electric': list_current}]
+                print(f"msite_setup: magnet_setup[{mname}]: force mpost[Current]={mpost['Current']}")
         if debug:
             print("NewMerge:", mpost)
+
+    print(f'mpost: {mpost}')
 
     if debug:
         print("mdict:", mdict)

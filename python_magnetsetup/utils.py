@@ -22,13 +22,15 @@ def NMerge(dict1: dict, dict2: dict, debug: bool=False, name: str="") -> dict:
                 if isinstance(dict1[key], list):
                     for item in dict1[key]:
                         if not item in dict2[key]:
-                            if debug: print(f"{item} not in dict2")
+                            if debug:
+                                print(f"{item} not in dict2")
                             dict2[key].append(item)
                         # else:
-                        #    print(f"{item} type={type(item)}")
-                        #    print(f"dict1 item={item}")
-                        #    index = dict2[key].index(item)
-                        #    print(f"dict2 item={dict2[key][index]}")
+                        #    if debug:
+                        #        print(f"{item} type={type(item)}")
+                        #        print(f"dict1 item={item}")
+                        #        index = dict2[key].index(item)
+                        #        print(f"dict2 item={dict2[key][index]}")
                 
                 if debug:
                     print(f"NMerge({name}): result={dict2[key]}")         

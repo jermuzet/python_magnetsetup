@@ -106,8 +106,8 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     
     if method_data[2] == "Axi":
         currentH_data.append( {"part_electric": part_electric } )
-        powerH_data.append( {f"header": f"Power_{name}", "markers": { "name": f"{name}_B%1%", "index1": index_Bitters}} )
-        meanT_data.append( {f"header": f"T_{name}", "markers":  { "name": f"{name}_B%1%", "index1": index_Bitters}} )
+        powerH_data.append( {"header": f"Power_{name}", "markers": { "name": f"{name}_B%1%", "index1": index_Bitters}} )
+        meanT_data.append( {"header": f"T_{name}", "markers":  { "name": f"{name}_B%1%", "index1": index_Bitters}} )
         Stress_data.append( {"header": f"Stress_{name}", "markers":  { "name": f"{name}_B%1%", "index1": index_Bitters}} )
         VonMises_data.append( {"header": f"VonMises_{name}", "markers":  { "name": f"{name}_B%1%", "index1": index_Bitters}} )
 
@@ -162,7 +162,10 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
             index = params.index(item)
             mat = mmat[marker]
             # print("U=", params[index], mat['sigma'], R1[i], pitch_h[i][j])
-            sigma = float(mat['sigma'])
+            if method_data[6]:
+                sigma = float(mat['sigma0'])
+            else:
+                sigma = float(mat['sigma'])
             I_s = I0 * cad.axi.turns[j]
             j1 = I_s / (math.log(cad.r[1]/cad.r[0]) * (cad.r[0]*1.e-3) * (cad.axi.pitch[j]*1.e-3) * cad.axi.turns[j] )
             U_s = 2 * math.pi * (cad.r[0] * 1.e-3) * j1 / sigma
