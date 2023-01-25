@@ -94,7 +94,7 @@ def magnet_simfile(MyEnv, confdata: str, addAir: bool=False, debug: bool=False, 
 
     return files
 
-def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug: bool=False):
+def magnet_setup(MyEnv, mname: str, confdata: str, method_data: List, templates: dict, debug: bool=False):
     """
     Creating dict for setup for magnet
     """
@@ -119,7 +119,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
         with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
             cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
         # if isinstance(cad, Insert):
-        (mdict, mmat, mmodels, mpost) = Insert_setup(MyEnv, confdata, cad, method_data, templates, debug)
+        (mdict, mmat, mmodels, mpost) = Insert_setup(MyEnv, mname, confdata, cad, method_data, templates, debug)
 
     for mtype in ["Bitter", "Supra"]:
         if mtype in confdata:
@@ -136,10 +136,10 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
                 print(f"load a {mtype} insert: {cad.name} ****")
 
                 if isinstance(cad, Bitter.Bitter):
-                    (tdict, tmat, tmodels, tpost) = Bitter_setup(MyEnv, obj, cad, method_data, templates, debug)
+                    (tdict, tmat, tmodels, tpost) = Bitter_setup(MyEnv, mname, obj, cad, method_data, templates, debug)
                     # print("Bitter tpost:", tpost)
                 elif isinstance(cad, Supra.Supra):
-                    (tdict, tmat, tmodels, tpost) = Supra_setup(MyEnv, obj, cad, method_data, templates, debug)
+                    (tdict, tmat, tmodels, tpost) = Supra_setup(MyEnv, mname, obj, cad, method_data, templates, debug)
                 else:
                     raise Exception(f"setup: unexpected cad type {str(type(cad))}")
 
@@ -161,9 +161,9 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
             
                 if debug:
                     print(f'tpost: {tpost}')
-                print(f"magnet_setup {cad.name}: tpost[Current]={tpost['Current']}")
+                print(f"magnet_setup {mname}: tpost[Current]={tpost['Current']}")
                 mpost = NMerge(tpost, mpost, debug, "magnet_setup Bitter/Supra mpost") # debug)
-                print(f"magnet_setup {cad.name}: mpost[Current]={mpost['Current']}")
+                print(f"magnet_setup {mname}: mpost[Current]={mpost['Current']}")
 
                 list_current = []
                 for item in mpost['Current']:
@@ -171,7 +171,7 @@ def magnet_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug
                         list_current = list(set(list_current+ item['part_electric']))
                 if list_current:
                     mpost['Current'] = [{'part_electric': list_current}]
-                    print(f"magnet_setup {cad.name}: force mpost[Current]={mpost['Current']}")
+                    print(f"magnet_setup {mname}: force mpost[Current]={mpost['Current']}")
                     
 
     if debug:
@@ -233,7 +233,7 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, debug:
         if debug:
             print(f'msite_setup: magnet_setup[{mname}]: confdata={magnet}'),
         mconfdata = magnet[mname]
-        (tdict, tmat, tmodels, tpost) = magnet_setup(MyEnv, mconfdata, method_data, templates, debug)
+        (tdict, tmat, tmodels, tpost) = magnet_setup(MyEnv, mname, mconfdata, method_data, templates, debug)
         print(f"tpost[{mname}][Current]: {tpost['Current']}")
         
         if debug:
@@ -313,7 +313,7 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
                     except FileNotFoundError as e:
                         pass
 
-        (mdict, mmat, mmodels, mpost) = magnet_setup(MyEnv, confdata, method_data, templates, args.debug or args.verbose)
+        (mdict, mmat, mmodels, mpost) = magnet_setup(MyEnv, mname, confdata, method_data, templates, args.debug or args.verbose)
     else:
         print("Load a msite %s" % confdata["name"], "debug:", args.debug)
         cad_basename = confdata["name"]
@@ -464,14 +464,15 @@ def setup_cmds(MyEnv, args, node_spec, yamlfile, cfgfile, jsonfile, xaofile, mes
     if "exec" in AppCfg[args.method][args.time][args.geom][args.model]:
         exec = AppCfg[args.method][args.time][args.geom][args.model]
 
-    if len([*currents]) > 1:
-        currents_v = [float(currents[key]) for key in currents]
-    else:
-        for key in currents:
-            currents_v = currents[key]
+    print(f'currents({type(currents)}): {currents}')
+    # if len([*currents]) > 1:
+    #     currents_v = [float(currents[key]) for key in currents]
+    # else:
+    #     for key in currents:
+    #         currents_v = currents[key]
 
     pyfeel = ' -m python_magnetworkflows.cli' # fix-current, commisioning, fixcooling
-    pyfeel_args = f'--current {currents_v} --cooling {args.cooling} --eps {1.e-5} --itermax {20} --flow_params {args.flow_params}'
+    pyfeel_args = f'--current {currents} --cooling {args.cooling} --eps {1.e-5} --itermax {20} --flow_params {args.flow_params}'
 
     # TODO infty as params
     if "mqs" in args.model or "mag" in args.model:

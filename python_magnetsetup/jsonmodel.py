@@ -10,7 +10,7 @@ import math
 from .utils import Merge
 from .units import load_units, convert_data
 
-def create_params_supra(gdata: tuple, method_data: List[str], debug: bool=False) -> dict:
+def create_params_supra(mname: str, gdata: tuple, method_data: List[str], debug: bool=False) -> dict:
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
     """
@@ -30,11 +30,11 @@ def create_params_supra(gdata: tuple, method_data: List[str], debug: bool=False)
 
     return params_data
 
-def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False):
+def create_params_bitter(mname: str, gdata: tuple, method_data: List[str], debug: bool=False):
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
     """
-    print("create_params_bitter for %s" % gdata[0])
+    print(f"create_params_bitter for mname={mname} gdata[0]={gdata[0]}")
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5] # "meter"
@@ -54,20 +54,20 @@ def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False
 
     (name, snames, nturns) = gdata
     for thbc in ["rInt", "rExt"]:
-        params_data['Parameters'].append({"name":"%s_%s_hw" % (name, thbc), "value":convert_data(units, 58222.1, "h")})
-        params_data['Parameters'].append({"name":"%s_%s_Tw" % (name, thbc), "value":290.671})
-        params_data['Parameters'].append({"name":"%s_%s_dTw" % (name, thbc), "value":12.74})
+        params_data['Parameters'].append({"name": f"{name}_{thbc}_hw", "value":convert_data(units, 58222.1, "h")})
+        params_data['Parameters'].append({"name": f"{name}_{thbc}_Tw", "value":290.671})
+        params_data['Parameters'].append({"name": f"{name}_{thbc}_dTw", "value":12.74})
     # for sname in snames:
-    #    params_data['Parameters'].append({"name":"%s_hw" % sname, "value":convert_data(units, 58222.1, "h")})
-    #    params_data['Parameters'].append({"name":"%s_Tw" % sname, "value":290.671})
-    #    params_data['Parameters'].append({"name":"%s_dTw" % sname, "value":12.74})
+    #    params_data['Parameters'].append({"name": f"{sname}_hw", "value":convert_data(units, 58222.1, "h")})
+    #    params_data['Parameters'].append({"name": f"{sname}_Tw", "value":290.671})
+    #    params_data['Parameters'].append({"name": f"{sname}_dTw", "value":12.74})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
         for i,sname in enumerate(snames):
-            params_data['Parameters'].append({"name":"U_%s" % sname, "value":"1"})
-            params_data['Parameters'].append({"name":"N_%s" % sname, "value":nturns[i]})
-            # params_data['Parameters'].append({"name":"S_%s" % sname, "value":convert_data(units, Ssections[i], "Area")})
+            params_data['Parameters'].append({"name": f"U_{sname}", "value":"1"})
+            params_data['Parameters'].append({"name": f"N_{sname}", "value":nturns[i]})
+            # params_data['Parameters'].append({"name": f"S_{sname}", "value":convert_data(units, Ssections[i], "Area")})
 
     if "mag" in method_data[3] or "mqs" in method_data[3] :
         params_data['Parameters'].append({"name":"mu0", "value":convert_data(units,  4*math.pi*1e-7, "mu0")})
@@ -77,11 +77,11 @@ def create_params_bitter(gdata: tuple, method_data: List[str], debug: bool=False
 
     return params_data
 
-def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False) -> dict:
+def create_params_insert(mname: str, gdata: tuple, method_data: List[str], debug: bool=False) -> dict:
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
     """
-    print("create_params_insert")
+    print(f"create_params_insert: mname={mname}")
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5] # "meter"
@@ -130,27 +130,27 @@ def create_params_insert(gdata: tuple, method_data: List[str], debug: bool=False
 
     for i in range(NHelices+1):
         # get value from coolingmethod and Flow(I) value
-        params_data['Parameters'].append({"name":"h%d" % i, "value":convert_data(units, 58222.1, "h")})
-        params_data['Parameters'].append({"name":"Tw%d" % i, "value":290.671})
-        params_data['Parameters'].append({"name":"dTw%d" % i, "value":12.74})
-        params_data['Parameters'].append({"name":"Zmin%d" % i, "value": Zmin[i]})
-        params_data['Parameters'].append({"name":"Zmax%d" % i, "value": Zmax[i]})
-        params_data['Parameters'].append({"name":"Sh%d" % i, "value": Sh[i]})
-        params_data['Parameters'].append({"name":"Dh%d" % i, "value": Dh[i]})
+        params_data['Parameters'].append({f"name":"h{i}", "value":convert_data(units, 58222.1, "h")})
+        params_data['Parameters'].append({f"name":"Tw{i}", "value":290.671})
+        params_data['Parameters'].append({f"name":"dTw{i}", "value":12.74})
+        params_data['Parameters'].append({f"name":"Zmin{i}", "value": Zmin[i]})
+        params_data['Parameters'].append({f"name":"Zmax{i}", "value": Zmax[i]})
+        params_data['Parameters'].append({f"name":"Sh{i}", "value": Sh[i]})
+        params_data['Parameters'].append({f"name":"Dh{i}", "value": Dh[i]})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
         for i in range(NHelices):
             for j in range(Nsections[i]):
                 # TODO set more realistic value for I0 = 31kA ??
-                params_data['Parameters'].append({"name":"U_H%d_Cu%d" % (i+1, j+1), "value":"1"})
+                params_data['Parameters'].append({"name":f"U_H{i+1}_Cu{j+1}", "value":"1"})
 
             turns = turns_h[i]
             for j in range(Nsections[i]):
-                params_data['Parameters'].append({"name":"N_H%d_Cu%d" % (i+1, j+1), "value":turns[j]})
+                params_data['Parameters'].append({"name":f"N_H{i+1}_Cu{j+1}", "value":turns[j]})
         # for i in range(NHelices):
         #     for j in range(Nsections[i]):
-        #         params_data['Parameters'].append({"name":"S_H%d_Cu%d" % (i+1, j+1), "value":convert_data(units, distance_unit, Ssections[i], "Area")})
+        #         params_data['Parameters'].append({"name":f"S_H{i+1}_Cu{j+1}", "value":convert_data(units, distance_unit, Ssections[i], "Area")})
 
     if "mag" in method_data[3] or "mqs" in method_data[3] :
         params_data['Parameters'].append({"name":"mu0", "value":convert_data(units, 4*math.pi*1e-7, "mu0")})
@@ -199,8 +199,8 @@ def create_materials_bitter(gdata: tuple, confdata: dict, templates: dict, metho
     for sname in snames:
         if method_data[2] == "Axi":
             if debug: print("create_material_bitter:", sname)
-            mdata = entry(fconductor, Merge({'name': "%s" % sname}, confdata["material"]) , debug)
-            materials_dict["%s" % sname] = mdata["%s" % sname]
+            mdata = entry(fconductor, Merge({'name': f"{sname}"}, confdata["material"]) , debug)
+            materials_dict[f"{sname}"] = mdata[f"{sname}"]
         else:
             return {}
 
@@ -230,42 +230,42 @@ def create_materials_insert(gdata: tuple, idata: Optional[List], confdata: dict,
     # Loop for Helix
     for i in range(NHelices):
         if method_data[2] == "3D":
-            mdata = entry(fconductor, Merge({'name': "H%d" % (i+1), 'marker': "H%d_Cu" % (i+1)}, confdata["Helix"][i]["material"]) , debug)
-            materials_dict["H%d" % (i+1)] = mdata["H%d" % (i+1)]
+            mdata = entry(fconductor, Merge({'name': f"H{i+1}", 'marker': f"H{i+1}_Cu"}, confdata["Helix"][i]["material"]) , debug)
+            materials_dict[f"H{i+1}"] = mdata[f"H{i+1}"]
 
             if idata:
                 for item in idata:
                     if item[0] == "Glue":
-                        name = "Isolant%d" % (i+1)
-                        mdata = entry(finsulator, Merge({'name': name, 'marker': "H%d_Isolant" % (i+1)}, confdata["Helix"][i]["insulator"]), debug)
+                        name = f"Isolant{i+1}"
+                        mdata = entry(finsulator, Merge({'name': name, 'marker': f"H{i+1}_Isolant"}, confdata["Helix"][i]["insulator"]), debug)
                     else:
-                        name = "Kaptons%d" % (i+1)
-                        kapton_dict = { "name": "[\"Kapton%1%\"]", "index1": "0:%d" % item(1)}
+                        name = f"Kaptons{i+1}"
+                        kapton_dict = { "name": "[\"Kapton%1%\"]", "index1": f"0:{item(1)}"}
                         mdata = entry(finsulator, Merge({'name': name, 'marker': kapton_dict}, confdata["Helix"][i]["insulator"]), debug)
                     materials_dict[name] = mdata[name]
         else:
             # section j==0:  treated as insulator in Axi
-            mdata = entry(finsulator, Merge({'name': "H%d_Cu%d" % (i+1, 0)}, confdata["Helix"][i]["material"]), debug)
-            materials_dict["H%d_Cu%d" % (i+1, 0)] = mdata["H%d_Cu%d" % (i+1, 0)]
+            mdata = entry(finsulator, Merge({'name': f"H{i+1}_Cu0"}, confdata["Helix"][i]["material"]), debug)
+            materials_dict[f"H{i+1}_Cu0"] = mdata[f"H{i+1}_Cu0"]
 
             # load conductor template
             for j in range(1,Nsections[i]+1):
-                # print("load conductor[%d]: mat:" % j, confdata["Helix"][i]["material"])
-                mdata = entry(fconductor, Merge({'name': "H%d_Cu%d" % (i+1, j)}, confdata["Helix"][i]["material"]), debug)
-                # print("load conductor[%d]:" % j, mdata)
-                materials_dict["H%d_Cu%d" % (i+1, j)] = mdata["H%d_Cu%d" % (i+1, j)]
+                # print("load conductor[{j}]: mat:", confdata["Helix"][i]["material"])
+                mdata = entry(fconductor, Merge({'name': f"H{i+1}_Cu{j}"}, confdata["Helix"][i]["material"]), debug)
+                # print("load conductor[{j}]:", mdata)
+                materials_dict[f"H{i+1}_Cu{j}"] = mdata[f"H{i+1}_Cu{j}"]
 
             # section j==Nsections+1:  treated as insulator in Axi
-            mdata = entry(finsulator, Merge({'name': "H%d_Cu%d" % (i+1, Nsections[i]+1)}, confdata["Helix"][i]["material"]), debug)
-            materials_dict["H%d_Cu%d" % (i+1, Nsections[i]+1)] = mdata["H%d_Cu%d" % (i+1, Nsections[i]+1)]
+            mdata = entry(finsulator, Merge({'name': f"H{i+1}_Cu{Nsections[i]+1}"}, confdata["Helix"][i]["material"]), debug)
+            materials_dict[f"H{i+1}_Cu{Nsections[i]+1}"] = mdata[f"H{i+1}_Cu{Nsections[i]+1}"]
 
     # loop for Rings
     for i in range(NRings):
         if method_data[2] == "3D":
-            mdata = entry(fconductor, Merge({'name': "R%d" % (i+1)}, confdata["Ring"][i]["material"]), debug)
+            mdata = entry(fconductor, Merge({'name': f"R{i+1}"}, confdata["Ring"][i]["material"]), debug)
         else:
-            mdata = entry(finsulator, Merge({'name': "R%d" % (i+1)}, confdata["Ring"][i]["material"]), debug)
-        materials_dict["R%d" % (i+1)] = mdata["R%d" % (i+1)]
+            mdata = entry(finsulator, Merge({'name': f"R{i+1}"}, confdata["Ring"][i]["material"]), debug)
+        materials_dict[f"R{i+1}"] = mdata[f"R{i+1}"]
 
     # Leads:
     if method_data[2] == "3D" and "Lead" in confdata:
@@ -310,8 +310,8 @@ def create_models_bitter(gdata: tuple, confdata: dict, templates: dict, method_d
     for sname in snames:
         if method_data[2] == "Axi":
             if debug: print("create_model_bitter:", sname)
-            mdata = entry(fconductor, Merge({'name': "%s" % sname}, confdata["material"]) , debug)
-            models_dict["%s" % sname] = mdata
+            mdata = entry(fconductor, Merge({'name': f"{sname}"}, confdata["material"]) , debug)
+            models_dict[f"{sname}"] = mdata
         else:
             return {}
 
@@ -335,22 +335,22 @@ def create_models_insert(gdata: tuple, idata: Optional[List], confdata: dict, te
     # Loop for Helix
     for i in range(NHelices):
         # section j==0:  treated as insulator in Axi
-        mdata = entry(finsulator, {'name': "H%d_Cu%d" % (i+1, 0)}, debug)
-        models_dict["H%d_Cu%d" % (i+1, 0)] = mdata
+        mdata = entry(finsulator, {'name': f"H{i+1}_Cu0"}, debug)
+        models_dict[f"H{i+1}_Cu0"] = mdata
 
         # load conductor template
         for j in range(1,Nsections[i]+1):
-            mdata = entry(fconductor, {'name': "H%d_Cu%d" % (i+1, j)}, debug)
-            models_dict["H%d_Cu%d" % (i+1, j)] = mdata
+            mdata = entry(fconductor, {'name': f"H{i+1}_Cu{j}"}, debug)
+            models_dict[f"H{i+1}_Cu{j}"] = mdata
 
         # section j==Nsections+1:  treated as insulator in Axi
-        mdata = entry(finsulator, {'name': "H%d_Cu%d" % (i+1, Nsections[i]+1)}, debug)
-        models_dict["H%d_Cu%d" % (i+1, Nsections[i]+1)] = mdata
+        mdata = entry(finsulator, {'name': f"H{i+1}_Cu{Nsections[i]+1}"}, debug)
+        models_dict[f"H{i+1}_Cu{Nsections[i]+1}"] = mdata
 
     # loop for Rings
     for i in range(NRings):
-        mdata = entry(finsulator, {'name': "R%d" % (i+1)}, debug)
-        models_dict["R%d" % (i+1)] = mdata
+        mdata = entry(finsulator, {'name': f"R{i+1}"}, debug)
+        models_dict[f"R{i+1}"] = mdata
 
     return models_dict
 
@@ -382,7 +382,7 @@ def create_bcs_bitter(boundary_meca: List,
                debug: bool = False) -> dict:
 
     (name, snames, nturns) = gdata
-    print("create_bcs_bitter from templates for %s" % name)
+    print(f"create_bcs_bitter from templates for {name}")
     # print("snames=", snames)
 
     electric_bcs_dir = { 'boundary_Electric_Dir': []} # name, value, vol
@@ -399,7 +399,7 @@ def create_bcs_bitter(boundary_meca: List,
         for thbc in ["rInt", "rExt"]:
             bcname =  name + "_" + thbc
             # Add markers list
-            mdata = entry(fcooling, {'name': bcname, "markers": snames, 'hw': '%s_hw' % bcname, 'Tw': '%s_Tw' % bcname, 'dTw':'%s_dTw' % bcname},  debug)
+            mdata = entry(fcooling, {'name': bcname, "markers": snames, 'hw': f'{bcname}_hw', 'Tw': f'{bcname}_Tw', 'dTw':'{bcname}_dTw'},  debug)
             thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": bcname}, mdata[bcname]) )
 
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
@@ -451,7 +451,7 @@ def create_bcs_insert(boundary_meca: List,
         for i in range(NChannels):
             # load insulator template for j==0
             mdata = entry(fcooling, {'i': i}, debug)
-            thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": "Channel%d" % i}, mdata["Channel%d" % i]) )
+            thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": f"Channel{i}"}, mdata[f"Channel{i}"]) )
 
     if 'el' in method_data[3] and method_data[3] != 'thelec':
         for bc in boundary_meca:
@@ -600,7 +600,7 @@ def entry(template: str, rdata: List, debug: bool = False) -> str:
     import re
 
     if debug:
-        print("entry/loading %s" % str(template), type(template))
+        print("entry/loading {str(template)}", type(template))
         print("entry/rdata:", rdata)
     with open(template, "r") as f:
         jsonfile = chevron.render(f, rdata)

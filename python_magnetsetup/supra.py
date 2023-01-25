@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+import os
 import yaml
 
 from python_magnetgeo import Supra
@@ -8,27 +9,26 @@ from python_magnetgeo import python_magnetgeo
 from .jsonmodel import create_params_supra, create_bcs_supra, create_materials_supra, create_models_supra
 from .utils import NMerge
 
-from .file_utils import MyOpen, findfile
+from .file_utils import MyOpen, findfile, search_paths
 
 def Supra_simfile(MyEnv, confdata: dict, cad: Supra):
-    print("Supra_simfile: %s" % cad.name)
-
-    from .file_utils import MyOpen, findfile
+    print(f"Supra_simfile: cad={cad.name}")
 
     files = []
 
     yamlfile = confdata["geom"]
-    with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as f:
+    with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as f:
         files.append(f.name)
 
-    structfile = cad.struct # + '.json'
-    with MyOpen(structfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as f:
-        files.append(f.name)
+    if cad.struct:
+        structfile = cad.struct
+        with MyOpen(structfile, 'r', paths=search_paths(MyEnv, "geom")) as f:
+            files.append(f.name)
 
     return files
 
-def Supra_setup(confdata: dict, cad: Supra, method_data: List, templates: dict, debug: bool=False):
-    print("Supra_setup: %s" % cad.name)
+def Supra_setup(mname: str, confdata: dict, cad: Supra, method_data: List, templates: dict, debug: bool=False):
+    print("Supra_setup: magnet={mname}, cad={cad.name}")
     part_thermic = []
     part_electric = []
     
@@ -60,7 +60,7 @@ def Supra_setup(confdata: dict, cad: Supra, method_data: List, templates: dict, 
         boundary_maxwell.append("Infty")
     
     # params section
-    params_data = create_params_supra(gdata, method_data, debug)
+    params_data = create_params_supra(mname, gdata, method_data, debug)
 
     # bcs section
     bcs_data = create_bcs_supra(boundary_meca, 

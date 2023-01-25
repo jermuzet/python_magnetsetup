@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional
+from typing import List, Optional, Type, Union
 
 import yaml
 
@@ -12,8 +12,9 @@ from .file_utils import MyOpen, findfile, search_paths
 
 import os
 
+# MyEnv: Union[Type[appenv]|None]
 def Insert_simfile(MyEnv, confdata: dict, cad: Insert, addAir: bool = False):
-    print("Insert_simfile: %s" % cad.name)
+    print(f"Insert_simfile: cad={cad.name}")
 
     files = []
 
@@ -97,8 +98,10 @@ def Insert_simfile(MyEnv, confdata: dict, cad: Insert, addAir: bool = False):
 
     return files
 
-def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, templates: dict, debug: bool=False):
-    print("Insert_setup: %s" % cad.name)
+def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: List, templates: dict, debug: bool=False):
+    print(f"Insert_setup: magnet={mname}, cad={cad.name}")
+    print(f'MyEnv: {type(MyEnv)}')
+
     part_thermic = []
     part_electric = []
     index_Helices = []
@@ -195,7 +198,7 @@ def Insert_setup(MyEnv, confdata: dict, cad: Insert, method_data: List, template
         print("insert part_thermic:", part_thermic)
 
     # params section
-    params_data = create_params_insert(gdata + (turns_h,), method_data, debug)
+    params_data = create_params_insert(mname, gdata + (turns_h,), method_data, debug)
 
     # bcs section
     bcs_data = create_bcs_insert(boundary_meca, 

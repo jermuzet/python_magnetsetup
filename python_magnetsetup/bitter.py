@@ -12,7 +12,7 @@ import os
 
 from .file_utils import MyOpen, findfile, search_paths
 
-def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter):
+def Bitter_simfile(MyEnv, mname: str, confdata: dict, cad: Bitter):
     print("Bitter_simfile: %s" % cad.name)
 
     from .file_utils import MyOpen, findfile
@@ -21,8 +21,8 @@ def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter):
     with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
         return cfgdata
 
-def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, templates: dict, debug: bool=False):
-    print(f'Bitter_setup: {cad.name}') #, "debug=", debug, "confdata:", confdata)
+def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: List, templates: dict, debug: bool=False):
+    print(f'Bitter_setup: magnet={mname}, cad={cad.name}') #, "debug=", debug, "confdata:", confdata)
     if debug:
         print(f'Bitter_setup/Bitter confdata: {confdata}')
 
@@ -43,7 +43,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
         print(f"cad: {cad} tpe: {type(cad)}")
 
     snames = []
-    name = cad.name#.replace('Bitter_','')
+    name = cad.name #.replace('Bitter_','')
     if method_data[2] == "Axi":
         for i in range(len(cad.axi.turns)):
             snames.append(name + "_B%d" % (i+1))
@@ -71,7 +71,7 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
         boundary_maxwell.append("Infty")
     
     # params section
-    params_data = create_params_bitter(gdata, method_data, debug)
+    params_data = create_params_bitter(mname, gdata, method_data, debug)
 
     # bcs section
     bcs_data = create_bcs_bitter(boundary_meca, 
@@ -152,13 +152,13 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
     if method_data[2] == "Axi":
         import math
         params = params_data['Parameters']
-        # print('params:', type(params))
+        print('params:', params)
         for key in params:
             print(f"{key}")
         for j in range(len(cad.axi.turns)):
-            marker = name + "_B%d" % (j+1)
+            marker = f"{name}_B{j+1}"
             # print("marker:", marker)
-            item = {"name": "U_" + marker, "value":"1"}
+            item = {"name": f"U_{marker}", "value":"1"}
             index = params.index(item)
             mat = mmat[marker]
             # print("U=", params[index], mat['sigma'], R1[i], pitch_h[i][j])
@@ -169,8 +169,8 @@ def Bitter_setup(MyEnv, confdata: dict, cad: Bitter, method_data: List, template
             I_s = I0 * cad.axi.turns[j]
             j1 = I_s / (math.log(cad.r[1]/cad.r[0]) * (cad.r[0]*1.e-3) * (cad.axi.pitch[j]*1.e-3) * cad.axi.turns[j] )
             U_s = 2 * math.pi * (cad.r[0] * 1.e-3) * j1 / sigma
-            print("U=", params[index]['name'], cad.r[0], cad.axi.pitch[j], mat['sigma'], "U_s=", U_s, "j1=", j1)
-            item = {"name": "U_" + marker, "value":str(U_s)}
+            # print("U=", params[index]['name'], cad.r[0], cad.axi.pitch[j], mat['sigma'], "U_s=", U_s, "j1=", j1)
+            item = {"name": f"U_{marker}", "value":str(U_s)}
             params[index] = item
                 
     
