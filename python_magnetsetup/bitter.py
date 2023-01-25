@@ -12,8 +12,8 @@ import os
 
 from .file_utils import MyOpen, findfile, search_paths
 
-def Bitter_simfile(MyEnv, mname: str, confdata: dict, cad: Bitter):
-    print("Bitter_simfile: %s" % cad.name)
+def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter, debug: bool=False):
+    print(f"Bitter_simfile: cad={cad.name}")
 
     from .file_utils import MyOpen, findfile
 
@@ -43,10 +43,10 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
         print(f"cad: {cad} tpe: {type(cad)}")
 
     snames = []
-    name = cad.name #.replace('Bitter_','')
+    name = f"{mname}_{cad.name}" #.replace('Bitter_','')
     if method_data[2] == "Axi":
         for i in range(len(cad.axi.turns)):
-            snames.append(name + "_B%d" % (i+1))
+            snames.append(f"{name}_B{i+1}")
             part_electric.append(snames[-1])
             if 'th' in method_data[3]:
                 part_thermic.append(snames[-1])

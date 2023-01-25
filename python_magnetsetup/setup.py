@@ -99,7 +99,7 @@ def magnet_setup(MyEnv, mname: str, confdata: str, method_data: List, templates:
     Creating dict for setup for magnet
     """
 
-    print("magnet_setup")
+    print(f"magnet_setup: mname={mname}")
     if debug:
         print(f'magnet_setup: confdata={confdata}'),
 
@@ -109,7 +109,7 @@ def magnet_setup(MyEnv, mname: str, confdata: str, method_data: List, templates:
     mpost = {}
 
     if "Helix" in confdata:
-        print("Load an insert")
+        print(f"Load an insert: mname={mname}")
         yamlfile = confdata["geom"]
         if debug:
             print(f"magnet_setup: yamfile: {yamlfile}")
