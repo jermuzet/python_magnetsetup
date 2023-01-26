@@ -98,7 +98,7 @@ def Insert_simfile(MyEnv, confdata: dict, cad: Insert, addAir: bool = False, deb
 
     return files
 
-def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: List, templates: dict, debug: bool=False):
+def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: List, templates: dict, current: float=31.e+3, debug: bool=False):
     print(f"Insert_setup: magnet={mname}, cad={cad.name}")
     print(f'MyEnv: {type(MyEnv)}')
 
@@ -304,10 +304,10 @@ def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: Li
 
     
     # update U and hw, dTw param
-    print("Update U for I0=31kA")
+    print(f"{mname}: Update U for I0={current}A")
     # print(f"insert: mmat: {mmat}")
     # print(f"insert: mdict['Parameters']: {mdict['Parameters']}")
-    I0 = 31.e+3
+    I0 = current # 31.e+3
     if method_data[2] == "Axi":
         import math
         params = params_data['Parameters']

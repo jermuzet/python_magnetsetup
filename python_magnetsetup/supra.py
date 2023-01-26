@@ -27,7 +27,7 @@ def Supra_simfile(MyEnv, confdata: dict, cad: Supra, debug: bool=False):
 
     return files
 
-def Supra_setup(MyEnv, mname: str, confdata: dict, cad: Supra, method_data: List, templates: dict, debug: bool=False):
+def Supra_setup(MyEnv, mname: str, confdata: dict, cad: Supra, method_data: List, templates: dict, current: float=31.e+3, debug: bool=False):
     print("Supra_setup: magnet={mname}, cad={cad.name}")
     part_thermic = []
     part_electric = []

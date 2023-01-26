@@ -21,7 +21,7 @@ def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter, debug: bool=False):
     with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
         return cfgdata
 
-def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: List, templates: dict, debug: bool=False):
+def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: List, templates: dict, current: float=31.e+3, debug: bool=False):
     print(f'Bitter_setup: magnet={mname}, cad={cad.name}') #, "debug=", debug, "confdata:", confdata)
     if debug:
         print(f'Bitter_setup/Bitter confdata: {confdata}')
@@ -145,10 +145,10 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
         mmodels["elastic2"] = create_models_bitter(gdata, confdata, templates, method_data, "elastic2", debug)
 
     # update U and hw, dTw param
-    print("Update U for I0=31kA")
+    print(f"{mname}: Update U for I0={current}A")
     # print(f"insert: mmat: {mmat}")
     # print(f"insert: mdict['Parameters']: {mdict['Parameters']}")
-    I0 = 31.e+3
+    I0 = current # 31.e+3
     if method_data[2] == "Axi":
         import math
         params = params_data['Parameters']
