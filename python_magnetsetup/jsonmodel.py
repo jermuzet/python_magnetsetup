@@ -50,7 +50,7 @@ def create_params_bitter(mname: str, gdata: tuple, method_data: List[str], debug
 
     # TODO : initialization of parameters with cooling model
 
-    params_data['Parameters'].append({"name":"Tinit", "value":293})
+    params_data['Parameters'].append({"name": f"{mname}_Tinit", "value":293})
 
     (name, snames, nturns) = gdata
     for thbc in ["rInt", "rExt"]:
@@ -119,7 +119,7 @@ def create_params_insert(mname: str, gdata: tuple, method_data: List[str], debug
 
     # TODO : initialization of parameters with cooling model
 
-    params_data['Parameters'].append({"name":"Tinit", "value":293})
+    params_data['Parameters'].append({"name": f"{mname}_Tinit", "value":293})
     # get value from coolingmethod and Flow(I) value
     params_data['Parameters'].append({"name":"hw", "value":convert_data(units, 58222.1, "h")})
     params_data['Parameters'].append({"name":"Tw", "value":290.671})
@@ -130,13 +130,13 @@ def create_params_insert(mname: str, gdata: tuple, method_data: List[str], debug
 
     for i in range(NHelices+1):
         # get value from coolingmethod and Flow(I) value
-        params_data['Parameters'].append({f"name":"h{i}", "value":convert_data(units, 58222.1, "h")})
-        params_data['Parameters'].append({f"name":"Tw{i}", "value":290.671})
-        params_data['Parameters'].append({f"name":"dTw{i}", "value":12.74})
-        params_data['Parameters'].append({f"name":"Zmin{i}", "value": Zmin[i]})
-        params_data['Parameters'].append({f"name":"Zmax{i}", "value": Zmax[i]})
-        params_data['Parameters'].append({f"name":"Sh{i}", "value": Sh[i]})
-        params_data['Parameters'].append({f"name":"Dh{i}", "value": Dh[i]})
+        params_data['Parameters'].append({"name": f"h{i}", "value":convert_data(units, 58222.1, "h")})
+        params_data['Parameters'].append({"name": f"Tw{i}", "value":290.671})
+        params_data['Parameters'].append({"name": f"dTw{i}", "value":12.74})
+        params_data['Parameters'].append({"name": f"Zmin{i}", "value": Zmin[i]})
+        params_data['Parameters'].append({"name": f"Zmax{i}", "value": Zmax[i]})
+        params_data['Parameters'].append({"name": f"Sh{i}", "value": Sh[i]})
+        params_data['Parameters'].append({"name": f"Dh{i}", "value": Dh[i]})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
@@ -397,7 +397,7 @@ def create_bcs_bitter(boundary_meca: List,
 
         # TODO make only one Bc for rInt and on for RExt
         for thbc in ["rInt", "rExt"]:
-            bcname =  name + "_" + thbc
+            bcname =  f'{name}_{thbc}'
             # Add markers list
             mdata = entry(fcooling, {'name': bcname, "markers": snames, 'hw': f'{bcname}_hw', 'Tw': f'{bcname}_Tw', 'dTw':'{bcname}_dTw'},  debug)
             thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": bcname}, mdata[bcname]) )
@@ -523,15 +523,20 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
     if debug: print("create_json/Materials data:", data)
 
     # models section from templates['physic']
+    print(f'mmodels: {mmodels}')
     for physic in templates['physic']:
         _model = mmodels[physic]
         for key in _model:
             data["Models"][physic]["models"].append(_model[key])
 
-    # postprocess
-    for field in templates['stats']:
-        print(f'stats: {field}')
+    # init values
+    # mpost init: {name: mname, value: Tinit param}
+    # init_heat['init_Temperature'] = mpost['init']
 
+    # postprocess
+    if debug:
+        for field in templates['stats']: print(f'stats: {field}')
+            
     post_keywords = {
         "Flux" : {
             'name': 'Flux',
@@ -558,7 +563,8 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
     for key in post_keywords:
         field = post_keywords[key]
         if field['physic'] in data['PostProcess']:
-            print(f"{key}: field={field}")
+            if debug:
+                print(f"{key}: field={field}")
             _data = field['data']
             if debug:
                 print(f"{key} (type={type(_data)}): {_data}")
@@ -574,18 +580,19 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
 
     # TODO: add data for B plots, aka Rinf, Zinf, NR and Nz?
     if "B" in mpost:
+        plotB_data = mpost["B"]
         if debug:
             print("plotB")
             print("section:", "magnetic")
             print("templates[plots]:", templates["plots"])
-        plotB_data = mpost["B"]
-        print(f"plotB_data:{plotB_data}")
+            print(f"plotB_data:{plotB_data}")
         add = data["PostProcess"]["magnetic"]["Measures"]["Points"]
         odata = entry(templates["plots"]['B'], {'Rinf': plotB_data['Rinf'], 'Zinf': plotB_data['Zinf'], 'NR': 100, 'NZ': 100}, debug)
         # print(f"data[PostProcess][magnetic][Measures][Points]: {add}")
         if debug: print(f"plot_B odata: {odata}")
         for md in odata:
-            print(f"odata[{md}: {odata[md]}")
+            if debug:
+                print(f"odata[{md}]: {odata[md]}")
             add[md] = odata[md]
         # print(f"data[PostProcess][magnetic][Measures][Points]: {add}")
 

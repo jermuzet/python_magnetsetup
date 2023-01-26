@@ -134,7 +134,7 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
     if 'stats' in modelcfg:
         _cfg = modelcfg["stats"]
         for field in _cfg:
-            print(f'stats[{field}]: {_cfg} (type={type(_cfg)})')
+            # print(f'stats[{field}]: {_cfg} (type={type(_cfg)})')
             dict['stats'][field] = _cfg[field]
             dict['stats'][field]['template'] = os.path.join(template_path, _cfg[field]['template'])
         if debug:
@@ -211,17 +211,17 @@ def check_templates(templates: dict):
     """
     check if template file exist
     """
-    print("\n\n=== Checking Templates ===")
+    print("=== Checking Templates ===")
     for key in templates:
         if isinstance(templates[key], str):
-            print(key, templates[key])
+            print(f'{key}: {templates[key]}')
             with open(templates[key], "r") as f: pass
 
         elif isinstance(templates[key], str):
             for s in templates[key]:
-                print(key, s)
+                print(f'{key}: {s}')
                 with open(s, "r") as f: pass
-    print("==========================\n\n")
+    print("==========================")
 
     return True
 

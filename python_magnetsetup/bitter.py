@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 import yaml
+import copy
 
 from python_magnetgeo import Bitter
 from python_magnetgeo import python_magnetgeo
@@ -22,7 +23,7 @@ def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter, debug: bool=False):
         return cfgdata
 
 def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: List, templates: dict, current: float=31.e+3, debug: bool=False):
-    print(f'Bitter_setup: magnet={mname}, cad={cad.name}') #, "debug=", debug, "confdata:", confdata)
+    print(f'Bitter_setup: magnet={mname}, cad={cad.name}')
     if debug:
         print(f'Bitter_setup/Bitter confdata: {confdata}')
 
@@ -78,10 +79,38 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
                           boundary_maxwell,
                           boundary_electric,
                           gdata, confdata, templates, method_data, debug) # merge all bcs dict
+    # print(f'bcs_data({mname}): {bcs_data}')
 
     # build dict from geom for templates
     # TODO fix initfile name (see create_cfg for the name of output / see directory entry)
     # eg: $home/feel[ppdb]/$directory/cfpdes-heat.save
+
+    mdict = {}
+    print("bitter_setup: merge params_data")
+    NMerge(params_data, mdict, debug, "bitter_setup params")
+    print("bitter_setup: merge bcs_data")
+    NMerge(bcs_data, mdict, debug, "bitter_setup bcs_data")
+    # mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "bitter_setup mdict")
+
+    # add init data: 
+    print("bitter_setup: add init_temp")
+    init_temp_data = []
+    # init_temp_data.append( {'name': f'{mname}', "part_thermic_part": part_thermic } )
+    init_temp_data.append( {'name': f'{mname}', "magnet_parts_th": copy.deepcopy(part_thermic) } )
+    init_temp_dict = {'init_temp': init_temp_data} 
+    NMerge(init_temp_dict.copy(),  mdict, debug, name="bitter_setup init")
+    print(f'init_tem_data({mname}): {init_temp_data}')
+
+    # add power per magnet data: mdict = NMerge( mdict, {'power_magnet': power_data}, debug, "bitter_setup mdict")
+    print("bitter_setup: add power_magnet")
+    power_data = []
+    power_data.append( {'name': f'{mname}', "magnet_parts": copy.deepcopy(part_electric) } )
+    power_dict = {'power_magnet': power_data}
+    NMerge(power_dict, mdict, debug, "bitter_setup power")
+    print(f'power_data({mname}): {power_data}')
+
+    print(f"mdict[init_temp]={mdict['init_temp']}")
+    print(f"mdict[power_magnet]={mdict['power_magnet']}")
 
     main_data = {
         "part_thermic": part_thermic,
@@ -89,9 +118,12 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
         "index_V0": boundary_electric,
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5"
-    }
-    mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "bitter_setup mdict")
-
+    }    
+    print("bitter_setup: add main_data")
+    NMerge(main_data, mdict, debug, "bitter_setup params")
+    print(f"mdict[init_temp]={mdict['init_temp']}")
+    print(f"mdict[power_magnet]={mdict['power_magnet']}")
+    
     print("bitter_setup: post-processing section")
     currentH_data = []
     powerH_data = []
@@ -113,7 +145,7 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
 
     else:
         print("bitter3D post not implemented")
-        
+
     mpost = {
         "Power": powerH_data ,
         "Current": currentH_data,
@@ -131,18 +163,8 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
     mmat = create_materials_bitter(gdata, confdata, templates, method_data, debug)
     
     mmodels = {}
-    if 'th' in method_data[3]:
-        mmodels["heat"] = create_models_bitter(gdata, confdata, templates, method_data, "heat", debug)
-
-    if 'mag' in method_data[3] or 'mqs' in method_data[3] :
-        mmodels["magnetic"] = create_models_bitter(gdata, confdata, templates, method_data, "magnetic", debug)
-    
-    if 'magel' in method_data[3] :
-        mmodels["elastic"] = create_models_bitter(gdata, confdata, templates, method_data, "elastic", debug)
-
-    if 'mqsel' in method_data[3] :
-        mmodels["elastic1"] = create_models_bitter(gdata, confdata, templates, method_data, "elastic1", debug)
-        mmodels["elastic2"] = create_models_bitter(gdata, confdata, templates, method_data, "elastic2", debug)
+    for physic in templates['physic']:
+        mmodels[physic] = create_models_bitter(gdata, confdata, templates, method_data, physic, debug)
 
     # update U and hw, dTw param
     print(f"{mname}: Update U for I0={current}A")
@@ -152,9 +174,6 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
     if method_data[2] == "Axi":
         import math
         params = params_data['Parameters']
-        print('params:', params)
-        for key in params:
-            print(f"{key}")
         for j in range(len(cad.axi.turns)):
             marker = f"{name}_B{j+1}"
             # print("marker:", marker)

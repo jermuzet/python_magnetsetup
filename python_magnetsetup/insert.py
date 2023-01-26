@@ -2,6 +2,7 @@ import os
 from typing import List, Optional, Type, Union
 
 import yaml
+import copy
 
 from python_magnetgeo import Insert
 from python_magnetgeo import python_magnetgeo
@@ -205,10 +206,30 @@ def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: Li
                           boundary_maxwell,
                           boundary_electric,
                           gdata, confdata, templates, method_data, debug) # merge all bcs dict
+    # print(f'bcs_data({mname}): {bcs_data}')
 
     # build dict from geom for templates
     # TODO fix initfile name (see create_cfg for the name of output / see directory entry)
     # eg: $home/feel[ppdb]/$directory/cfpdes-heat.save
+
+    mdict = {}
+    NMerge(params_data, mdict, debug, "insert_setup params")
+    NMerge(bcs_data, mdict, debug, "insert_setup bcs_data")
+    # mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "insert_setup mdict")
+
+    # add power per magnet data: mdict = NMerge( mdict, {'power_ma    # add init data: 
+    init_temp_data = []
+    init_temp_data.append( {'name': f'{mname}', "magnet_parts_th": copy.deepcopy(part_thermic)} )
+    init_temp_dict = {'init_temp': init_temp_data}
+    NMerge(init_temp_dict, mdict, debug, "insert_setup mdict")
+    print(f'init_tem_data({mname}): {init_temp_data}')
+
+    # add power per magnet data: mdict = NMerge( mdict, {'power_magnet': power_data}, debug, "bitter_setup mdict")
+    power_data = []
+    power_data.append( {'name': f'{mname}', "magnet_parts": copy.deepcopy(part_electric)} )
+    power_dict = {'power_magnet': power_data}
+    NMerge(power_dict, mdict, debug, "insert_setup mdict")
+    print(f'power_data({mname}): {power_data}')
 
     main_data = {
         "part_thermic": part_thermic,
@@ -217,12 +238,11 @@ def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: Li
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5"
     }
-    mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "insert_setup mdict")
+    NMerge(main_data, mdict, debug, "insert_setup params")
 
     print("insert_setup: post-processing section")
     currentH_data = []
     powerH_data = []
-    power_data = []
     meanT_data = []
     Stress_data = []
     VonMises_data = []
@@ -232,8 +252,6 @@ def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: Li
     unit_Length = method_data[5] # "meter"
     units = load_units(unit_Length)
     plotB_data = { "Rinf": convert_data(units, R2[-1], "Length"), "Zinf": convert_data(units, Zmax[-1], "Length")}
-
-    power_data.append( {"part_electric": part_electric } )
 
     # if method_data[3] != 'mag' and method_data[3] != 'mag_hcurl':
     if method_data[2] == "Axi":
@@ -271,7 +289,7 @@ def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: Li
             powerH_data.append( {"header": f"Power_R{i+1}", "markers": { "name": f"R{i+1}"} } )
             meanT_data.append( {"header": f"T_R{i+1}", "markers": { "name": f"R{i+1}"} } )
 
-    mpost = { 
+    mpost = {
         "Power": powerH_data ,
         "Current": currentH_data,        
         "Flux": {'index_h': f"0:{str(NChannels)}"},

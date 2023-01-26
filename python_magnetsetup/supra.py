@@ -79,7 +79,10 @@ def Supra_setup(MyEnv, mname: str, confdata: dict, cad: Supra, method_data: List
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5"
     }
-    mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "supra_setup mdict")
+    mdict = main_data
+    NMerge(params_data, mdict, debug, "supra_setup params")
+    NMerge(bcs_data, mdict, debug, "supra_setup bcs_data")
+    # mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "supra_setup mdict")
 
     print("supra_setup: post-processing section")
     currentH_data = []
