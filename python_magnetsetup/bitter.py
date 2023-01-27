@@ -96,10 +96,10 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
     print("bitter_setup: add init_temp")
     init_temp_data = []
     # init_temp_data.append( {'name': f'{mname}', "part_thermic_part": part_thermic } )
-    init_temp_data.append( {'name': f'{mname}', "magnet_parts_th": copy.deepcopy(part_thermic) } )
+    init_temp_data.append( {'name': f'{mname}', "magnet_parts": copy.deepcopy(part_thermic) } )
     init_temp_dict = {'init_temp': init_temp_data} 
     NMerge(init_temp_dict.copy(),  mdict, debug, name="bitter_setup init")
-    print(f'init_tem_data({mname}): {init_temp_data}')
+    # print(f'init_tem_data({mname}): {init_temp_data}')
 
     # add power per magnet data: mdict = NMerge( mdict, {'power_magnet': power_data}, debug, "bitter_setup mdict")
     print("bitter_setup: add power_magnet")
@@ -107,10 +107,10 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
     power_data.append( {'name': f'{mname}', "magnet_parts": copy.deepcopy(part_electric) } )
     power_dict = {'power_magnet': power_data}
     NMerge(power_dict, mdict, debug, "bitter_setup power")
-    print(f'power_data({mname}): {power_data}')
+    # print(f'power_data({mname}): {power_data}')
 
-    print(f"mdict[init_temp]={mdict['init_temp']}")
-    print(f"mdict[power_magnet]={mdict['power_magnet']}")
+    # print(f"mdict[init_temp]={mdict['init_temp']}")
+    # print(f"mdict[power_magnet]={mdict['power_magnet']}")
 
     main_data = {
         "part_thermic": part_thermic,
@@ -121,8 +121,8 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
     }    
     print("bitter_setup: add main_data")
     NMerge(main_data, mdict, debug, "bitter_setup params")
-    print(f"mdict[init_temp]={mdict['init_temp']}")
-    print(f"mdict[power_magnet]={mdict['power_magnet']}")
+    # print(f"mdict[init_temp]={mdict['init_temp']}")
+    # print(f"mdict[power_magnet]={mdict['power_magnet']}")
     
     print("bitter_setup: post-processing section")
     currentH_data = []

@@ -523,7 +523,8 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mmodels: dict, mpost: di
     if debug: print("create_json/Materials data:", data)
 
     # models section from templates['physic']
-    print(f'mmodels: {mmodels}')
+    if debug:
+        print(f'mmodels: {mmodels}')
     for physic in templates['physic']:
         _model = mmodels[physic]
         for key in _model:

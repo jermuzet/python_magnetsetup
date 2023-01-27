@@ -1,5 +1,4 @@
-import os
-from typing import List, Optional, Type, Union
+from typing import List, Type
 
 import yaml
 import copy
@@ -99,6 +98,7 @@ def Insert_simfile(MyEnv, confdata: dict, cad: Insert, addAir: bool = False, deb
 
     return files
 
+# MyEnv: Type[config.appenv]
 def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: List, templates: dict, current: float=31.e+3, debug: bool=False):
     print(f"Insert_setup: magnet={mname}, cad={cad.name}")
     print(f'MyEnv: {type(MyEnv)}')
@@ -116,7 +116,7 @@ def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: Li
     gdata = python_magnetgeo.get_main_characteristics(cad, MyEnv)
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
 
-    print("Insert: %s" % cad.name, "NHelices=%d NRings=%d NChannels=%d" % (NHelices, NRings, NChannels))
+    print(f"Insert: {cad.name}, NHelices={NHelices}, NRings={NRings}, NChannels={NChannels}")
 
     pitch_h = []
     turns_h = []
@@ -219,17 +219,17 @@ def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: Li
 
     # add power per magnet data: mdict = NMerge( mdict, {'power_ma    # add init data: 
     init_temp_data = []
-    init_temp_data.append( {'name': f'{mname}', "magnet_parts_th": copy.deepcopy(part_thermic)} )
+    init_temp_data.append({'name': f'{mname}', "magnet_parts": copy.deepcopy(part_thermic)})
     init_temp_dict = {'init_temp': init_temp_data}
     NMerge(init_temp_dict, mdict, debug, "insert_setup mdict")
-    print(f'init_tem_data({mname}): {init_temp_data}')
+    # print(f'init_tem_data({mname}): {init_temp_data}')
 
     # add power per magnet data: mdict = NMerge( mdict, {'power_magnet': power_data}, debug, "bitter_setup mdict")
     power_data = []
-    power_data.append( {'name': f'{mname}', "magnet_parts": copy.deepcopy(part_electric)} )
+    power_data.append({'name': f'{mname}', "magnet_parts": copy.deepcopy(part_electric)})
     power_dict = {'power_magnet': power_data}
     NMerge(power_dict, mdict, debug, "insert_setup mdict")
-    print(f'power_data({mname}): {power_data}')
+    # print(f'power_data({mname}): {power_data}')
 
     main_data = {
         "part_thermic": part_thermic,

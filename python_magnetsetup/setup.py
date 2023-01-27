@@ -28,7 +28,9 @@ from typing import List, Optional
 
 import os
 import re
+import json
 import yaml
+import itertools
 
 from python_magnetgeo import Insert, MSite, Bitter, Supra
 from python_magnetgeo import python_magnetgeo
@@ -140,18 +142,13 @@ def magnet_setup(MyEnv, mname: str, confdata: str, method_data: List, templates:
                 elif isinstance(cad, Supra.Supra):
                     (tdict, tmat, tmodels, tpost) = Supra_setup(MyEnv, mname, obj, cad, method_data, templates, current, debug)
                 else:
-                    raise Exception(f"setup: unexpected cad type {str(type(cad))}")
+                    raise Exception(f"setup/agnet_setup: unexpected cad type {str(type(cad))}")
 
                 if debug:
                     print(f'tdict: {tdict}')
-                if mdict:
-                    print(f"magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict['init_temp']}")
-                    print(f"magnet_setup: {mtype}, mname={mname}, mdict[power_magnet]={mdict['power_magnet']}")
-                print(f"magnet_setup: {mtype}, mname={mname}, tdict[init_temp]={tdict['init_temp']}")
-                print(f"magnet_setup: {mtype}, mname={mname}, tdict[power_magnet]={tdict['power_magnet']}")
-                NMerge(tdict, mdict, debug=True, name=f"magnet_setup {mtype} mdict for {mname}/{yamlfile}")
-                print(f"magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict['init_temp']}")
-                print(f"magnet_setup: {mtype}, mname={mname}, mdict[power_magnet]={mdict['power_magnet']}")
+                NMerge(tdict, mdict, debug, name=f"magnet_setup {mtype} mdict for {mname}/{yamlfile}")
+                # print(f"magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict['init_temp']}")
+                # print(f"magnet_setup: {mtype}, mname={mname}, mdict[power_magnet]={mdict['power_magnet']}")
                 # list_name = [item['name'] for item in mdict['int_temp']]
 
                 if debug:
@@ -183,7 +180,24 @@ def magnet_setup(MyEnv, mname: str, confdata: str, method_data: List, templates:
                 tmodels.clear()
                 tpost.clear()
                     
+        # fix init_temp and power_magnet entries in mdict
+        for key in ['init_temp', 'power_magnet']:
+            if len(mdict[key]) > 1:
+                # print(f"setup/magnet_setup mname={mname}: mdict[{key}]={mdict[key]}")
+                _key = [item['name'] for item in mdict[key]]
+                _keys= list(set(_key))
+                if len(_keys) > 1:
+                    raise Exception(f'setup/magnet_setup mname={mname}: mdict[{key}] seems broken - mdict[{key}]={mdict[key]}')
 
+                _list = [item['magnet_parts'] for item in mdict[key]]
+                _lists = list(set(list(itertools.chain(*_list))))
+                mdict[key] = [{'name': _keys[0], 'magnet_parts': _lists}]
+                if debug:
+                    print(f"setup/magnet_setup mname={mname}: force mdict[{key}] to = {{'name': _keys[0], 'magnet_parts': _lists}}")
+
+        # _list = [item['magnet_parts'] for item in mdict['power_magnet']]
+    # print(f'mdict[power_magnet]={list(itertools.chain(*_list))}')
+    
     if debug:
         print(f'magnet_setup: mdict={mdict}')
     return (mdict, mmat, mmodels, mpost)
@@ -245,20 +259,17 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, curren
         mconfdata = magnet[mname]
         current = currents[mname]['value']
         (tdict, tmat, tmodels, tpost) = magnet_setup(MyEnv, mname, mconfdata, method_data, templates, current, debug)
-        print(f"msite_setup({mname}): tdict[init_temp]={tdict['init_temp']}")
-        print(f"msite_setup({mname}): tdict[power_magnet]={tdict['power_magnet']}")
+        # print(f"msite_setup({mname}): tdict[init_temp]={tdict['init_temp']}")
+        # print(f"msite_setup({mname}): tdict[power_magnet]={tdict['power_magnet']}")
         if debug:
             print(f"tpost[{mname}][Current]: {tpost['Current']}")
         
         NMerge(tdict, mdict, debug, name=f"msite_setup: merge(mdict,tdict) for {mname}")
         # if debug:
-        print("tdict[part_electric]:", tdict['part_electric'])
-        print("tdict[part_thermic]:", tdict['part_thermic'])
-        print("mdict[part_electric]:", mdict['part_electric'])
-        print("mdict[part_thermic]:", mdict['part_thermic'])
-        
-        print(f"msite_setup: mdict[init_temp]={mdict['init_temp']}")
-        print(f"msite_setup: mdict[power_magnet]={mdict['power_magnet']}")
+        # print("tdict[part_electric]:", tdict['part_electric'])
+        # print("tdict[part_thermic]:", tdict['part_thermic'])
+        # print("mdict[part_electric]:", mdict['part_electric'])
+        # print("mdict[part_thermic]:", mdict['part_thermic'])
 
         NMerge(tmat, mmat, debug, "msite_setup/tmat")
         if debug:
@@ -277,6 +288,9 @@ def msite_setup(MyEnv, confdata: str, method_data: List, templates: dict, curren
                     print(f"msite_setup: magnet_setup[{mname}]: force mpost[Current]={mpost['Current']}")
         if debug:
             print("NewMerge:", mpost)
+
+    print(f"msite_setup: mdict[init_temp]={mdict['init_temp']}")
+    # print(f"msite_setup: mdict[power_magnet]={mdict['power_magnet']}")
 
     if debug:
         print(f'mpost: {mpost}')
@@ -518,7 +532,7 @@ def setup_cmds(MyEnv, args, node_spec, yamlfile, cfgfile, jsonfile, xaofile, mes
             geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--axi"
         
         # let xao decide mesh caracteristic length ??:
-        meshcmd = f"python3 -m python_magnetgeo.xao {xaofile} --mdata mdata --wd data/geometries mesh --group CoolingChannels --geo {yamlfile}"
+        meshcmd = f"python3 -m python_magnetgeo.xao {xaofile} --mdata \'{json.dumps(mdata)}\' --wd data/geometries mesh --group CoolingChannels --geo {yamlfile}"
     else:
         gmshfile = meshfile.replace(".med", ".msh")
         meshconvert = f"gmsh -0 {meshfile} -bin -o {gmshfile}"
