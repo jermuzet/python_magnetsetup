@@ -96,11 +96,13 @@
 			{
 				"Expression":
 				{
-					"myic":
+					{{#init_temp}}
+					"{{name}}":
 					{
-						"markers": {{part_thermic}},
-						"expr":"Tinit:Tinit"
-					}
+						"markers": {{magnet_parts}},
+						"expr":"{{name}}_Tinit:{{name}}_Tinit"
+					},
+					{{/init_temp}}
 				}
 			}
 		}
@@ -174,7 +176,21 @@
 	    	{
 				"Statistics":
 				{
-		    		"Stat_T": 
+					{{#power_magnet}}
+					"Power_{{name}}":
+					{
+        				"type": "integrate",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+        				"markers": {{magnet_parts}}
+					},
+					{{/power_magnet}}
+		    		"Power":
+				    {
+        				"type": "integrate",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+        				"markers": {{part_electric}}
+    				},
+					"Stat_T": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 
