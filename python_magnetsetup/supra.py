@@ -1,34 +1,41 @@
 from typing import List, Optional
 
+import os
 import yaml
 
 from python_magnetgeo import Supra
 from python_magnetgeo import python_magnetgeo
 
-from .jsonmodel import create_params_supra, create_bcs_supra, create_materials_supra
+
+from .jsonmodel import create_params_supra, create_bcs_supra, create_materials_supra, create_models_supra
+
 from .utils import NMerge
 
-from .file_utils import MyOpen, findfile
+from .file_utils import MyOpen, findfile, search_paths
 
-def Supra_simfile(MyEnv, confdata: dict, cad: Supra):
-    print("Supra_simfile: %s" % cad.name)
-
-    from .file_utils import MyOpen, findfile
+def Supra_simfile(MyEnv, confdata: dict, cad: Supra, debug: bool=False):
+    print(f"Supra_simfile: cad={cad.name}")
 
     files = []
 
     yamlfile = confdata["geom"]
-    with MyOpen(yamlfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as f:
+    with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as f:
         files.append(f.name)
 
-    structfile = cad.struct # + '.json'
-    with MyOpen(structfile, 'r', paths=[ os.getcwd(), default_pathes["geom"]]) as f:
-        files.append(f.name)
+    if cad.struct:
+        structfile = cad.struct
+        with MyOpen(structfile, 'r', paths=search_paths(MyEnv, "geom")) as f:
+            files.append(f.name)
 
     return files
 
+<<<<<<< HEAD
 def Supra_setup(MyEnv, confdata: dict, cad: Supra, method_data: List, templates: dict, debug: bool=False):
     print("Supra_setup: %s" % cad.name)
+=======
+def Supra_setup(MyEnv, mname: str, confdata: dict, cad: Supra, method_data: List, templates: dict, current: float=31.e+3, debug: bool=False):
+    print("Supra_setup: magnet={mname}, cad={cad.name}")
+>>>>>>> 37247514b37ab0c70aeec6e645ca693b313cb195
     part_thermic = []
     part_electric = []
     
@@ -38,10 +45,15 @@ def Supra_setup(MyEnv, confdata: dict, cad: Supra, method_data: List, templates:
         
     mdict = {}
     mmat = {}
+    mmodels = {}
     mpost = {}
 
     snames = []
+<<<<<<< HEAD
     name = cad.name.replace('Supra_','')
+=======
+    name = f"{mname}_{cad.name}"
+>>>>>>> 37247514b37ab0c70aeec6e645ca693b313cb195
     # TODO eventually get details
     part_electric.append(name)
         
@@ -59,7 +71,7 @@ def Supra_setup(MyEnv, confdata: dict, cad: Supra, method_data: List, templates:
         boundary_maxwell.append("Infty")
     
     # params section
-    params_data = create_params_supra(gdata, method_data, debug)
+    params_data = create_params_supra(mname, gdata, method_data, debug)
 
     # bcs section
     bcs_data = create_bcs_supra(boundary_meca, 
@@ -78,12 +90,15 @@ def Supra_setup(MyEnv, confdata: dict, cad: Supra, method_data: List, templates:
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5"
     }
-    mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "supra_setup mdict")
+    mdict = main_data
+    NMerge(params_data, mdict, debug, "supra_setup params")
+    NMerge(bcs_data, mdict, debug, "supra_setup bcs_data")
+    # mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "supra_setup mdict")
 
     print("supra_setup: post-processing section")
     currentH_data = []
     meanT_data = []
 
     mpost = {}
-    return (mdict, mmat, mpost)
+    return (mdict, mmat, mmodels, mpost)
 

@@ -3,17 +3,33 @@
     "ShortName":"AxiMagnetoStatic",
     "Models":
     {
-		"equations":[
-	    {
-			"name":"magnetic",
-			"unknown":
-			{
-			    "basis":"Pch2",
-			    "name":"Atheta",
-			    "symbol":"Atheta"
-			}
-	    }
-		]
+		"cfpdes":{
+			"equations":"magnetic"
+		},
+		"magnetic":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"Atheta",
+						"symbol":"Atheta"
+					}
+				}
+			},
+			"models":[
+				{
+					"name":"magnetic_Air",
+					"materials":"Air",
+					"setup":{
+						"coefficients":{
+							"c":"x/mu0:x:mu0",
+							"a":"1/mu0/x:x:mu0"
+						}
+					}
+				}
+			]
+		}
     },
     "Parameters":
     {
@@ -27,9 +43,7 @@
     {
 		"Air":
 		{
-	    	"physics":"magnetic",
-	    	"magnetic_c":"x/mu0:x:mu0",
-	    	"magnetic_a":"1/mu0/x:x:mu0"
+	    	
 		}
     },
     "BoundaryConditions":
@@ -55,10 +69,10 @@
 	    	{
 				"expr":
 				{
-					"atheta":"magnetic_Atheta:magnetic_Atheta",
+		    		"atheta":"magnetic_Atheta:magnetic_Atheta",
 		    		"B":
 		    		{
-						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:magnetic_Atheta:x",
+						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x",
 						"representation":["element"]
 		    		},
 					"U":
@@ -86,8 +100,20 @@
 						"expr":"-2*pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi):magnetic_Atheta:materials_sigma:materials_U",
 						"markers": {{part_electric}}
 		    		}
+				},
+				"Points":
+				{
+				"B0":
+				{
+                                    "coord":"{1e-7,0.}",
+                                    "fields":"Atheta",
+			            "expressions":
+                                    {
+                                          "Bz": "magnetic_grad_Atheta_0+magnetic_Atheta/x:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x"
+                                    }
 				}
-	    	}
+                                }
 		}
+                }
     }
 }

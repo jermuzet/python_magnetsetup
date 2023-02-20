@@ -1,34 +1,18 @@
 {
-    "j_th":"-sigma*U/2/pi/x:sigma:U:x",
-
-    "magnetic_c":"x/mu:x:mu",
-    "magnetic_beta":"{2/mu,0}:mu",
-    "magnetic_f":"j_th*x*x:j_th:x",
-    "magnetic_d":"sigma*x:x:sigma",
-
-    "heat_c":"k*x:k:x",
-    "heat_f":"sigma*(U/(2*pi)+magnetic_dphi_dt)*(U/(2*pi)+magnetic_dphi_dt)/x:sigma:U:magnetic_dphi_dt:x",
-    "heat_d":"rho*Cp*x:rho:Cp:x",
-    
-    "Lame_lambda":"E*nu/(1-2*nu)/(1+nu):E:nu",  
-    "Lame_mu":"E/(2*(1+nu)):E:nu",
-
-    "F_laplace":"{1/x*j_th*magnetic_grad_phi_0,1/x*j_th*magnetic_grad_phi_1}:x:j_th:magnetic_grad_phi_0:magnetic_grad_phi_1",
-    "stress_T":"-(3*Lame_lambda+2*Lame_mu)*alphaT*(heat_T-T0):Lame_lambda:Lame_mu:alphaT:heat_T:T0",   
-
-    "stress_rr":"(Lame_lambda+2*Lame_mu)*elastic1_grad_u_00+Lame_lambda/x*elastic1_u_0+Lame_lambda*elastic1_grad_u_11+bool_dilatation*stress_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:stress_T",
-    "stress_thth":"Lame_lambda*elastic1_grad_u_00+(Lame_lambda+2*Lame_mu)/x*elastic1_u_0+Lame_lambda*elastic1_grad_u_11+bool_dilatation*stress_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:stress_T",
-    "stress_zz":"Lame_lambda*elastic1_grad_u_00+Lame_lambda/x*elastic1_u_0+(Lame_lambda+2*Lame_mu)*elastic1_grad_u_11+bool_dilatation*stress_T:x:Lame_lambda:Lame_mu:elastic1_u_0:elastic1_grad_u_00:elastic1_grad_u_11:bool_dilatation:stress_T",
-    "stress_rz":"Lame_mu*(elastic1_grad_u_01+elastic1_grad_u_10):Lame_mu:elastic1_grad_u_01:elastic1_grad_u_10",
-
-    "elastic1_d":"rho*x:rho:x",
-    "elastic1_f":"{x*elastic2_v_0,x*elastic2_v_1}:x:elastic2_v_0:elastic2_v_1",
-
-    "elastic2_d":"x:x",
-    "elastic2_gamma":"{-stress_rr*x, -stress_rz*x, -stress_rz*x, -stress_zz*x}:x:stress_rr:stress_rz:stress_zz",
-    "elastic2_f":"{bool_laplace*x*F_laplace_0 - stress_thth,bool_laplace*x*F_laplace_1}:x:bool_laplace:F_laplace_0:stress_thth:F_laplace_1",
-
-    "stress1":"1/2*(stress_rr+stress_zz+sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz)):stress_rr:stress_zz:stress_rz",
-    "stress2":"stress_thth:stress_thth",
-    "stress3":"1/2*(stress_rr+stress_zz-sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz)):stress_rr:stress_zz:stress_rz"
+    "j_th": "-sigma*U/2/pi/x:sigma:U:x",
+    "Lame_lambda": "E*nu/(1-2*nu)/(1+nu):E:nu",
+    "Lame_mu": "E/(2*(1+nu)):E:nu",
+    "F_laplace": "{1/x*j_th*magnetic_grad_phi_0,1/x*j_th*magnetic_grad_phi_1}:x:j_th:magnetic_grad_phi_0:magnetic_grad_phi_1",
+    "stress_T": "-(3*Lame_lambda+2*Lame_mu)*alphaT*(heat_T-T0):Lame_lambda:Lame_mu:alphaT:heat_T:T0",
+    "strain_rr": "elastic_grad_u_00:elastic_grad_u_00",
+    "strain_rz": "1/2*(elastic_grad_u_01+elastic_grad_u_10):elastic_grad_u_01:elastic_grad_u_10",
+    "strain_thth": "1/x*elastic_u_0:x:elastic_u_0",
+    "strain_zz": "elastic_grad_u_11:elastic_grad_u_11",
+    "stress_rr": "(Lame_lambda+2*Lame_mu)*strain_rr+Lame_lambda*strain_thth+Lame_lambda*strain_zz+bool_dilatation*stress_T:bool_dilatation:Lame_lambda:Lame_mu:stress_T:strain_rr:strain_thth:strain_zz",
+    "stress_thth": "Lame_lambda*strain_rr+(Lame_lambda+2*Lame_mu)*strain_thth+Lame_lambda*strain_zz+bool_dilatation*stress_T:bool_dilatation:Lame_lambda:Lame_mu:stress_T:strain_rr:strain_thth:strain_zz",
+    "stress_zz": "Lame_lambda*strain_rr+Lame_lambda*strain_thth+(Lame_lambda+2*Lame_mu)*strain_zz+bool_dilatation*stress_T:bool_dilatation:Lame_lambda:Lame_mu:stress_T:strain_rr:strain_thth:strain_zz",
+    "stress_rz": "2*Lame_mu*strain_rz:Lame_mu:strain_rz",
+    "stress1": "1/2.*((stress_rr + stress_rz) +sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz)):stress_rr:stress_zz:stress_rz",
+    "stress2": "stress_thth:stress_thth",
+    "stress3": "1/2.*((stress_rr + stress_rz) -sqrt((stress_rr-stress_zz)*(stress_rr-stress_zz)+4*stress_rz*stress_rz)):stress_rr:stress_zz:stress_rz"
 }

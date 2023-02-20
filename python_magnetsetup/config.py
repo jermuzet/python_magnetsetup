@@ -1,42 +1,43 @@
+import json
+import os
 from typing import List, Optional
 
-import sys
-import os
-import json
+from decouple import Config, RepositoryEnv
 
-from .machines import load_machines
 
 class appenv():
     
-    def __init__(self, debug: bool = False):
-        self.url_api: str = None
-        self.yaml_repo: Optional[str] = None
-        self.cad_repo: Optional[str] = None
-        self.mesh_repo: Optional[str] = None
-        self.template_repo: Optional[str] = None
-        self.simage_repo: Optional[str] = None
-        self.mrecord_repo: Optional[str] = None
-        self.optim_repo: Optional[str] = None
+    def __init__(self, envfile: str = "settings.env", debug: bool = False, url_api: str = None,
+                 yaml_repo: str = None, cad_repo: str = None, mesh_repo: str = None, template_repo: str = None,
+                 simage_repo: str = None, mrecord_repo: str = None, optim_repo: str = None):
+        self.url_api: str = url_api
+        self.yaml_repo: Optional[str] = yaml_repo
+        self.cad_repo: Optional[str] = cad_repo
+        self.mesh_repo: Optional[str] = mesh_repo
+        self.template_repo: Optional[str] = template_repo
+        self.simage_repo: Optional[str] = simage_repo
+        self.mrecord_repo: Optional[str] = mrecord_repo
+        self.optim_repo: Optional[str] = optim_repo
 
-        from decouple import Config, RepositoryEnv
-        envdata = RepositoryEnv("settings.env")
-        data = Config(envdata)
-        if debug:
-            print("appenv:", RepositoryEnv("settings.env").data)
+        if envfile is not None:
+            envdata = RepositoryEnv(envfile)
+            data = Config(envdata)
+            if debug:
+                print("appenv:", RepositoryEnv("settings.env").data)
 
-        self.url_api = data.get('URL_API')
-        self.compute_server = data.get('COMPUTE_SERVER')
-        self.visu_server = data.get('VISU_SERVER')
-        if 'TEMPLATE_REPO' in envdata:
-            self.template_repo = data.get('TEMPLATE_REPO')
-        if 'SIMAGE_REPO' in envdata:
-            self.simage_repo = data.get('SIMAGE_REPO')
-        if 'DATA_REPO' in envdata:
-            self.yaml_repo = data.get('DATA_REPO') + "/geometries"
-            self.cad_repo = data.get('DATA_REPO') + "/cad"
-            self.mesh_repo = data.get('DATA_REPO') + "/meshes"
-            self.mrecord_repo = data.get('DATA_REPO') + "/mrecords"
-            self.optim_repo = data.get('DATA_REPO') + "/optims"
+            self.url_api = data.get('URL_API')
+            self.compute_server = data.get('COMPUTE_SERVER')
+            self.visu_server = data.get('VISU_SERVER')
+            if 'TEMPLATE_REPO' in envdata:
+                self.template_repo = data.get('TEMPLATE_REPO')
+            if 'SIMAGE_REPO' in envdata:
+                self.simage_repo = data.get('SIMAGE_REPO')
+            if 'DATA_REPO' in envdata:
+                self.yaml_repo = data.get('DATA_REPO') + "/geometries"
+                self.cad_repo = data.get('DATA_REPO') + "/cad"
+                self.mesh_repo = data.get('DATA_REPO') + "/meshes"
+                self.mrecord_repo = data.get('DATA_REPO') + "/mrecords"
+                self.optim_repo = data.get('DATA_REPO') + "/optims"
         if debug:
             print(f"DATA: {self.yaml_repo}")
 
@@ -78,20 +79,7 @@ def loadconfig():
         magnetsetup = json.load(appcfg)
     return magnetsetup
 
-def loadmachine(server: str):
-    """
-    Load app server config (aka machines.json)
-    """
-
-    server_defs = load_machines()
-    if server in server_defs:
-        return server_defs[server]
-    else:
-        raise ValueError(f"loadmachine: {server} no such server defined")
-
-    pass
-
-def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear: bool=True, debug: bool=False):
+def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: bool=False):
     """
     Load templates into a dict
 
@@ -103,87 +91,138 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     cooling
 
     """
-    
-    [method, time, geom, model, cooling, units_def] = method_data
+
+    [method, time, geom, model, cooling, units_def, nonlinear] = method_data
+    print(f"time: {time}")
+    print(f"nonlinear: {nonlinear} type={type(nonlinear)}")
     template_path = os.path.join(appenv.template_path(), method, geom, model)
 
-    cfg_model = appcfg[method][time][geom][model]["cfg"]
-    json_model = appcfg[method][time][geom][model]["model"]
-    if linear:
-        conductor_model = appcfg[method][time][geom][model]["conductor-linear"]
+    modelcfg = appcfg[method][time][geom][model]
+    cfg_model = modelcfg["cfg"]
+    json_model = modelcfg["model"]
+    if not nonlinear:
+        conductor_model = modelcfg["conductor-linear"]
     else:
-        if geom == "3D": 
-            json_model = appcfg[method][time][geom][model]["model-nonlinear"]
-        conductor_model = appcfg[method][time][geom][model]["conductor-nonlinear"]
-    insulator_model = appcfg[method][time][geom][model]["insulator"]
+        if geom == "3D":
+            json_model = modelcfg["model-nonlinear"]
+        conductor_model = modelcfg["conductor-nonlinear"]
+    insulator_model = modelcfg["insulator"]
     
     fcfg = os.path.join(template_path, cfg_model)
     if debug:
-        print("fcfg:", fcfg, type(fcfg))
+        print(f"fcfg: {fcfg} type={type(fcfg)}")
+
     fmodel = os.path.join(template_path, json_model)
     fconductor = os.path.join(template_path, conductor_model)
     finsulator = os.path.join(template_path, insulator_model)
-    if 'th' in model:
-        cooling_model = appcfg[method][time][geom][model]["cooling"][cooling]
-        flux_model = appcfg[method][time][geom][model]["cooling-post"][cooling]
-        stats_T_model = appcfg[method][time][geom][model]["stats_T"]
-    
-        fcooling = os.path.join(template_path, cooling_model)
-        frobin = os.path.join(template_path, appcfg[method][time][geom][model]["cooling"]["robin"])
-        fflux = os.path.join(template_path, flux_model)
-        fstats_T = os.path.join(template_path, stats_T_model)
-
-    #if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
-    stats_Power_model = appcfg[method][time][geom][model]["stats_Power"]
-    stats_Current_model = appcfg[method][time][geom][model]["stats_Current"]
-
-    fstats_Power = os.path.join(template_path, stats_Power_model)
-    fstats_Current = os.path.join(template_path, stats_Current_model)
 
     material_generic_def = ["conductor", "insulator"]
     if time == "transient":
         material_generic_def.append("conduct-nosource") # only for transient with mqs
 
     dict = {
+        'physic': modelcfg["physic"],
         "cfg": fcfg,
         "model": fmodel,
         "conductor": fconductor,
         "insulator": finsulator,
-        "stats": [],
+        "stats": {},
+        "plots":{},
         "material_def" : material_generic_def
     }
 
+    if 'stats' in modelcfg:
+        _cfg = modelcfg["stats"]
+        for field in _cfg:
+            # print(f'stats[{field}]: {_cfg} (type={type(_cfg)})')
+            dict['stats'][field] = _cfg[field]
+            dict['stats'][field]['template'] = os.path.join(template_path, _cfg[field]['template'])
+        if debug:
+            print(f"dict[stats]={dict['stats']}")
+
+    if 'plots' in modelcfg:
+        _cfg = modelcfg["plots"]
+        for field in _cfg:
+            dict['plots'][field] = os.path.join(template_path, _cfg[field])
+        if debug:
+            print(f"dict[plots]={dict['plots']}")
+
     if 'th' in model:
+        heat_conductor = modelcfg["models"]["heat-conductor"]
+        heat_insulator = modelcfg["models"]["heat-insulator"]
+
+        cooling_model = modelcfg["cooling"][cooling]
+        flux_model = modelcfg["cooling-post"][cooling]
+
+        fheatconductor = os.path.join(template_path, heat_conductor)
+        fheatinsulator = os.path.join(template_path, heat_insulator)
+    
+        fcooling = os.path.join(template_path, cooling_model)
+        frobin = os.path.join(template_path, modelcfg["cooling"]["robin"])
+        fflux = os.path.join(template_path, flux_model)
+
+        dict["heat-conductor"] = fheatconductor
+        dict["heat-insulator"] = fheatinsulator
         dict["cooling"] = fcooling
         dict["robin"] = frobin
         dict["flux"] = fflux
-        dict["stats"].append(fstats_T)
-    
-    #if model != 'mag' and model != 'mag_hcurl' and model != 'mqs' and model != 'mqs_hcurl':
-    dict["stats"].append(fstats_Power)
-    dict["stats"].append(fstats_Current)
 
+    if 'mag' in model or 'mqs' in model :
+        magnetic_conductor = modelcfg["models"]["magnetic-conductor"]
+        magnetic_insulator = modelcfg["models"]["magnetic-insulator"]
+
+        fmagconductor = os.path.join(template_path, magnetic_conductor)
+        fmaginsulator = os.path.join(template_path, magnetic_insulator)
+
+        dict["magnetic-conductor"] = fmagconductor
+        dict["magnetic-insulator"] = fmaginsulator
+
+    if 'magel' in model :
+        elastic_conductor = modelcfg["models"]["elastic-conductor"]
+        elastic_insulator = modelcfg["models"]["elastic-insulator"]
+        felasconductor = os.path.join(template_path, elastic_conductor)
+        felasinsulator = os.path.join(template_path, elastic_insulator)
+
+        dict["elastic-conductor"] = felasconductor
+        dict["elastic-insulator"] = felasinsulator
+
+    if 'mqsel' in model :
+        elastic1_conductor = modelcfg["models"]["elastic1-conductor"]
+        elastic1_insulator = modelcfg["models"]["elastic1-insulator"]
+        elastic2_conductor = modelcfg["models"]["elastic2-conductor"]
+        elastic2_insulator = modelcfg["models"]["elastic2-insulator"]
+
+        felas1conductor = os.path.join(template_path, elastic1_conductor)
+        felas1insulator = os.path.join(template_path, elastic1_insulator)
+        felas2conductor = os.path.join(template_path, elastic2_conductor)
+        felas2insulator = os.path.join(template_path, elastic2_insulator)
+
+        dict["elastic1-conductor"] = felas1conductor
+        dict["elastic1-insulator"] = felas1insulator
+        dict["elastic2-conductor"] = felas2conductor
+        dict["elastic2-insulator"] = felas2insulator
+    
     if check_templates(dict):
         pass
 
-    return dict    
+    return dict
 
 def check_templates(templates: dict):
     """
     check if template file exist
     """
-    print("\n\n=== Checking Templates ===")
+    print("=== Checking Templates ===")
     for key in templates:
         if isinstance(templates[key], str):
-            print(key, templates[key])
+            print(f'{key}: {templates[key]}')
             with open(templates[key], "r") as f: pass
 
         elif isinstance(templates[key], str):
             for s in templates[key]:
-                print(key, s)
+                print(f'{key}: {s}')
                 with open(s, "r") as f: pass
-    print("==========================\n\n")
-    
+    print("==========================")
+
     return True
 
 def supported_models(Appcfg, method: str, geom: str, time: str) -> List:

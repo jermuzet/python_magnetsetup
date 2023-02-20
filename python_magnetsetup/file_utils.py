@@ -14,7 +14,7 @@ def search_paths(MyEnv=None, otype: str = "geom"):
 
     return paths
   
-def findfile(searchfile, paths=None, debug: bool = True):
+def findfile(searchfile, paths=None, debug: bool = False):
     """
     Look for file in search_paths
     """
@@ -23,7 +23,8 @@ def findfile(searchfile, paths=None, debug: bool = True):
     for path in paths:
         filename = os.path.join(path, searchfile)
         if os.path.isfile(filename):
-            if debug: print(f"{filename} found in {path}")
+            if debug: 
+                print(f"{filename} found in {path}")
             return filename
 
     raise FileNotFoundError(errno.ENOENT, f"cannot find {searchfile} in paths:{paths}")

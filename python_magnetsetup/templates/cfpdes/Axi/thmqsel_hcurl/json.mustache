@@ -3,44 +3,78 @@
     "ShortName":"FullAxiTrans",
     "Models":
     {
-		"equations":[
-	    {
-			"name":"heat",
-			"unknown":
-			{
-		    	"basis":"Pch1",
-		    	"name":"temperature",
-		    	"symbol":"T"
-			}
-	    },
-	    {
-			"name":"magnetic",
-			"unknown":
-			{
-			    "basis":"Pch2",
-			    "name":"Atheta",
-			    "symbol":"Atheta"
-			}
-	    },
-	    {
-			"name":"elastic1",
-			"unknown":
-			{
-			    "basis":"Pchv1",
-			    "name":"displacement",
-			    "symbol":"u"
-			}
-	    },
-	    {
-			"name":"elastic2",
-			"unknown":
-			{
-			    "basis":"Pchv1",
-			    "name":"speed",
-			    "symbol":"v"
-			}
-	    }
-		]
+		"cfpdes":{
+			"equations":["heat","magnetic","elastic1","elastic2"]
+		},
+		"heat":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"temperature",
+						"symbol":"T"
+					}
+				}
+			},
+			"models":[
+				
+			]
+		},
+		"magnetic":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"Atheta",
+						"symbol":"Atheta"
+					}
+				}
+			},
+			"models":[
+				{
+					"name":"magnetic_Air",
+					"materials":"Air",
+					"setup":{
+						"coefficients":{
+							"c":"x/mu0:x:mu0",
+							"a":"1/mu0/x:x:mu0"
+						}
+					}
+				}
+			]
+		},
+		"elastic1":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pchv1",
+						"name":"displacement",
+						"symbol":"u"
+					}
+				}
+			},
+			"models":[
+				
+			]
+		},
+		"elastic2":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pchv1",
+						"name":"speed",
+						"symbol":"v"
+					}
+				}
+			},
+			"models":[
+				
+			]
+		}
     },
     "Parameters":
     {
@@ -55,9 +89,7 @@
     {
 		"Air":
 		{
-	    	"physics":"magnetic",
-	    	"magnetic_c":"x/mu0:x:mu0",
-	    	"magnetic_a":"1/mu0/x:x:mu0"
+
 		}
     },
     "BoundaryConditions":
@@ -101,17 +133,21 @@
     },
     "InitialConditions":
     {
-        "temperature":
-        {
-            "Expression":
-            {
-                "myic":
-                {
-                    "markers": {{part_thermic}},
-		    		"expr":"Tinit:Tinit"
-                }
-            }
-        }
+		"heat":{
+			"temperature":
+			{
+				"Expression":
+				{
+					{{#init_temp}}
+					"{{name}}":
+					{
+						"markers": {{magnet_parts}},
+						"expr":"{{name}}_Tinit:{{name}}_Tinit"
+					},
+					{{/init_temp}}
+				}
+			}
+		}
     },
     "PostProcess":
     {
@@ -163,22 +199,23 @@
 		    		},
 		    		"Vonmises":
 		    		{
- 				                "expr": "sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
-                        			"markers": {{part_thermic}},
+
+						"expr": "sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
+						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"strain":
 		    		{
-						"expr":"{elastic_grad_u_00,1/2*(elastic_grad_u_01+elastic_grad_u_10), 1/2*(elastic_grad_u_01+elastic_grad_u_10),elastic_grad_u_11}:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11",
-                        			"markers": {{part_thermic}},
+						"expr":"{elastic1_grad_u_00,1/2*(elastic1_grad_u_01+elastic1_grad_u_10), 1/2*(elastic1_grad_u_01+elastic1_grad_u_10),elastic1_grad_u_11}:elastic1_grad_u_00:elastic1_grad_u_01:elastic1_grad_u_10:elastic1_grad_u_11",
+						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
-				"HoopStrain":
-				{
-						"expr": "elastic_u_0/x:x:elastic_u_0",
-                        			"markers": {{part_thermic}},
+					"HoopStrain":
+					{
+						"expr": "elastic1_u_0/x:x:elastic1_u_0",
+						"markers": {{part_thermic}},
 						"representation":["element"]
-				}
+					}
 				}
 	    	}
 		},
@@ -200,8 +237,20 @@
 						"type":"integrate",
 						"expr":"-2*pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x):magnetic_dAtheta_dt:magnetic_Atheta:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
-		    		}
 				}
+                                },
+				"Points":
+				{
+				"B0":
+				{
+                                    "coord":"{1e-7,0.}",
+                                    "fields":"Atheta",
+			            "expressions":
+                                    {
+                                          "Bz": "magnetic_grad_Atheta_0+magnetic_Atheta/x:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x"
+                                    }
+				}
+			}
 	    	}
 		},
 		"heat":
@@ -217,13 +266,21 @@
 	    	{
 				"Statistics":
 				{
+					{{#power_magnet}}
+					"Power_{{name}}":
+					{
+        				"type": "integrate",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x)*(materials_U/2/pi+magnetic_dAtheta_dt*x)/x:magnetic_dAtheta_dt:materials_sigma:materials_U:x",
+        				"markers": {{magnet_parts}}
+					},
+					{{/power_magnet}}
 		    		"Power":
 				    {
         				"type": "integrate",
         				"expr": "2*pi*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x)*(materials_U/2/pi+magnetic_dAtheta_dt*x)/x:magnetic_dAtheta_dt:materials_sigma:materials_U:x",
         				"markers": {{part_electric}}
     				},
-				"MeanT": 
+				"Stat_T": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 

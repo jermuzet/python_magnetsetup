@@ -25,7 +25,7 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
 
     b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, fillingfactor, rho)
     """
-    print("HMagnet:", data)
+    if debug: print("HMagnet:", data)
 
     # how to create Tubes??
     #Tube(const int n= len(struct.axi.turns), const MyDouble r1 = struct.r[0], const MyDouble r2 = struct.r[1], const MyDouble l = struct.axi.h??)
@@ -60,7 +60,8 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
             Helices.append(item)
         index += Tube.get_n_elem()
 
-    print("HMagnet:", struct.name, "Tubes:", len(Tubes), "Helices:", len(Helices))
+    if debug:
+        print("HMagnet:", struct.name, "Tubes:", len(Tubes), "Helices:", len(Helices))
     return (Tubes, Helices, OHelices)
 
 def BMagnet(struct: Bitter, material: dict, fillingfactor: float=1, debug: bool=False):
@@ -95,7 +96,8 @@ def BMagnet(struct: Bitter, material: dict, fillingfactor: float=1, debug: bool=
                 
         z += dz
 
-    print("BMagnet:", struct.name, len(BMagnets))
+    if debug:
+        print("BMagnet:", struct.name, len(BMagnets))
     return BMagnets
 
 def UMagnet(struct: Supra, debug: bool=False):
@@ -249,13 +251,13 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
     return (Tubes,Helices,OHelices,BMagnets,UMagnets,Shims)
 
 
-def msite_setup(MyEnv, confdata: str, debug: bool=False, session=None):
+def msite_setup(MyEnv, confdata: str, debug: bool=False):
     """
     Creating MagnetTools data struct for setup for msite
     """
-    print("msite_setup:", "debug=", debug)
-    print("msite_setup:", "confdata=", confdata)
-    print("miste_setup: confdata[magnets]=", confdata["magnets"])
+    if debug:
+        print(f"msite_setup: confdata={confdata}")
+        print(f"msite_setup: confdata[magnets]={confdata['magnets']}")
     
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
@@ -265,19 +267,10 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False, session=None):
     Shims = mt.VectorOfShims()
 
     for magnet in confdata["magnets"]:
-        print("magnet:", magnet, "type(magnet)=", type(magnet), "debug=", debug)
-        try:
-            mconfdata = load_object(MyEnv, magnet + "-data.json", magnet, debug)
-        except:
-            print("setup: failed to load %s, look into magnetdb" % (magnet + "-data.json") )
-            try:
-                mconfdata = load_object_from_db(MyEnv, "magnet", magnet, debug, session)
-            except:
-                raise Exception(f"setup: failed to load {magnet} from magnetdb")
-                    
         if debug:
-            print("mconfdata[geom]:", mconfdata["geom"])
-        tmp = magnet_setup(MyEnv, mconfdata, debug)
+            print(f"magnet: {magnet}, type={type(magnet)}={type(magnet)} debug={debug}")
+            print(f"mconfdata[geom]: {magnet['geom']}")
+        tmp = magnet_setup(MyEnv, magnet, debug)
         
         # pack magnets
         for item in tmp[0]:
