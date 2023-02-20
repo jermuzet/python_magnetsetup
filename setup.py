@@ -7,7 +7,15 @@ from setuptools import setup, find_packages
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-requirements = [ ]
+requirements = [
+    'fabric',
+    'Pint',
+    'python-decouple',
+    'requests==2.*,>=2.27.1',
+    'chevron>=0.14.0',
+    'PyYAML>=5.0',
+    'python_magnetgeo'
+]
 
 setup_requirements = [ ]
 
@@ -40,7 +48,7 @@ setup(
     include_package_data=True,
     keywords='python_magnetsetup',
     name='python_magnetsetup',
-    packages=find_packages(include=['python_magnetsetup', 'python_magnetsetup.*', 'python_magnetsetup.workflows.*', 'python_magnetsetup.postprocessing.*']),
+    packages=find_packages(include=['python_magnetsetup', 'python_magnetsetup.*', 'python_magnetsetup.postprocessing.*']),
     package_data={'': [
         'settings.env', 
         'flow_params.json', 

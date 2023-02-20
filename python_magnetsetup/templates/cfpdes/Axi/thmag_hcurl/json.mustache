@@ -3,26 +3,48 @@
     "ShortName":"AxiThermo-Magnetostatic",
     "Models":
     {
-		"equations":[
-	    {
-			"name":"heat",
-			"unknown":
-			{
-		    	"basis":"Pch1",
-		    	"name":"temperature",
-		    	"symbol":"T"
-			}
-	    },
-	    {
-			"name":"magnetic",
-			"unknown":
-			{
-			    "basis":"Pch2",
-			    "name":"Atheta",
-			    "symbol":"Atheta"
-			}
-	    }
-		]
+		"cfpdes":{
+			"equations":["heat","magnetic"]
+		},
+		"heat":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"temperature",
+						"symbol":"T"
+					}
+				}
+			},
+			"models":[
+				
+			]
+		},
+		"magnetic":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"Atheta",
+						"symbol":"Atheta"
+					}
+				}
+			},
+			"models":[
+				{
+					"name":"magnetic_Air",
+					"materials":"Air",
+					"setup":{
+						"coefficients":{
+							"c":"x/mu0:x:mu0",
+							"a":"1/mu0/x:x:mu0"
+						}
+					}
+				}
+			]
+		}
     },
     "Parameters":
     {
@@ -37,9 +59,7 @@
     {
 		"Air":
 		{
-	    	"physics":"magnetic",
-	    	"magnetic_c":"x/mu0:x:mu0",
-	    	"magnetic_a":"1/mu0/x:x:mu0"
+
 		}
     },
     "BoundaryConditions":
@@ -71,17 +91,21 @@
     },
     "InitialConditions":
     {
-        "temperature":
-        {
-            "Expression":
-            {
-                "myic":
-                {
-                    "markers": {{part_thermic}},
-                    "expr":"Tinit:Tinit"
-                }
-            }
-        }
+		"heat":{
+			"temperature":
+			{
+				"Expression":
+				{
+					{{#init_temp}}
+					"{{name}}":
+					{
+						"markers": {{magnet_parts}},
+						"expr":"{{name}}_Tinit:{{name}}_Tinit"
+					},
+					{{/init_temp}}
+				}
+			}
+		}
     },
     "PostProcess":
     {
@@ -96,7 +120,7 @@
 		    		"atheta":"magnetic_Atheta:magnetic_Atheta",
 		    		"B":
 		    		{
-						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:magnetic_Atheta:x",
+						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x",
 						"representation":["element"]
 		    		},
 		    		"U":
@@ -119,6 +143,13 @@
 		},
 		"magnetic":
 		{
+	    	"Save":
+	    	{
+				"Fields":
+				{
+		    		"names":["Atheta"]
+				}
+	    	},
 	    	"Measures": 
 	    	{
 				"Statistics":
@@ -146,13 +177,21 @@
 	    	{
 				"Statistics":
 				{
+					{{#power_magnet}}
+					"Power_{{name}}":
+					{
+        				"type": "integrate",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+        				"markers": {{magnet_parts}}
+					},
+					{{/power_magnet}}
 		    		"Power":
 				    {
         				"type": "integrate",
         				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
         				"markers": {{part_electric}}
     				},
-					"MeanT": 
+					"Stat_T": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 

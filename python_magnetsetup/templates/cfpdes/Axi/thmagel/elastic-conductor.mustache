@@ -1,0 +1,11 @@
+{
+    "name":"elastic_{{name}}",
+    "materials":"{{name}}",
+    "setup":{
+        "coefficients":{
+            "c":"x*materials_{{name}}_Lame_mu:x:materials_{{name}}_Lame_mu",
+            "gamma":"{-materials_{{name}}_Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*materials_{{name}}_Lame_mu*elastic_grad_u_00-bool_dilatation*x*materials_{{name}}_stress_T, -x*materials_{{name}}_Lame_mu*elastic_grad_u_10, -x*materials_{{name}}_Lame_mu*elastic_grad_u_01, -materials_{{name}}_Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*materials_{{name}}_Lame_mu*elastic_grad_u_11-bool_dilatation*x*materials_{{name}}_stress_T}:bool_dilatation:x:materials_{{name}}_Lame_lambda:materials_{{name}}_Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11:materials_{{name}}_stress_T",
+            "f":"{bool_laplace*x*materials_{{name}}_F_laplace_0-materials_{{name}}_Lame_lambda*elastic_grad_u_00-(materials_{{name}}_Lame_lambda+2*materials_{{name}}_Lame_mu)*elastic_u_0/x-materials_{{name}}_Lame_lambda*elastic_grad_u_11-bool_dilatation*materials_{{name}}_stress_T, bool_laplace*x*materials_{{name}}_F_laplace_1}:bool_laplace:bool_dilatation:x:materials_{{name}}_F_laplace_0:materials_{{name}}_F_laplace_1:materials_{{name}}_Lame_mu:materials_{{name}}_Lame_lambda:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_11:materials_{{name}}_stress_T"
+        }
+    }
+}

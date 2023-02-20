@@ -3,26 +3,48 @@
     "ShortName":"AxiThermo-Mqs",
     "Models":
     {
-		"equations":[
-	    {
-			"name":"heat",
-			"unknown":
-			{
-		    	"basis":"Pch1",
-		    	"name":"temperature",
-		    	"symbol":"T"
-			}
-	    },
-	    {
-			"name":"magnetic",
-			"unknown":
-			{
-			    "basis":"Pch2",
-			    "name":"phi",
-			    "symbol":"phi"
-			}
-	    }
-		]
+		"cfpdes":{
+			"equations":["heat","magnetic"]
+		},
+		"heat":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"temperature",
+						"symbol":"T"
+					}
+				}
+			},
+			"models":[
+				
+			]
+		},
+		"magnetic":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch2",
+						"name":"phi",
+						"symbol":"phi"
+					}
+				}
+			},
+			"models":[
+				{
+					"name":"magnetic_Air",
+					"materials":"Air",
+					"setup":{
+						"coefficients":{
+							"c":"x/mu0:x:mu0",
+							"beta":"{2/mu0,0}:mu0"
+						}
+					}
+				}
+			]
+		}
     },
     "Parameters":
     {
@@ -37,9 +59,7 @@
     {
 		"Air":
 		{
-	    	"physics":"magnetic",
-	    	"magnetic_c":"x/mu0:x:mu0",
-	    	"magnetic_beta":"{2/mu0,0}:mu0"
+
 		}
     },
     "BoundaryConditions":
@@ -71,17 +91,21 @@
     },
     "InitialConditions":
     {
-        "temperature":
-        {
-            "Expression":
-            {
-                "myic":
-                {
-                    "markers": {{part_thermic}},
-                    "expr":"Tinit:Tinit"
-                }
-            }
-        }
+		"heat":{
+			"temperature":
+			{
+				"Expression":
+				{
+					{{#init_temp}}
+					"{{name}}":
+					{
+						"markers": {{magnet_parts}},
+						"expr":"{{name}}_Tinit:{{name}}_Tinit"
+					},
+					{{/init_temp}}
+				}
+			}
+		}
     },
     "PostProcess":
     {
@@ -119,6 +143,13 @@
 		},
 		"magnetic":
 		{
+	    	"Save":
+	    	{
+				"Fields":
+				{
+		    		"names":["phi"]
+				}
+	    	},
 	    	"Measures": 
 	    	{
 				"Statistics":
@@ -145,7 +176,21 @@
 	    	{
 				"Statistics":
 				{
-		    		"MeanT": 
+					{{#power_magnet}}
+					"Power_{{name}}":
+					{
+        				"type": "integrate",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+        				"markers": {{magnet_parts}}
+					},
+					{{/power_magnet}}
+		    		"Power":
+				    {
+        				"type": "integrate",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+        				"markers": {{part_electric}}
+    				},
+					"Stat_T": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 

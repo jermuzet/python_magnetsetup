@@ -53,13 +53,13 @@ def load_units(distance_unit: str):
     return units
 
     
-def convert_data(units: dict, quantity: Union[float, List[float]], qtype: str, debug: bool=False):
+def convert_data(units: dict, quantity: Union[int, float, List[float]], qtype: str, debug: bool=False):
     """
     Returns quantity unit consistant with length unit
     """
 
     data = None
-    if isinstance(quantity, float):
+    if isinstance(quantity, float) or isinstance(quantity, int):
         data = Quantity(quantity, units[qtype][0]).to(units[qtype][1]).magnitude
         if debug: print(qtype, quantity, "data=", data)
     elif isinstance(quantity, list):
