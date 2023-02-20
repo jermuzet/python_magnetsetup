@@ -5,7 +5,7 @@
     "{{header}}": 
     {
         "type": "integrate",
-        "expr": "2*pi*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x)*(materials_U/2/pi+magnetic_dAtheta_dt*x)/x:magnetic_dAtheta_dt:materials_sigma:materials_U:x",
+        "expr": "2*pi*materials_Conductor_sigma*(materials_Conductor_U/2/pi+magnetic_dAtheta_dt*x)*(materials_Conductor_U/2/pi+magnetic_dAtheta_dt*x)/x:magnetic_dAtheta_dt:materials_Conductor_sigma:materials_Conductor_U:x",
         "markers": {{markers}}
     },
     {{/Stats_Power}}

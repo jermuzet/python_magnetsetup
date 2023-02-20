@@ -1,11 +1,11 @@
 {
-    "name":"elastic2_{{name}}",
-    "materials":"{{name}}",
+    "name":"elastic2_Conductor",
+    "materials":"Conductor",
     "setup":{
         "coefficients":{
             "d":"x:x",
-            "gamma":"{-materials_{{name}}_stress_rr*x,-materials_{{name}}_stress_rz*x,- materials_{{name}}_stress_rz*x, -materials_{{name}}_stress_zz*x}:x:materials_{{name}}_stress_rr:materials_{{name}}_stress_rz:materials_{{name}}_stress_zz",
-            "f":"{bool_laplace*x*materials_{{name}}_F_laplace_0 - materials_{{name}}_stress_thth,bool_laplace*x*materials_{{name}}_F_laplace_1}:x:bool_laplace:materials_{{name}}_F_laplace_0:materials_{{name}}_stress_thth:materials_{{name}}_F_laplace_1"
+            "gamma":"{-materials_Conductor_stress_rr*x,-materials_Conductor_stress_rz*x,- materials_Conductor_stress_rz*x, -materials_Conductor_stress_zz*x}:x:materials_Conductor_stress_rr:materials_Conductor_stress_rz:materials_Conductor_stress_zz",
+            "f":"{bool_laplace*x*materials_Conductor_F_laplace_0 - materials_Conductor_stress_thth,bool_laplace*x*materials_Conductor_F_laplace_1}:x:bool_laplace:materials_Conductor_F_laplace_0:materials_Conductor_stress_thth:materials_Conductor_F_laplace_1"
         }
     }
 }

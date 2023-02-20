@@ -1,10 +1,10 @@
 {
-    "name":"elastic1_{{name}}",
-    "materials":"{{name}}",
+    "name":"elastic1_Insulator",
+    "materials":"Insulator",
     "setup":{
         "coefficients":{
-            "gamma":"{-materials_{{name}}_stress_rr*x,-materials_{{name}}_stress_rz*x,- materials_{{name}}_stress_rz*x, -materials_{{name}}_stress_zz*x}:x:materials_{{name}}_stress_rr:materials_{{name}}_stress_rz:materials_{{name}}_stress_zz",
-            "f":"{- materials_{{name}}_stress_thth,0}:materials_{{name}}_stress_thth"
+            "gamma":"{-materials_Insulator_stress_rr*x,-materials_Insulator_stress_rz*x,- materials_Insulator_stress_rz*x, -materials_Insulator_stress_zz*x}:x:materials_Insulator_stress_rr:materials_Insulator_stress_rz:materials_Insulator_stress_zz",
+            "f":"{- materials_Insulator_stress_thth,0}:materials_Insulator_stress_thth"
         }
     }
 }

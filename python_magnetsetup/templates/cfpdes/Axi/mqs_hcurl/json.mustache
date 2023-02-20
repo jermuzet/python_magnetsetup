@@ -39,6 +39,16 @@
 
 		"T0":"293."
     },
+	"Meshes": {
+        "cfpdes": {
+            "Fields": {
+                "U": {
+                    "filename": "$cfgdir/U.h5",
+                    "basis": "Pch1"
+                }
+            }
+        }
+    },
     "Materials":
     {
 		"Air":
@@ -77,12 +87,12 @@
 		    		},
 					"U":
 		    		{
-						"expr":"materials_U:materials_U",
+						"expr":"materials_Condcutor_U:materials_Condcutor_U",
 						"markers": {{part_electric}}
 		    		},
 		    		"Jth":
 		    		{
-						"expr":"-materials_sigma*(materials_U/(2*pi*x)+magnetic_dAtheta_dt):magnetic_dAtheta_dt:materials_sigma:materials_U:x",
+						"expr":"-materials_Condcutor_sigma*(materials_Condcutor_U/(2*pi*x)+magnetic_dAtheta_dt):magnetic_dAtheta_dt:materials_Condcutor_sigma:materials_Condcutor_U:x",
 						"markers": {{part_electric}}
 		    		}
 				}
@@ -97,7 +107,7 @@
 		    		"MagneticEnergy":
 		    		{
 						"type":"integrate",
-						"expr":"-2*pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x):magnetic_Atheta:magnetic_dAtheta_dt:materials_sigma:materials_U:x",
+						"expr":"-2*pi*magnetic_Atheta*materials_Condcutor_sigma*(materials_Condcutor_U/2/pi+magnetic_dAtheta_dt*x):magnetic_Atheta:magnetic_dAtheta_dt:materials_Condcutor_sigma:materials_Condcutor_U:x",
 						"markers": {{part_electric}}
 		    		}
 				},

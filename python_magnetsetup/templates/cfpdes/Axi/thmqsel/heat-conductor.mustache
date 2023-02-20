@@ -1,11 +1,11 @@
 {
-    "name":"heat_{{name}}",
-    "materials":"{{name}}",
+    "name":"heat_Conductor",
+    "materials":"Conductor",
     "setup":{
         "coefficients":{
-            "c":"materials_{{name}}_k*x:materials_{{name}}_k:x",
-            "f":"materials_{{name}}_sigma*materials_{{name}}_U/(2*pi)*materials_{{name}}_U/(2*pi)/x:materials_{{name}}_sigma:materials_{{name}}_U:x",
-            "d":"materials_{{name}}_rho*materials_{{name}}_Cp*x:materials_{{name}}_rho:materials_{{name}}_Cp:x"
+            "c":"materials_Conductor_k*x:materials_Conductor_k:x",
+            "f":"materials_Conductor_sigma*materials_Conductor_U/(2*pi)*materials_Conductor_U/(2*pi)/x:materials_Conductor_sigma:materials_Conductor_U:x",
+            "d":"materials_Conductor_rho*materials_Conductor_Cp*x:materials_Conductor_rho:materials_Conductor_Cp:x"
         }
     }
 }
