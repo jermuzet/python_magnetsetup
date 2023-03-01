@@ -87,12 +87,12 @@
 		    		},
 					"U":
 		    		{
-						"expr":"materials_Condcutor_U:materials_Condcutor_U",
+						"expr":"materials_Conductor_U:materials_Conductor_U",
 						"markers": {{part_electric}}
 		    		},
 		    		"Jth":
 		    		{
-						"expr":"-materials_Condcutor_sigma*(materials_Condcutor_U/(2*pi*x)+magnetic_dAtheta_dt):magnetic_dAtheta_dt:materials_Condcutor_sigma:materials_Condcutor_U:x",
+						"expr":"-materials_Conductor_sigma*(materials_Conductor_U/(2*pi*x)+magnetic_dAtheta_dt):magnetic_dAtheta_dt:materials_Conductor_sigma:materials_Conductor_U:x",
 						"markers": {{part_electric}}
 		    		}
 				}
@@ -107,7 +107,7 @@
 		    		"MagneticEnergy":
 		    		{
 						"type":"integrate",
-						"expr":"-2*pi*magnetic_Atheta*materials_Condcutor_sigma*(materials_Condcutor_U/2/pi+magnetic_dAtheta_dt*x):magnetic_Atheta:magnetic_dAtheta_dt:materials_Condcutor_sigma:materials_Condcutor_U:x",
+						"expr":"-2*pi*magnetic_Atheta*materials_Conductor_sigma*(materials_Conductor_U/2/pi+magnetic_dAtheta_dt*x):magnetic_Atheta:magnetic_dAtheta_dt:materials_Conductor_sigma:materials_Conductor_U:x",
 						"markers": {{part_electric}}
 		    		}
 				},

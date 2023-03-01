@@ -182,19 +182,19 @@
 		    		},
 		    		"stress":
 		    		{
-						"expr":"{materials_Conductor_stress_rr,materials_Conductor_stress_rz, materials_Conductor_stress_rz,materials_Conductor_stress_zz}:materials_Conductor_stress_rr:materials_Conductor_stress_rz:materials_Conductor_stress_zz",
+						"expr":"{materials_stress_rr,materials_stress_rz, materials_stress_rz,materials_stress_zz}:materials_stress_rr:materials_stress_rz:materials_stress_zz",
 						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"HoopStress":
 		    		{
-						"expr":"materials_Conductor_stress_thth:materials_Conductor_stress_thth",
+						"expr":"materials_stress_thth:materials_stress_thth",
 						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
 		    		"Vonmises":
 		    		{
-						"expr": "sqrt(1/2*((materials_Conductor_stress1-materials_Conductor_stress2)*(materials_Conductor_stress1-materials_Conductor_stress2)+(materials_Conductor_stress2-materials_Conductor_stress3)*(materials_Conductor_stress2-materials_Conductor_stress3)+(materials_Conductor_stress1-materials_Conductor_stress3)*(materials_Conductor_stress1-materials_Conductor_stress3))):materials_Conductor_stress1:materials_Conductor_stress2:materials_Conductor_stress3",
+						"expr": "sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3",
 						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
@@ -305,7 +305,12 @@
 		    		"Stat_Stress": 
 		    		{
 						"type":["min","max","mean"], 
-						"expr":"materials_Conductor_stress_thth:materials_Conductor_stress_thth" 
+						"expr":"materials_stress_thth:materials_stress_thth" 
+		    		},
+		    		"Stat_VonMises": 
+		    		{
+						"type":["min","max","mean"], 
+						"expr":"sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3"
 		    		}
 				}
 	    	}
