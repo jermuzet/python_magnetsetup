@@ -16,8 +16,7 @@ from .objects import load_object, load_object_from_db
 
 import yaml
 
-from python_magnetgeo import Insert
-from python_magnetgeo import python_magnetgeo
+from python_magnetgeo.Insert import Insert
 
 # Ignore warning for pint
 with warnings.catch_warnings():
@@ -118,7 +117,7 @@ def main():
     with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
         cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         if isinstance(cad, Insert):
-            gdata = python_magnetgeo.get_main_characteristics(cad, MyEnv)
+            gdata = cad.get_params(MyEnv.yaml_repo)
             (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
 
             for mtype in ["Helix", "Ring", "Lead"]:

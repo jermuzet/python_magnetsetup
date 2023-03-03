@@ -27,6 +27,8 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
     if debug:
         print(f'Bitter_setup/Bitter confdata: {confdata}')
 
+    (NCoolingSlits, Dh, Sh) = cad.get_params(MyEnv.yaml_repo)
+
     part_thermic = []
     part_electric = []
     index_Bitters = ""
@@ -43,30 +45,41 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
     if debug:
         print(f"cad: {cad} tpe: {type(cad)}")
 
+    ignore_index = []
     snames = []
     name = f"{mname}_{cad.name}" #.replace('Bitter_','')
     if method_data[2] == "Axi":
+        shift = 0
+        if cad.z[0] < -cad.h:
+            snames.append(f"{name}_B0")
+            part_thermic.append(snames[-1])
+            ignore_index.append(len(snames)-1)
+            shift = 1
         for i in range(len(cad.axi.turns)):
-            snames.append(f"{name}_B{i+1}")
+            snames.append(f"{name}_B{i+shift}")
             part_electric.append(snames[-1])
             if 'th' in method_data[3]:
                 part_thermic.append(snames[-1])
-        index_Bitters = f"1:{NSections+1}"
+        if cad.z[1] > cad.h:
+            snames.append(f"{name}_B{len(cad.axi.turns)+1}")
+            part_thermic.append(snames[-1])
+            ignore_index.append(len(snames)-1)
+        index_Bitters = f"shift:{NSections+shift}"
         if debug: print("sname:", snames)
     else:
         part_electric.append(cad.name)
         if 'th' in method_data[3]:
             part_thermic.append(cad.name)
 
-    gdata = (name, snames, cad.axi.turns)
+    gdata = (name, snames, cad.axi.turns, NCoolingSlits, Dh, Sh, ignore_index)
 
     if debug:
         print("bitter part_thermic:", part_thermic)
         print("bitter part_electric:", part_electric)
         
     if  method_data[2] == "Axi" and ('el' in method_data[3] and  method_data[3] != 'thelec'):
-        boundary_meca.append("{}_V0".format(name))
-        boundary_meca.append("{}_V1".format(name))    
+        boundary_meca.append(f"{name}_HP")
+        boundary_meca.append(f"{name}_BP")    
                 
         boundary_maxwell.append("ZAxis")
         boundary_maxwell.append("Infty")
@@ -149,7 +162,7 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
     mpost = {
         "Power": powerH_data ,
         "Current": currentH_data,
-        "Flux": {},
+        "Flux": {'prefix': f'{name}_Slit',  'index_h': f"1:{str(NCoolingSlits+1)}"},
         "T" : meanT_data,
         "Stress": Stress_data,
         "VonMises": VonMises_data,

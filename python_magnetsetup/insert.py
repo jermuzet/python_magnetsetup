@@ -113,7 +113,7 @@ def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: Li
     boundary_maxwell = []
     boundary_electric = []
 
-    gdata = python_magnetgeo.get_main_characteristics(cad, MyEnv)
+    gdata = cad.get_params(MyEnv.yaml_repo)
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
 
     print(f"Insert: {cad.name}, NHelices={NHelices}, NRings={NRings}, NChannels={NChannels}")
@@ -292,7 +292,7 @@ def Insert_setup(MyEnv, mname: str, confdata: dict, cad: Insert, method_data: Li
     mpost = {
         "Power": powerH_data ,
         "Current": currentH_data,        
-        "Flux": {'index_h': f"0:{str(NChannels)}"},
+        "Flux": {'prefix': 'Channel', 'index_h': f"0:{str(NChannels)}"},
         "T" : meanT_data,
         "Stress": Stress_data,
         "VonMises": VonMises_data,
