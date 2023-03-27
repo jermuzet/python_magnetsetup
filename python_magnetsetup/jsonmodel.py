@@ -65,26 +65,31 @@ def create_params_bitter(
 
     params_data["Parameters"].append({"name": f"{mname}_Tinit", "value": 293})
 
-    (name, snames, nturns) = gdata
+    (name, snames, nturns, NCoolingSlits, Dh, Sh, ignore_index) = gdata
     for thbc in ["rInt", "rExt"]:
-        params_data["Parameters"].append(
-            {"name": f"{name}_{thbc}_hw", "value": convert_data(units, 58222.1, "h")}
-        )
-        params_data["Parameters"].append(
-            {"name": f"{name}_{thbc}_Tw", "value": 290.671}
-        )
-        params_data["Parameters"].append({"name": f"{name}_{thbc}_dTw", "value": 12.74})
-    # for sname in snames:
-    #    params_data['Parameters'].append({"name": f"{sname}_hw", "value":convert_data(units, 58222.1, "h")})
-    #    params_data['Parameters'].append({"name": f"{sname}_Tw", "value":290.671})
-    #    params_data['Parameters'].append({"name": f"{sname}_dTw", "value":12.74})
+        bcname = f"{name}_{thbc}"
+        params_data['Parameters'].append({"name": f"{bcname}_hw", "value":convert_data(units, 58222.1, "h")})
+        params_data['Parameters'].append({"name": f"{bcname}_Tw", "value":290.671})
+        params_data['Parameters'].append({"name": f"{bcname}_dTw", "value":12.74})
+        params_data['Parameters'].append({"name": f"{bcname}_Zmin", "value": Zmin})
+        params_data['Parameters'].append({"name": f"{bcname}_Zmax", "value": Zmax})
+        for i in range(NCoolingSlits:)
+            bcname = f"{name}_slit{i+1}"
+            params_data['Parameters'].append({"name": f"{bcname}_hw", "value":convert_data(units, 58222.1, "h")})
+            params_data['Parameters'].append({"name": f"{bcname}_Tw", "value":290.671})
+            params_data['Parameters'].append({"name": f"{bcname}_dTw", "value":12.74})
+            params_data['Parameters'].append({"name": f"{bcname}_Sh", "value": Sh[i]})
+            params_data['Parameters'].append({"name": f"{bcname}_Dh", "value": Dh[i]})
+            params_data['Parameters'].append({"name": f"{bcname}_Zmin", "value": Zmin})
+            params_data['Parameters'].append({"name": f"{bcname}_Zmax", "value": Zmax})
+        
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
-        for i, sname in enumerate(snames):
-            params_data["Parameters"].append({"name": f"U_{sname}", "value": "1"})
-            params_data["Parameters"].append({"name": f"N_{sname}", "value": nturns[i]})
-            # params_data['Parameters'].append({"name": f"S_{sname}", "value":convert_data(units, Ssections[i], "Area")})
+        for i,sname in enumerate(snames):
+            if not i in ignore_index:
+                params_data['Parameters'].append({"name": f"U_{sname}", "value":"1"})
+                params_data['Parameters'].append({"name": f"N_{sname}", "value":nturns[i]})
 
     if "mag" in method_data[3] or "mqs" in method_data[3]:
         params_data["Parameters"].append(
@@ -579,7 +584,7 @@ def create_bcs_bitter(
     debug: bool = False,
 ) -> dict:
 
-    (name, snames, nturns) = gdata
+    (name, snames, cad.axi.turns, NCoolingSlits, Dh, Sh, ignore_index)
     print(f"create_bcs_bitter from templates for {name}")
     # print("snames=", snames)
 
@@ -612,6 +617,11 @@ def create_bcs_bitter(
                 Merge({"name": bcname}, mdata[bcname])
             )
 
+        for i in range(NCoolingSlits):
+            bcname =  f'{name}_slit{i+1}'
+            mdata = entry(fcooling, {'name': bcname, "markers": snames, 'hw': f'{bcname}_hw', 'Tw': f'{bcname}_Tw', 'dTw':'{bcname}_dTw'},  debug)
+            thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": bcname}, mdata[bcname]) )
+            
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
 
     if method_data[3] == "thelec":

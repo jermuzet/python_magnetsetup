@@ -459,10 +459,14 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
             if args.debug:
                 print(f"todict: {todict}")
             yamldata["magnets"] = todict
+            yamldata["screens"] = []
+            yamldata["z_offset"] = [0 for key in todict]  # init to zero
+            yamldata["r_offset"] = [0 for key in todict]
+            yamldata["paralax"] = [0 for key in todict]
 
-            print(f"try to create {MyEnv.yaml_repo + '/' + confdata['name'] + '.yaml'}")
+            print(f"try to create {MyEnv.yaml_repo}/{confdata['name']}.yaml")
             # for obj in confdata[mtype]:
-            with open(MyEnv.yaml_repo + "/" + confdata["name"] + ".yaml", "x") as out:
+            with open(f"{MyEnv.yaml_repo}/{confdata['name']}.yaml", "x") as out:
                 out.write("!<MSite>\n")
                 yaml.dump(yamldata, out)
             print(f"try to create {confdata['name']}.yaml done")
@@ -606,6 +610,7 @@ def setup_cmds(
     simage_path = MyEnv.simage_path()
     hifimagnet = AppCfg["mesh"]["hifimagnet"]
     salome = AppCfg["mesh"]["salome"]
+    gmsh = AppCfg["mesh"]["gmsh"]
     feelpp = AppCfg[args.method]["feelpp"]
     partitioner = AppCfg["mesh"]["partitioner"]
     if "exec" in AppCfg[args.method]:
@@ -615,15 +620,6 @@ def setup_cmds(
 
     print(f"currents({type(currents)}): {currents}")
     # currents: {mname: {value: x, type: t}}
-    mdata = {}
-    for key in currents:
-        mdata[key] = mdata[key]["type"]
-
-    # if len([*currents]) > 1:
-    #     currents_v = [float(currents[key]) for key in currents]
-    # else:
-    #     for key in currents:
-    #         currents_v = currents[key]
 
     pyfeel = " -m python_magnetworkflows.cli"  # fix-current, commisioning, fixcooling
     pyfeel_args = f"--current {currents} --cooling {args.cooling} --eps {1.e-5} --itermax {20} --flow_params {args.flow_params}"
@@ -631,26 +627,26 @@ def setup_cmds(
     # TODO infty as params
     if "mqs" in args.model or "mag" in args.model:
         geocmd = (
-            f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--air,4,6"
+            f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--air,8,6"
         )
-        meshcmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--air,4,6,--wd,$PWD,mesh,--group,CoolingChannels,Isolants"  # -wd ??
+        meshcmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--air,8,6,--wd,$PWD,mesh,--group,CoolingChannels,Isolants"  # -wd ??
     else:
-        geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},4,6"
-        meshcmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},4,6,--wd,$PWD,mesh,--group,CoolingChannels,Isolants"  # -wd ??
+        geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},8,6"
+        meshcmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},8,6,--wd,$PWD,mesh,--group,CoolingChannels,Isolants"  # -wd ??
 
     gmshfile = meshfile.replace(".med", ".msh")
     meshconvert = ""
 
     if args.geom == "Axi" and args.method == "cfpdes":
         if "mqs" in args.model or "mag" in args.model:
-            geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--axi,--air,4,6"
+            geocmd = f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--axi,--air,8,6"
         else:
             geocmd = (
                 f"salome -w1 -t {hifimagnet}/HIFIMAGNET_Cmd.py args:{yamlfile},--axi"
             )
 
         # let xao decide mesh caracteristic length ??:
-        meshcmd = f"python3 -m python_magnetgeo.xao {xaofile} --mdata '{json.dumps(mdata)}' --wd data/geometries mesh --group CoolingChannels --geo {yamlfile}"
+        meshcmd = f"python3 -m python_magnetgmsh.xao {xaofile} --wd data/geometries --geo {yamlfile} mesh --group CoolingChannels"
     else:
         gmshfile = meshfile.replace(".med", ".msh")
         meshconvert = f"gmsh -0 {meshfile} -bin -o {gmshfile}"
@@ -673,7 +669,10 @@ def setup_cmds(
     # to be changed in the future by using an entry from magnetsetup.conf MeshGems or gmsh
     # MeshGems_licdir = f"-B {node_spec.mgkeydir}:/opt/DISTENE/license:ro" if node_spec.mgkeydir is not None else ""
     # cmds["Mesh"] = f"singularity exec {MeshGems_licdir} {simage_path}/{salome} {meshcmd}"
-    cmds["Mesh"] = f"singularity exec {simage_path}/{salome} {meshcmd}"
+    if args.geom == "Axi":
+        cmds["Mesh"] = f"singularity exec {simage_path}/{gmsh} {meshcmd}"
+    else:
+        cmds["Mesh"] = f"singularity exec {simage_path}/{salome} {meshcmd}"
     # if gmsh:
     #    cmds["Mesh"] = f"singularity exec -B /opt/MeshGems:/opt/DISTENE/license:ro {simage_path}/{salome} {meshcmd}"
 

@@ -1,994 +1,1033 @@
 {
-	"post":
+    "post":
+    {
+	"paraview": "paraview-osmesa-5.9.1.sif"
+    },
+    "mesh":
+    {
+	"hifimagnet": "/opt/SALOME-9.8.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome",
+	"salome": "hifimagnet-salome-9.8.4.sif",
+	"gsmh": "magnetgmsh-0.1.0.sif",
+	"partitioner": "feelpp_mesh_partitioner",
+	"3D": 
 	{
-		"paraview": "paraview-osmesa-5.9.1.sif"
+	    "MeshGems": "",
+	    "Gmsh": ""
 	},
-        "mesh":
+	"Axi": 
 	{
-		"hifimagnet": "/opt/SALOME-9.8.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome",
-		"salome": "hifimagnet-salome-9.8.4.sif",
-		"partitioner": "feelpp_mesh_partitioner",
-		"3D": 
-		{
-			"MeshGems": "",
-			"Gmsh": ""
-		},
-		"Axi": 
-		{
-			"MeshGems":"",
-			"Gmsh": ""
-		}
-	},
-	"cfpdes":
-	{
+	    "MeshGems":"",
+	    "Gmsh": ""
+	}
+    },
+    "cfpdes":
+    {
     	"feelpp": "feelpp-v0.110.2-ubuntu-20.04.sif",
     	"exec": "feelpp_toolbox_coefficientformpdes",
-		"static":
+	"static":
+	{
+	    "Axi":
+	    {
+		"thelec":
 		{
-			"Axi":
-			{
-				"thelec":
-				{
-					"physic": ["heat"],
-					"cfg": "cfg.mustache",
-					"model": "json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-static.mustache",
-					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
-					"insulator": "insulator-static.mustache",
-					"models":
-					{
-						"heat-conductor":"heat-conductor.mustache",
-						"heat-insulator":"heat-insulator.mustache"
-					},
-					"cooling":
-					{
-						"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache",
-						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-static.json",
-						"insulator": "insulator-static.json"
-					},
-				    "stats":
-				    {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"current_H":""}
-						}
-				    },
-				    "post":
-				    {
-					    "heat.temperature": "T[K]"
-				    }
-				},
-				"mag_hcurl":
-				{
-					"physic": ["magnetic"],
-					"cfg": "cfg.mustache",
-					"model":"json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-static.mustache",
-					"insulator": "insulator-static.mustache",
-					"models":
-					{
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-static.json",
-						"insulator": "insulator-static.json"
-					},
-				    "plots":
-				    {
-						"B": "plot_B.mustache"
-				    }
-				},
-				"mag":
-				{
-					"physic": ["magnetic"],
-					"cfg": "cfg.mustache",
-					"model":"json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-static.mustache",
-					"insulator": "insulator-static.mustache",
-					"models":
-					{
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-static.json",
-						"insulator": "insulator-static.json"
-					},
-				    "stats":
-				    {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"Current_H":""}
-						}
-				    },
-				    "plots":
-				    {
-						"B": "plot_B.mustache"
-				    }
-				},
-				"thmag_hcurl":
-				{
-					"physic": ["heat", "magnetic"],
-					"cfg": "cfg.mustache",
-					"model": "json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-static.mustache",
-					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
-					"insulator": "insulator-static.mustache",
-					"models":
-					{
-						"heat-conductor":"heat-conductor.mustache",
-						"heat-insulator":"heat-insulator.mustache",
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache"
-					},
-					"cooling":
-					{
-						"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache",
-						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-static.json",
-						"insulator": "insulator-static.json"
-					},
-				    "stats":
-				    {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"current_H":""}
-						}
-				    },
-				    "plots":
-				    {
-						"B": "plot_B.mustache"
-				    }
-				},
-				"thmag":
-				{
-					"physic": ["heat", "magnetic"],
-					"cfg": "cfg.mustache",
-					"model": "json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-static.mustache",
-					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
-					"insulator": "insulator-static.mustache",
-					"models":
-					{
-						"heat-conductor":"heat-conductor.mustache",
-						"heat-insulator":"heat-insulator.mustache",
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache"
-					},
-					"cooling":
-					{
-						"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache",
-						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-static.json",
-						"insulator": "insulator-static.json"
-					},
-				    "stats":
-				    {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"current_H":""}
-						}
-			        },
-			        "plots":
-			        {
-						"B": "plot_B.mustache"
-			        }
-				},
-				"thmagel_hcurl":
-				{
-					"physic": ["heat", "magnetic", "elastic"],
-					"cfg": "cfg.mustache",
-					"model" : "json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-static.mustache",
-					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
-					"insulator": "insulator-static.mustache",
-					"models":
-					{
-						"heat-conductor":"heat-conductor.mustache",
-						"heat-insulator":"heat-insulator.mustache",
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache",
-						"elastic-conductor":"elastic-conductor.mustache",
-						"elastic-insulator":"elastic-insulator.mustache"
-					},
-					"cooling":
-					{
-						"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache",
-						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-static.json",
-						"insulator": "insulator-static.json"
-					},
-				    "stats":
-				    {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"current_H":""}
-						},
-						"Stress":   {
-							"name": "Stats_Stress",
-							"template": "stats_Stress.mustache",
-							"physic": "elastic",
-							"data": {"Stress_H":""}
-						},
-				    	"VonMises":    {
-							"name": "Stats_VonMises",
-							"template": "stats_VonMises.mustache",
-							"physic": "elastic",
-							"data": {"VonMises_H":""}
-						}
-				    },
-				    "plots":
-				    {
-						"B": "plot_B.mustache"
-				    }
-				        
-				},
-				"thmagel":
-				{
-					"physic": ["heat", "magnetic", "elastic"],
-					"cfg": "cfg.mustache",
-					"model" : "json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-static.mustache",
-					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
-					"insulator": "insulator-static.mustache",
-					"models":
-					{
-						"heat-conductor":"heat-conductor.mustache",
-						"heat-insulator":"heat-insulator.mustache",
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache",
-						"elastic-conductor":"elastic-conductor.mustache",
-						"elastic-insulator":"elastic-insulator.mustache"
-					},
-					"cooling":
-					{
-						"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache",
-						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-static.json",
-						"insulator": "insulator-static.json"
-					},
-				    "stats":
-				    {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"current_H":""}
-						},
-						"Stress":   {
-							"name": "Stats_Stress",
-							"template": "stats_Stress.mustache",
-							"physic": "heat",
-							"data": {"Stress_H":""}
-						},
-				    	"VonMises":    {
-							"name": "Stats_VonMises",
-							"template": "stats_VonMises.mustache",
-							"physic": "heat",
-							"data": {"VonMises_H":""}
-						}
-				    },
-				    "plots":
-				    {
-						"B": "plot_B.mustache"
-				    }
-				}
+		    "physic": ["heat"],
+		    "cfg": "cfg.mustache",
+		    "model": "json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-static.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear-static.mustache",
+		    "insulator": "insulator-static.mustache",
+		    "models":
+		    {
+			"heat-conductor":"heat-conductor.mustache",
+			"heat-insulator":"heat-insulator.mustache"
+		    },
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-gradH.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-static.json",
+			"insulator": "insulator-static.json"
+		    },
+		    "stats":
+		    {
+			"T": {
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
 			},
-			"3D":
-			{
-				"thelec":
-				{
-					"physic": ["heat", "electric"],
-					"model": "json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"cfg": "cfg.mustache",
-					"conductor-linear": "conductor-linear-static.mustache",
-					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
-					"insulator": "insulator-static.mustache",
-					"cooling":
-					{
-						"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache",
-						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-static.json",
-						"insulator": "insulator-static.json"
-					},
-				    "stats":
-				    {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"current_H":""}
-						}
-				    }
-				},
-				"thmag":
-				{
-				},
-				"thmagel":
-				{
-				}
-			}
-		},
-		"transient":	
-		{
-			"Axi":
-			{
-				"mqs_hcurl":
-				{
-					"physic": ["magnetic"],
-					"cfg": "cfg.mustache",
-					"model":"json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-transient.mustache",
-					"conduct-nosource": "conduct-nosource.mustache",
-					"insulator": "insulator-transient.mustache",
-					"models":
-					{
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-transient.json",
-						"conduct-nosource": "conduct-nosource.json",
-						"insulator": "insulator-transient.json"
-					},
-				    "plots":
-				    {
-						"B": "plot_B.mustache"
-				    }
-				},
-				"mqs":
-				{
-					"physic": ["magnetic"],
-					"cfg": "cfg.mustache",
-					"model":"json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-transient.mustache",
-					"conduct-nosource": "conduct-nosource.mustache",
-					"insulator": "insulator-transient.mustache",
-					"models":
-					{
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-transient.json",
-						"conduct-nosource": "conduct-nosource.json",
-						"insulator": "insulator-transient.json"
-					},
-				    "plots":
-				    {
-						"B": "plot_B.mustache"
-				    }
-				},
-				"thmqs_hcurl":
-				{
-					"physic": ["heat", "magnetic"],
-					"cfg": "cfg.mustache",
-					"model": "json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-transient.mustache",
-					"conductor-nonlinear": "conductor-nonlinear.mustache",
-					"conduct-nosource": "conduct-nosource.mustache",
-					"insulator": "insulator-transient.mustache",
-					"models":
-					{
-						"heat-conductor":"heat-conductor.mustache",
-						"heat-conduct-nosource":"heat-conduct-nosource.mustache",
-						"heat-insulator":"heat-insulator.mustache",
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache"
-					},
-					"cooling":
-					{
-						"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache",
-						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-transient.json",
-						"conduct-nosource": "conduct-nosource.json",
-						"insulator": "insulator-transient.json"
-					},
-				    "stats":
-				    {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"current_H":""}
-						}
-				    },
-				    "plots":
-				    {
-						"B": "plot_B.mustache"
-				    }
-				},
-				"thmqs":
-				{
-					"physic": ["heat", "magnetic"],
-					"cfg": "cfg.mustache",
-					"model": "json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-transient.mustache",
-					"conductor-nonlinear": "conductor-nonlinear.mustache",
-					"conduct-nosource": "conduct-nosource.mustache",
-					"insulator": "insulator-transient.mustache",
-					"models":
-					{
-						"heat-conductor":"heat-conductor.mustache",
-						"heat-conduct-nosource":"heat-conduct-nosource.mustache",
-						"heat-insulator":"heat-insulator.mustache",
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache"
-					},
-					"cooling":
-					{
-						"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache",
-						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-transient.json",
-						"conduct-nosource": "conduct-nosource.json",
-						"insulator": "insulator-transient.json"
-					},
-				    "stats":
-				    {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"Current_H":""}
-						}
-				    },
-				    "plots":
-				    {
-						"B": "plot_B.mustache"
-				    }
-				},
-				"thmqsel_hcurl":
-				{
-					"physic": ["heat", "magnetic", "elastic1", "elastic2"],
-					"cfg": "cfg.mustache",
-					"model" : "json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-transient.mustache",
-					"conductor-nonlinear": "conductor-nonlinear-transient.mustache",
-					"conduct-nosource": "conduct-nosource-transient.mustache",
-					"insulator": "insulator-transient.mustache",
-					"models":
-					{
-						"heat-conductor":"heat-conductor.mustache",
-						"heat-conduct-nosource":"heat-conduct-nosource.mustache",
-						"heat-insulator":"heat-insulator.mustache",
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache",
-						"elastic1-conductor":"elastic1-conductor.mustache",
-						"elastic1-conduct-nosource":"elastic1-conduct-nosource.mustache",
-						"elastic1-insulator":"elastic1-insulator.mustache",
-						"elastic2-conductor":"elastic2-conductor.mustache",
-						"elastic2-conduct-nosource":"elastic2-conduct-nosource.mustache",
-						"elastic2-insulator":"elastic2-insulator.mustache"
-					},
-					"cooling":
-					{
-						"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache",
-						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-transient.json",
-						"conduct-nosource": "conduct-nosource-transient.json",
-						"insulator": "insulator-transient.json"
-					},
-				    "stats":
-				    {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"current_H":""}
-						},
-						"Stress":   {
-							"name": "Stats_Stress",
-							"template": "stats_Stress.mustache",
-							"physic": "elastic1",
-							"data": {"Stress_H":""}
-						},
-				    	"VonMises":    {
-							"name": "Stats_VonMises",
-							"template": "stats_VonMises.mustache",
-							"physic": "elastic1",
-							"data": {"VonMises_H":""}
-						}
-				    },
-				    "plots":
-					{
-						"B": "plot_B.mustache"
-				    }
-				},
-				"thmqsel":
-				{
-					"physic": ["heat", "magnetic", "elastic1", "elastic2"],
-					"cfg": "cfg.mustache",
-					"model" : "json.mustache",
-					"model-nonlinear": "json-nonlinear.mustache",
-					"conductor-linear": "conductor-linear-transient.mustache",
-					"conductor-nonlinear": "conductor-nonlinear-transient.mustache",
-					"conduct-nosource": "conduct-nosource-transient.mustache",
-					"insulator": "insulator-transient.mustache",
-					"models":
-					{
-						"heat-conductor":"heat-conductor.mustache",
-						"heat-conduct-nosource":"heat-conduct-nosource.mustache",
-						"heat-insulator":"heat-insulator.mustache",
-						"magnetic-conductor":"magnetic-conductor.mustache",
-						"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
-						"magnetic-insulator":"magnetic-insulator.mustache",
-						"elastic1-conductor":"elastic1-conductor.mustache",
-						"elastic1-conduct-nosource":"elastic1-conduct-nosource.mustache",
-						"elastic1-insulator":"elastic1-insulator.mustache",
-						"elastic2-conductor":"elastic2-conductor.mustache",
-						"elastic2-conduct-nosource":"elastic2-conduct-nosource.mustache",
-						"elastic2-insulator":"elastic2-insulator.mustache"
-					},
-					"cooling":
-					{
-						"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache",
-						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
-					},
-					"filename":
-					{
-						"conductor": "conductor-transient.json",
-						"conduct-nosource": "conduct-nosource-transient.json",
-						"insulator": "insulator-transient.json"
-					},
-				    "stats":
-			        {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"current_H":""}
-						},
-						"Stress":   {
-							"name": "Stats_Stress",
-							"template": "stats_Stress.mustache",
-							"physic": "elastic2",
-							"data": {"Stress_H":""}
-						},
-				    	"VonMises":    {
-							"name": "Stats_VonMises",
-							"template": "stats_VonMises.mustache",
-							"physic": "elastic2",
-							"data": {"VonMises_H":""}
-						}
-			        },
-			        "plots":
-			        {
-						"B": "plot_B.mustache"
-			        }
-				}
+			"Power":  {
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
 			},
-			"3D":
-			{
-				"mqs":
-				{
-				},
-				"thmqs":
-				{
-				}
+			"Current":  {
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"current_H":""}
 			}
-		}
-	},
-	"CG":
-	{
-		"feelpp": "feelpp-toolboxes-v0.110.0-alpha.3.sif",
-    	"static":
-		{
-			"3D":
-		        {
-			    "thelec":
-			    {
-					"exec": "feelpp_toolbox_thermoelectric",
-					"model": "thel.mustache",
-					"conductor-linear": "conductor-linear-static-thel.mustache",
-					"conductor-nonlinear": "conductor-nonlinear-static-thel.mustache",
-					"insulator": "insulator-static-thel.mustache",
-					"cooling":
-					{
-				    	"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-				    	"grad": "channel-grad.mustache",
-				    	"meanH": "channel-meanH.mustache",
-				    	"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-				    	"grad": "flux-channel-grad.mustache",
-				    	"meanH": "flux-channel-meanH.mustache",
-				    	"gradH": "flux-channel-gradH.mustache"
-					},
-					"filename":
-					{
-					},
-			        "stats":
-			        {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"current_H":""}
-						}
-			        }		
-			    }
-			}
+		    },
+		    "post":
+		    {
+			"heat.temperature": "T[K]"
+		    }
 		},
-		"transient":	
+		"mag_hcurl":
 		{
-			"3D":
-			{
-			}
-		}
-	},
-	"HDG":
-	{
-		"feelpp": "feelpp-toolboxes-v0.110.0-alpha.3.sif",
-		"static":
-		{
-			"3D":
-			{
-			    "thelec":
-			    {
-					"exec": "feelpp_toolbox_hdg_thermoelectric",
-					"model": "json.mustache",
-					"cfg": "cfg.mustache",
-					"conductor-linear": "conductor-linear-static.mustache",
-					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
-					"insulator": "insulator-static.mustache",
-					"cooling":
-					{
-						"robin": "T_robin.mustache",
-						"mean": "channel-mean.mustache",
-						"grad": "channel-grad.mustache",
-						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
-					},
-					"cooling-post":
-					{
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-grad.mustache"
-					},
-					"filename":
-					{
-					},
-			        "stats":
-			        {
-						"T": {
-							"name": "Stats_T",
-							"template": "stats_T.mustache",
-							"physic": "heat",
-							"data": {"T_H":""}
-						},
-						"Power":  {
-							"name": "Stats_Power",
-							"template": "stats_Power.mustache",
-							"physic": "heat",
-							"data": {"power_H":""}
-						},
-				    	"Current":  {
-							"name": "Stats_Currents",
-							"template": "stats_Current.mustache",
-							"physic": "heat",
-							"data": {"current_H":""}
-						}
-			        }
-				}
-			}
+		    "physic": ["magnetic"],
+		    "cfg": "cfg.mustache",
+		    "model":"json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-static.mustache",
+		    "insulator": "insulator-static.mustache",
+		    "models":
+		    {
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-static.json",
+			"insulator": "insulator-static.json"
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
 		},
-		"transient":	
+		"mag":
 		{
-			"3D":
+		    "physic": ["magnetic"],
+		    "cfg": "cfg.mustache",
+		    "model":"json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-static.mustache",
+		    "insulator": "insulator-static.mustache",
+		    "models":
+		    {
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-static.json",
+			"insulator": "insulator-static.json"
+		    },
+		    "stats":
+		    {
+			"T": 
 			{
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power": 
+			{
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":
+			{
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"Current_H":""}
 			}
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
+		},
+		"thmag_hcurl":
+		{
+		    "physic": ["heat", "magnetic"],
+		    "cfg": "cfg.mustache",
+		    "model": "json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-static.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear-static.mustache",
+		    "insulator": "insulator-static.mustache",
+		    "models":
+		    {
+			"heat-conductor":"heat-conductor.mustache",
+			"heat-insulator":"heat-insulator.mustache",
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache"
+		    },
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-gradH.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-static.json",
+			"insulator": "insulator-static.json"
+		    },
+		    "stats":
+		    {
+			"T":
+			{
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power":
+			{
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":
+			{
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"current_H":""}
+			}
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
+		},
+		"thmag":
+		{
+		    "physic": ["heat", "magnetic"],
+		    "cfg": "cfg.mustache",
+		    "model": "json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-static.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear-static.mustache",
+		    "insulator": "insulator-static.mustache",
+		    "models":
+		    {
+			"heat-conductor":"heat-conductor.mustache",
+			"heat-insulator":"heat-insulator.mustache",
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache"
+		    },
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-gradH.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-static.json",
+			"insulator": "insulator-static.json"
+		    },
+		    "stats":
+		    {
+			"T":
+			{
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power":
+			{
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":
+			{
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"current_H":""}
+			}
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
+		},
+		"thmagel_hcurl":
+		{
+		    "physic": ["heat", "magnetic", "elastic"],
+		    "cfg": "cfg.mustache",
+		    "model" : "json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-static.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear-static.mustache",
+		    "insulator": "insulator-static.mustache",
+		    "models":
+		    {
+			"heat-conductor":"heat-conductor.mustache",
+			"heat-insulator":"heat-insulator.mustache",
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache",
+			"elastic-conductor":"elastic-conductor.mustache",
+			"elastic-insulator":"elastic-insulator.mustache"
+		    },
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-gradH.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-static.json",
+			"insulator": "insulator-static.json"
+		    },
+		    "stats":
+		    {
+			"T":
+			{
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power":
+			{
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":
+			{
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"current_H":""}
+			},
+			"Stress":   {
+			    "name": "Stats_Stress",
+			    "template": "stats_Stress.mustache",
+			    "physic": "elastic",
+			    "data": {"Stress_H":""}
+			},
+			"VonMises":    {
+			    "name": "Stats_VonMises",
+			    "template": "stats_VonMises.mustache",
+			    "physic": "elastic",
+			    "data": {"VonMises_H":""}
+			}
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
+		    
+		},
+		"thmagel":
+		{
+		    "physic": ["heat", "magnetic", "elastic"],
+		    "cfg": "cfg.mustache",
+		    "model" : "json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-static.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear-static.mustache",
+		    "insulator": "insulator-static.mustache",
+		    "models":
+		    {
+			"heat-conductor":"heat-conductor.mustache",
+			"heat-insulator":"heat-insulator.mustache",
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache",
+			"elastic-conductor":"elastic-conductor.mustache",
+			"elastic-insulator":"elastic-insulator.mustache"
+		    },
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-gradH.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-static.json",
+			"insulator": "insulator-static.json"
+		    },
+		    "stats":
+		    {
+			"T":
+			{
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power":
+			{
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":
+			{
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"current_H":""}
+			},
+			"Stress":
+			{
+			    "name": "Stats_Stress",
+			    "template": "stats_Stress.mustache",
+			    "physic": "heat",
+			    "data": {"Stress_H":""}
+			},
+			"VonMises":
+			{
+			    "name": "Stats_VonMises",
+			    "template": "stats_VonMises.mustache",
+			    "physic": "heat",
+			    "data": {"VonMises_H":""}
+			}
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
 		}
+	    },
+	    "3D":
+	    {
+		"thelec":
+		{
+		    "physic": ["heat", "electric"],
+		    "model": "json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "cfg": "cfg.mustache",
+		    "conductor-linear": "conductor-linear-static.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear-static.mustache",
+		    "insulator": "insulator-static.mustache",
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-gradH.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-static.json",
+			"insulator": "insulator-static.json"
+		    },
+		    "stats":
+		    {
+			"T":
+			{
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power":
+			{
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":
+			{
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"current_H":""}
+			}
+		    }
+		},
+		"thmag":
+		{
+		},
+		"thmagel":
+		{
+		}
+	    }
 	},
-	"CRB":
+	"transient":	
 	{
+	    "Axi":
+	    {
+		"mqs_hcurl":
+		{
+		    "physic": ["magnetic"],
+		    "cfg": "cfg.mustache",
+		    "model":"json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-transient.mustache",
+		    "conduct-nosource": "conduct-nosource.mustache",
+		    "insulator": "insulator-transient.mustache",
+		    "models":
+		    {
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-transient.json",
+			"conduct-nosource": "conduct-nosource.json",
+			"insulator": "insulator-transient.json"
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
+		},
+		"mqs":
+		{
+		    "physic": ["magnetic"],
+		    "cfg": "cfg.mustache",
+		    "model":"json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-transient.mustache",
+		    "conduct-nosource": "conduct-nosource.mustache",
+		    "insulator": "insulator-transient.mustache",
+		    "models":
+		    {
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-transient.json",
+			"conduct-nosource": "conduct-nosource.json",
+			"insulator": "insulator-transient.json"
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
+		},
+		"thmqs_hcurl":
+		{
+		    "physic": ["heat", "magnetic"],
+		    "cfg": "cfg.mustache",
+		    "model": "json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-transient.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear.mustache",
+		    "conduct-nosource": "conduct-nosource.mustache",
+		    "insulator": "insulator-transient.mustache",
+		    "models":
+		    {
+			"heat-conductor":"heat-conductor.mustache",
+			"heat-conduct-nosource":"heat-conduct-nosource.mustache",
+			"heat-insulator":"heat-insulator.mustache",
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache"
+		    },
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-gradH.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-transient.json",
+			"conduct-nosource": "conduct-nosource.json",
+			"insulator": "insulator-transient.json"
+		    },
+		    "stats":
+		    {
+			"T":
+			{
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power":
+			{
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":
+			{
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"current_H":""}
+			}
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
+		},
+		"thmqs":
+		{
+		    "physic": ["heat", "magnetic"],
+		    "cfg": "cfg.mustache",
+		    "model": "json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-transient.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear.mustache",
+		    "conduct-nosource": "conduct-nosource.mustache",
+		    "insulator": "insulator-transient.mustache",
+		    "models":
+		    {
+			"heat-conductor":"heat-conductor.mustache",
+			"heat-conduct-nosource":"heat-conduct-nosource.mustache",
+			"heat-insulator":"heat-insulator.mustache",
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache"
+		    },
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-gradH.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-transient.json",
+			"conduct-nosource": "conduct-nosource.json",
+			"insulator": "insulator-transient.json"
+		    },
+		    "stats":
+		    {
+			"T":
+			{
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power":
+			{
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":
+			{
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"Current_H":""}
+			}
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
+		},
+		"thmqsel_hcurl":
+		{
+		    "physic": ["heat", "magnetic", "elastic1", "elastic2"],
+		    "cfg": "cfg.mustache",
+		    "model" : "json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-transient.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear-transient.mustache",
+		    "conduct-nosource": "conduct-nosource-transient.mustache",
+		    "insulator": "insulator-transient.mustache",
+		    "models":
+		    {
+			"heat-conductor":"heat-conductor.mustache",
+			"heat-conduct-nosource":"heat-conduct-nosource.mustache",
+			"heat-insulator":"heat-insulator.mustache",
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache",
+			"elastic1-conductor":"elastic1-conductor.mustache",
+			"elastic1-conduct-nosource":"elastic1-conduct-nosource.mustache",
+			"elastic1-insulator":"elastic1-insulator.mustache",
+			"elastic2-conductor":"elastic2-conductor.mustache",
+			"elastic2-conduct-nosource":"elastic2-conduct-nosource.mustache",
+			"elastic2-insulator":"elastic2-insulator.mustache"
+		    },
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-gradH.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-transient.json",
+			"conduct-nosource": "conduct-nosource-transient.json",
+			"insulator": "insulator-transient.json"
+		    },
+		    "stats":
+		    {
+			"T":
+			{
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power":
+			{
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":
+			{
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"current_H":""}
+			},
+			"Stress":
+			{
+			    "name": "Stats_Stress",
+			    "template": "stats_Stress.mustache",
+			    "physic": "elastic1",
+			    "data": {"Stress_H":""}
+			},
+			"VonMises":
+			{
+			    "name": "Stats_VonMises",
+			    "template": "stats_VonMises.mustache",
+			    "physic": "elastic1",
+			    "data": {"VonMises_H":""}
+			}
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
+		},
+		"thmqsel":
+		{
+		    "physic": ["heat", "magnetic", "elastic1", "elastic2"],
+		    "cfg": "cfg.mustache",
+		    "model" : "json.mustache",
+		    "model-nonlinear": "json-nonlinear.mustache",
+		    "conductor-linear": "conductor-linear-transient.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear-transient.mustache",
+		    "conduct-nosource": "conduct-nosource-transient.mustache",
+		    "insulator": "insulator-transient.mustache",
+		    "models":
+		    {
+			"heat-conductor":"heat-conductor.mustache",
+			"heat-conduct-nosource":"heat-conduct-nosource.mustache",
+			"heat-insulator":"heat-insulator.mustache",
+			"magnetic-conductor":"magnetic-conductor.mustache",
+			"magnetic-conduct-nosource":"magnetic-conduct-nosource.mustache",
+			"magnetic-insulator":"magnetic-insulator.mustache",
+			"elastic1-conductor":"elastic1-conductor.mustache",
+			"elastic1-conduct-nosource":"elastic1-conduct-nosource.mustache",
+			"elastic1-insulator":"elastic1-insulator.mustache",
+			"elastic2-conductor":"elastic2-conductor.mustache",
+			"elastic2-conduct-nosource":"elastic2-conduct-nosource.mustache",
+			"elastic2-insulator":"elastic2-insulator.mustache"
+		    },
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-gradH.mustache"
+		    },
+		    "filename":
+		    {
+			"conductor": "conductor-transient.json",
+			"conduct-nosource": "conduct-nosource-transient.json",
+			"insulator": "insulator-transient.json"
+		    },
+		    "stats":
+		    {
+			"T":
+			{
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power":
+			{
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":
+			{
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"current_H":""}
+			},
+			"Stress":
+			{
+			    "name": "Stats_Stress",
+			    "template": "stats_Stress.mustache",
+			    "physic": "elastic2",
+			    "data": {"Stress_H":""}
+			},
+			"VonMises":
+			{
+			    "name": "Stats_VonMises",
+			    "template": "stats_VonMises.mustache",
+			    "physic": "elastic2",
+			    "data": {"VonMises_H":""}
+			}
+		    },
+		    "plots":
+		    {
+			"B": "plot_B.mustache"
+		    }
+		}
+	    },
+	    "3D":
+	    {
+		"mqs":
+		{
+		},
+		"thmqs":
+		{
+		}
+	    }
 	}
+    },
+    "CG":
+    {
+	"feelpp": "feelpp-toolboxes-v0.110.0-alpha.3.sif",
+    	"static":
+	{
+	    "3D":
+	    {
+		"thelec":
+		{
+		    "exec": "feelpp_toolbox_thermoelectric",
+		    "model": "thel.mustache",
+		    "conductor-linear": "conductor-linear-static-thel.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear-static-thel.mustache",
+		    "insulator": "insulator-static-thel.mustache",
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-gradH.mustache"
+		    },
+		    "filename":
+		    {
+		    },
+		    "stats":
+		    {
+			"T": {
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power":  {
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":  {
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"current_H":""}
+			}
+		    }		
+		}
+	    }
+	},
+	"transient":	
+	{
+	    "3D":
+	    {
+	    }
+	}
+    },
+    "HDG":
+    {
+	"feelpp": "feelpp-toolboxes-v0.110.0-alpha.3.sif",
+	"static":
+	{
+	    "3D":
+	    {
+		"thelec":
+		{
+		    "exec": "feelpp_toolbox_hdg_thermoelectric",
+		    "model": "json.mustache",
+		    "cfg": "cfg.mustache",
+		    "conductor-linear": "conductor-linear-static.mustache",
+		    "conductor-nonlinear": "conductor-nonlinear-static.mustache",
+		    "insulator": "insulator-static.mustache",
+		    "cooling":
+		    {
+			"robin": "T_robin.mustache",
+			"mean": "channel-mean.mustache",
+			"grad": "channel-grad.mustache",
+			"meanH": "channel-meanH.mustache",
+			"gradH": "channel-gradH.mustache"
+		    },
+		    "cooling-post":
+		    {
+			"mean": "flux-channel-mean.mustache",
+			"grad": "flux-channel-grad.mustache",
+			"meanH": "flux-channel-meanH.mustache",
+			"gradH": "flux-channel-grad.mustache"
+		    },
+		    "filename":
+		    {
+		    },
+		    "stats":
+		    {
+			"T":
+			{
+			    "name": "Stats_T",
+			    "template": "stats_T.mustache",
+			    "physic": "heat",
+			    "data": {"T_H":""}
+			},
+			"Power":
+			{
+			    "name": "Stats_Power",
+			    "template": "stats_Power.mustache",
+			    "physic": "heat",
+			    "data": {"power_H":""}
+			},
+			"Current":  {
+			    "name": "Stats_Currents",
+			    "template": "stats_Current.mustache",
+			    "physic": "heat",
+			    "data": {"current_H":""}
+			}
+		    }
+		}
+	    }
+	},
+	"transient":	
+	{
+	    "3D":
+	    {
+	    }
+	}
+    },
+    "CRB":
+    {
+    }
 }

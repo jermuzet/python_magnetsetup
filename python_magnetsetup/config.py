@@ -147,61 +147,21 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
         if debug:
             print(f"dict[plots]={dict['plots']}")
 
+    for kdata in modelcfg["models"]:
+        dict[kdata] = os.path.join(template_path, modelcfg["models"][kdata])
+    
     if 'th' in model:
-        heat_conductor = modelcfg["models"]["heat-conductor"]
-        heat_insulator = modelcfg["models"]["heat-insulator"]
-
         cooling_model = modelcfg["cooling"][cooling]
         flux_model = modelcfg["cooling-post"][cooling]
 
-        fheatconductor = os.path.join(template_path, heat_conductor)
-        fheatinsulator = os.path.join(template_path, heat_insulator)
-    
         fcooling = os.path.join(template_path, cooling_model)
         frobin = os.path.join(template_path, modelcfg["cooling"]["robin"])
         fflux = os.path.join(template_path, flux_model)
 
-        dict["heat-conductor"] = fheatconductor
-        dict["heat-insulator"] = fheatinsulator
         dict["cooling"] = fcooling
         dict["robin"] = frobin
         dict["flux"] = fflux
 
-    if 'mag' in model or 'mqs' in model :
-        magnetic_conductor = modelcfg["models"]["magnetic-conductor"]
-        magnetic_insulator = modelcfg["models"]["magnetic-insulator"]
-
-        fmagconductor = os.path.join(template_path, magnetic_conductor)
-        fmaginsulator = os.path.join(template_path, magnetic_insulator)
-
-        dict["magnetic-conductor"] = fmagconductor
-        dict["magnetic-insulator"] = fmaginsulator
-
-    if 'magel' in model :
-        elastic_conductor = modelcfg["models"]["elastic-conductor"]
-        elastic_insulator = modelcfg["models"]["elastic-insulator"]
-        felasconductor = os.path.join(template_path, elastic_conductor)
-        felasinsulator = os.path.join(template_path, elastic_insulator)
-
-        dict["elastic-conductor"] = felasconductor
-        dict["elastic-insulator"] = felasinsulator
-
-    if 'mqsel' in model :
-        elastic1_conductor = modelcfg["models"]["elastic1-conductor"]
-        elastic1_insulator = modelcfg["models"]["elastic1-insulator"]
-        elastic2_conductor = modelcfg["models"]["elastic2-conductor"]
-        elastic2_insulator = modelcfg["models"]["elastic2-insulator"]
-
-        felas1conductor = os.path.join(template_path, elastic1_conductor)
-        felas1insulator = os.path.join(template_path, elastic1_insulator)
-        felas2conductor = os.path.join(template_path, elastic2_conductor)
-        felas2insulator = os.path.join(template_path, elastic2_insulator)
-
-        dict["elastic1-conductor"] = felas1conductor
-        dict["elastic1-insulator"] = felas1insulator
-        dict["elastic2-conductor"] = felas2conductor
-        dict["elastic2-insulator"] = felas2insulator
-    
     if check_templates(dict):
         pass
 
