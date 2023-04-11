@@ -7,49 +7,49 @@ import yaml
 
 from .config import appenv
 
-def query_db(appenv: appenv, mtype: str, name: str, debug: bool = False):
-    """
-    Get object from magnetdb
-    """
+# def query_db(appenv: appenv, mtype: str, name: str, debug: bool = False):
+#     """
+#     Get object from magnetdb
+#     """
+ 
+#     from python_magnetapi.utils import get_list, get_object
+#     headers = {"Authorization": os.getenv("MAGNETDB_API_KEY")}
+#     web = appenv.url_api
 
-    import requests
-    import requests.exceptions
+#     ids = get_list(
+#                 f"{web}", headers=headers, mtype=mtype, debug=debug
+#             )
+#     if name in ids:
+#         response = get_object(
+#                     f"{web}",
+#                     headers=headers,
+#                     mtype=mtype,
+#                     id=ids[name],
+#                     debug=debug,
+#                 )
+#         if debug: print("response:", response)
+#         mdata = {json.dumps(response)}
+#         return mdata
+#     else:
+#         available_objs = [id['name'] for id in ids]
+#         raise Exception(f"failed to retreive {name} from db: available requested mtype in db are: {available_objs}")
+
+# def list_mtype_db(appenv: appenv, mtype: str, debug: bool = False):
+#     """
+#     List object of mtype stored in magnetdb
+#     """
+
+#     from python_magnetapi.utils import get_list
+#     headers = {"Authorization": os.getenv("MAGNETDB_API_KEY")}
+#     web = appenv.url_api
     
-    r = requests.get(url= appenv.url_api + '/' + mtype + '/mdata/' + name )
-    if debug: print("request:", r)
-    if (r.status_code == requests.codes.ok):
-        if debug: print("request:", r.text)
-        mdata = json.loads(r.text)
-        if debug:
-            print("query_db/mdata:", mdata)
-        # confdata = ast.literal_eval(r.text)
-        return mdata
-    else:
-        available_objs = list_mtype_db(appenv, mtype)
-        raise Exception(f"failed to retreive {name} from db: available requested mtype in db are: {available_objs}")
-
-def list_mtype_db(appenv: appenv, mtype: str, debug: bool = False):
-    """
-    List object of mtype stored in magnetdb
-    """
-
-    import requests
-    import requests.exceptions
+#     if mtype.lower() in ["helix", "bitter", "supra"]:
+#         mtype = "part"
     
-    names = []
-    if mtype in ["Helix", "Bitter", "Supra"]:
-        mtype = "mpart"
-    r = requests.get(url= appenv.url_api + '/' + mtype + 's/' )
-    if debug:
-        print("url=%s", appenv.url_api)
-        print("request(url=%s):" % (appenv.url_api + '/' + mtype + 's/'), r)
-    if (r.status_code == requests.codes.ok):
-        data = json.loads(r.text)
-        # data = ast.literal_eval(r.text)
-        if debug:
-            print("list_mtype_db:", data)
-        return [ d["name"] for d in data ]
-    pass
+#     ids = get_list(
+#                 f"{web}", headers=headers, mtype=mtype, debug=debug
+#             )
+#     return [ id["name"] for id in ids ]
 
 def load_object(appenv: appenv, datafile: str, debug: bool = False):
     """
@@ -66,26 +66,29 @@ def load_object(appenv: appenv, datafile: str, debug: bool = False):
     return confdata
 
 
-def load_object_from_db(appenv: appenv, mtype: str, name: str, debug: bool = False, session = None):
-    """
-    Load object props from db
-    """
+# def load_object_from_db(appenv: appenv, mtype: str, name: str, debug: bool = False, session = None):
+#     """
+#     Load object props from db
+#     """
+#     if not mtype.lower() in ["msite", "magnet", "helix", "bitter", "supra", "material"]:
+#         raise("query_bd: %s not supported" % mtype)
 
-    if not mtype in ["msite", "magnet", "Helix", "Bitter", "Supra", "material"]:
-        raise("query_bd: %s not supported" % mtype)
+#     if session:
 
-    if session:
-        from python_magnetdb.crud import get_magnet_data, get_msite_data
+#         from python_magnetapi.utils import get_list
+#         headers = {"Authorization": os.getenv("MAGNETDB_API_KEY")}
+#         web = appenv.url_api
 
-        mdata = None
-        if mtype.lower() == "magnet":
-            mdata = get_magnet_data(session, name)
-        if mtype.lower() == "msite":
-            mdata = get_msite_data(session, name)
+#         mdata = None
+#         if mtype.lower() == "magnet":
+#             mdata = get_magnet_data(session, name)
+#             r = requests.get(url=f'{appenv.url_api}/{mtype}s/{id}/mdata')
+#         if mtype.lower() == "msite":
+#             mdata = get_msite_data(session, name)
 
-        print ("load_object_from_db: use direct call to db")
-        return mdata
+#         print ("load_object_from_db: use direct call to db")
+#         return mdata
     
-    print ("load_object_from_db: use request")
-    return query_db(appenv, mtype, name, debug)
+#     print ("load_object_from_db: use request")
+#     return query_db(appenv, mtype, name, debug)
 

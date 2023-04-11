@@ -37,11 +37,11 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     description="Python Magnet SetUp to create json and cfg files for simulation",
-    entry_points={
-        'console_scripts': [
-            'python_magnetsetup=python_magnetsetup.setup:main',
-        ],
-    },
+    # entry_points={
+    #     'console_scripts': [
+    #         'python_magnetsetup=python_magnetsetup.setup:main',
+    #     ],
+    # },
     install_requires=requirements,
     license="MIT license",
     long_description=readme,
