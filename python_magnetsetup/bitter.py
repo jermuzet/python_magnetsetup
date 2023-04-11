@@ -3,8 +3,7 @@ from typing import List, Optional
 import yaml
 import copy
 
-from python_magnetgeo import Bitter
-from python_magnetgeo import python_magnetgeo
+from python_magnetgeo.Bitter import Bitter
 
 from .jsonmodel import create_params_bitter, create_bcs_bitter, create_materials_bitter, create_models_bitter
 from .utils import Merge, NMerge
@@ -27,7 +26,10 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
     if debug:
         print(f'Bitter_setup/Bitter confdata: {confdata}')
 
-    (NCoolingSlits, Dh, Sh) = cad.get_params(MyEnv.yaml_repo)
+    print(f'Bitter_setup:  magnet={mname}, cad={cad.name}')
+    print(f'cad={cad}')
+    print(f'cad.get_params={cad.get_params(MyEnv.yaml_repo)}')
+    (NCoolingSlits, z0, z1, Dh, Sh) = cad.get_params(MyEnv.yaml_repo)
 
     part_thermic = []
     part_electric = []
@@ -50,7 +52,7 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
     name = f"{mname}_{cad.name}" #.replace('Bitter_','')
     if method_data[2] == "Axi":
         shift = 0
-        if cad.z[0] < -cad.h:
+        if cad.z[0] < -cad.axi.h:
             snames.append(f"{name}_B0")
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames)-1)
@@ -60,7 +62,7 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
             part_electric.append(snames[-1])
             if 'th' in method_data[3]:
                 part_thermic.append(snames[-1])
-        if cad.z[1] > cad.h:
+        if cad.z[1] > cad.axi.h:
             snames.append(f"{name}_B{len(cad.axi.turns)+1}")
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames)-1)
@@ -71,7 +73,7 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
         if 'th' in method_data[3]:
             part_thermic.append(cad.name)
 
-    gdata = (name, snames, cad.axi.turns, NCoolingSlits, Dh, Sh, ignore_index)
+    gdata = (name, snames, cad.axi.turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index)
 
     if debug:
         print("bitter part_thermic:", part_thermic)
@@ -111,7 +113,7 @@ def Bitter_setup(MyEnv, mname: str, confdata: dict, cad: Bitter, method_data: Li
     # init_temp_data.append( {'name': f'{mname}', "part_thermic_part": part_thermic } )
     init_temp_data.append( {'name': f'{mname}', "magnet_parts": copy.deepcopy(part_thermic) } )
     init_temp_dict = {'init_temp': init_temp_data} 
-    NMerge(init_temp_dict.copy(),  mdict, debug, name="bitter_setup init")
+    NMerge(init_temp_dict,  mdict, debug, name="bitter_setup init")
     # print(f'init_tem_data({mname}): {init_temp_data}')
 
     # add power per magnet data: mdict = NMerge( mdict, {'power_magnet': power_data}, debug, "bitter_setup mdict")

@@ -32,11 +32,15 @@ import json
 import yaml
 import itertools
 
-from python_magnetgeo import Insert, MSite, Bitter, Supra
-from python_magnetgeo import python_magnetgeo
+from python_magnetgeo.Insert import Insert
+from python_magnetgeo.MSite import MSite
+from python_magnetgeo.Bitter import Bitter
+from python_magnetgeo.Supra import Supra
 
 from .config import appenv, loadconfig, loadtemplates
-from .objects import load_object, load_object_from_db
+
+# from .objects import load_object, load_object_from_db
+from .objects import load_object
 from .utils import NMerge
 from .cfg import create_cfg
 from .jsonmodel import create_json
@@ -91,7 +95,7 @@ def magnet_simfile(
                 ) as cfgdata:
                     cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
 
-                if isinstance(cad, Bitter.Bitter):
+                if isinstance(cad, Bitter):
                     files.append(cfgdata.name)
                 elif isinstance(cad, Supra):
                     files.append(cfgdata.name)
@@ -118,6 +122,7 @@ def magnet_setup(
     """
 
     print(f"magnet_setup: mname={mname}")
+    print(f"magnet_setup: confdata={confdata}")
     if debug:
         print(f"magnet_setup: confdata={confdata}"),
 
@@ -144,6 +149,7 @@ def magnet_setup(
     for mtype in ["Bitter", "Supra"]:
         if mtype in confdata:
             # TODO check case with only 1 Bitter???
+            print(f"confdata[{mtype}]={confdata[mtype]}")
 
             # loop on mtype
             for obj in confdata[mtype]:
@@ -157,11 +163,11 @@ def magnet_setup(
                     cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
                 print(f"magnetsetup:magnet_setup: load a {mtype} insert: {cad.name}")
 
-                if isinstance(cad, Bitter.Bitter):
+                if isinstance(cad, Bitter):
                     (tdict, tmat, tmodels, tpost) = Bitter_setup(
                         MyEnv, mname, obj, cad, method_data, templates, current, debug
                     )
-                elif isinstance(cad, Supra.Supra):
+                elif isinstance(cad, Supra):
                     (tdict, tmat, tmodels, tpost) = Supra_setup(
                         MyEnv, mname, obj, cad, method_data, templates, current, debug
                     )
@@ -178,6 +184,8 @@ def magnet_setup(
                     debug,
                     name=f"magnet_setup {mtype} mdict for {mname}/{yamlfile}",
                 )
+                print(f"magnet_setup: {mtype}, mname={mname}, tdict={tdict}")
+                print(f"magnet_setup: {mtype}, mname={mname}, mdict={mdict}")
                 # print(f"magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict['init_temp']}")
                 # print(f"magnet_setup: {mtype}, mname={mname}, mdict[power_magnet]={mdict['power_magnet']}")
                 # list_name = [item['name'] for item in mdict['int_temp']]
@@ -187,7 +195,7 @@ def magnet_setup(
                 NMerge(tmat, mmat, debug, name="magnet_setup Bitter/Supra mmat")
 
                 if debug:
-                    print("tmodels:", tmodels)
+                    print(f"tmodels: {tmodels}")
                 NMerge(tmodels, mmodels, debug, "magnet_setup Bitter/Supra mmodels ")
 
                 if debug:
@@ -213,27 +221,27 @@ def magnet_setup(
                 tmodels.clear()
                 tpost.clear()
 
-        # fix init_temp and power_magnet entries in mdict
-        for key in ["init_temp", "power_magnet"]:
-            if len(mdict[key]) > 1:
-                # print(f"setup/magnet_setup mname={mname}: mdict[{key}]={mdict[key]}")
-                _key = [item["name"] for item in mdict[key]]
-                _keys = list(set(_key))
-                if len(_keys) > 1:
-                    raise Exception(
-                        f"setup/magnet_setup mname={mname}: mdict[{key}] seems broken - mdict[{key}]={mdict[key]}"
-                    )
+                # fix init_temp and power_magnet entries in mdict
+                print(f"mdict: key={mdict.keys()}")
+                for key in ["init_temp", "power_magnet"]:
+                    if len(mdict[key]) > 1:
+                        # print(f"setup/magnet_setup mname={mname}: mdict[{key}]={mdict[key]}")
+                        _key = [item["name"] for item in mdict[key]]
+                        _keys = list(set(_key))
+                        if len(_keys) > 1:
+                            raise Exception(
+                                f"setup/magnet_setup mname={mname}: mdict[{key}] seems broken - mdict[{key}]={mdict[key]}"
+                            )
 
-                _list = [item["magnet_parts"] for item in mdict[key]]
-                _lists = list(set(list(itertools.chain(*_list))))
-                mdict[key] = [{"name": _keys[0], "magnet_parts": _lists}]
-                if debug:
-                    print(
-                        f"setup/magnet_setup mname={mname}: force mdict[{key}] to = {{'name': _keys[0], 'magnet_parts': _lists}}"
-                    )
-
-        # _list = [item['magnet_parts'] for item in mdict['power_magnet']]
-    # print(f'mdict[power_magnet]={list(itertools.chain(*_list))}')
+                        _list = [item["magnet_parts"] for item in mdict[key]]
+                        _lists = list(set(list(itertools.chain(*_list))))
+                        mdict[key] = [{"name": _keys[0], "magnet_parts": _lists}]
+                        if debug:
+                            print(
+                                f"setup/magnet_setup mname={mname}: force mdict[{key}] to = {{'name': _keys[0], 'magnet_parts': _lists}}"
+                            )
+        else:
+            print(f"{mtype} not in confdata={confdata}")
 
     if debug:
         print(f"magnet_setup: mdict={mdict}")
@@ -263,17 +271,18 @@ def msite_simfile(MyEnv, confdata: str, addAir: bool = False, session=None):
         files.append(f)
     except:
         for magnet in confdata["magnets"]:
-            try:
-                mconfdata = load_object(MyEnv, magnet + "-data.json")
-            except:
-                try:
-                    mconfdata = load_object_from_db(
-                        MyEnv, "magnet", magnet, False, session
-                    )
-                except:
-                    raise Exception(
-                        f"msite_simfile: failed to load {magnet} from magnetdb"
-                    )
+            mconfdata = load_object(MyEnv, magnet + "-data.json")
+            # try:
+            #     mconfdata = load_object(MyEnv, magnet + "-data.json")
+            # except:
+            #     try:
+            #         mconfdata = load_object_from_db(
+            #             MyEnv, "magnet", magnet, False, session
+            #         )
+            #     except:
+            #         raise Exception(
+            #             f"msite_simfile: failed to load {magnet} from magnetdb"
+            #         )
 
             files += magnet_simfile(MyEnv, mconfdata)
 

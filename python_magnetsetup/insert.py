@@ -3,8 +3,7 @@ from typing import List, Type
 import yaml
 import copy
 
-from python_magnetgeo import Insert
-from python_magnetgeo import python_magnetgeo
+from python_magnetgeo.Insert import Insert
 
 from .jsonmodel import create_params_insert, create_bcs_insert, create_materials_insert, create_models_insert
 from .utils import Merge, NMerge
