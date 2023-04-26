@@ -9,11 +9,15 @@ import yaml
 import math
 
 import argparse
-from .objects import load_object, load_object_from_db
+#from .objects import load_object, load_object_from_db
+from .objects import load_object
 from .config import appenv, loadconfig, loadtemplates
 
-from python_magnetgeo import Insert, MSite, Bitter, Supra, SupraStructure
-from python_magnetgeo import python_magnetgeo
+from python_magnetgeo.Insert import Insert
+from python_magnetgeo.MSite import MSite
+from python_magnetgeo.Bitter import Bitter
+from python_magnetgeo.Supra import Supra
+from python_magnetgeo.SupraStructure import HTSinsert
 
 from .file_utils import MyOpen, findfile, search_paths
 
@@ -41,14 +45,16 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
         with MyOpen(geom, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         nturns = len(cad.axi.turns)
-        print("nturns:", nturns)
+        if debug:
+            print("nturns:", nturns)
         r1 = cad.r[0]
         r2 = cad.r[1]
         h = cad.axi.h
         Tube = mt.Tube(nturns, r1*1.e-3, r2*1.e-3, h*1.e-3)
         Tube.set_index(index)
-        print("index:", index, Tube.get_index())
-        print("cad.axi:", cad.axi)
+        if debug:
+            print("index:", index, Tube.get_index())
+            print("cad.axi:", cad.axi)
         for (n, pitch) in zip(cad.axi.turns,cad.axi.pitch):
             Tube.set_pitch(pitch*1.e-3)
             Tube.set_nturn(n)
@@ -115,11 +121,12 @@ def UMagnet(struct: Supra, debug: bool=False):
         nturns += 2 * dp.pancake.n
         j = nturns / struct.getArea()*1.e-6
     
-    print("UMagnets:", struct.name, 1)
+    if debug:
+        print("UMagnets:", struct.name, 1)
     return mt.UnifMagnet(struct.r1*1.e-3, struct.r0*1.e-3, struct.h*1.e-3, j, struct.z0, f, rho)
 
 
-def UMagnets(struct: SupraStructure.HTSinsert, detail: str ="dblepancake", debug: bool=False):
+def UMagnets(struct: HTSinsert, detail: str ="dblepancake", debug: bool=False):
     """
     create view of this insert as a stack of Uniform Magnets
 
@@ -170,7 +177,8 @@ def UMagnets(struct: SupraStructure.HTSinsert, detail: str ="dblepancake", debug
                 ro = ri + w
                 UMagnets.append( mt.UnifMagnet(ro, ri, h_t, j, zi+h_t/2., f, rho))
 
-    print("UMagnets:", struct.name, len(UMagnets))
+    if debug:
+        print("UMagnets:", struct.name, len(UMagnets))
     return UMagnets
 
 
@@ -218,20 +226,18 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
                 with MyOpen(obj['geom'], 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
     
-                if isinstance(cad, Bitter.Bitter):
+                if isinstance(cad, Bitter):
                     fillingfactor = 1/cad.axi.get_Nturns()
                     tmp = BMagnet(cad, obj["material"], fillingfactor, debug)
                     for item in tmp:
                         BMagnets.append(item)
                 elif isinstance(cad, Supra):
-                    # get SupraStructure.HTSinsert from cad
+                    # get HTSinsert from cad
                     if cad.detail == None:
                         tmp = UMagnet(cad, debug)
                         UMagnets.append(tmp)
                     else:
-                        sstruct = SupraStructure()
-                        fstruct = findfile(cad.struct, paths=search_paths(MyEnv, "geom"))
-                        sstruct.loadCfg(fstruct)
+                        sstruct = cad.get_magnet_struct()
                         tmp = UMagnets(sstruct, cad.detail, debug)
                         for item in tmp:
                             UMagnets.append(item)
@@ -318,16 +324,16 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
         os.chdir(args.wd)
 
     if "geom" in confdata:
-        print("Load a magnet %s " % jsonfile, "debug:", args.debug)
+        print(f"Load a magnet {jsonfile}, debug: {args.debug}")
         return magnet_setup(MyEnv, confdata, args.debug or args.verbose)
     else:
-        print("Load a msite %s" % confdata["name"], "debug:", args.debug)
+        print(f"Load a msite {confdata['name']}, debug: {args.debug}")
         # print("confdata:", confdata)
 
         # why do I need that???
         # would be better to do that when creating a msite in db
-        if not findfile(confdata["name"] + ".yaml", paths=search_paths(MyEnv, "geom")):
-            with open(confdata["name"] + ".yaml", "x") as out:
+        if not findfile(f"{confdata['name']}.yaml", paths=search_paths(MyEnv, "geom")):
+            with open(f"{confdata['name']}.yaml", "x") as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)
         return msite_setup(MyEnv, confdata, args.debug or args.verbose, session)               
@@ -348,7 +354,7 @@ def main():
     args = parser.parse_args()
 
     if args.debug:
-        print("Arguments: " + str(args._))
+        print(f"Arguments: {str(args._)}")
     
     # make datafile/[magnet|msite] exclusive one or the other
     if args.magnet != None and args.msite:
@@ -366,13 +372,13 @@ def main():
         confdata = load_object(MyEnv, args.datafile, args.debug)
         jsonfile = args.datafile.replace("-data.json","")
 
-    if args.magnet != None:
-        confdata = load_object_from_db(MyEnv, "magnet", args.magnet, args.debug)
-        jsonfile = args.magnet
+    # if args.magnet != None:
+    #     confdata = load_object_from_db(MyEnv, "magnet", args.magnet, args.debug)
+    #     jsonfile = args.magnet
     
-    if args.msite != None:
-        confdata = load_object_from_db(MyEnv, "msite", args.msite, args.debug)
-        jsonfile = args.msite
+    # if args.msite != None:
+    #     confdata = load_object_from_db(MyEnv, "msite", args.msite, args.debug)
+    #     jsonfile = args.msite
 
 
     setup(MyEnv, args, confdata, jsonfile)    

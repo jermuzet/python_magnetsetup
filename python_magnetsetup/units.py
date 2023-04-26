@@ -12,7 +12,8 @@ import warnings
 from pint import UnitRegistry, Unit, Quantity
 
 from .config import appenv, loadconfig
-from .objects import load_object, load_object_from_db
+#from .objects import load_object, load_object_from_db
+from .objects import load_object
 
 import yaml
 
@@ -102,9 +103,9 @@ def main():
         confdata = load_object(MyEnv, args.datafile, args.debug)
         jsonfile = args.datafile.replace(".json","")
 
-    if args.magnet != None:
-        confdata = load_object_from_db(MyEnv, "magnet", args.magnet, args.debug)
-        jsonfile = args.magnet
+    # if args.magnet != None:
+    #     confdata = load_object_from_db(MyEnv, "magnet", args.magnet, args.debug)
+    #     jsonfile = args.magnet
 
     units = load_units(distance_unit)
 

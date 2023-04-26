@@ -25,11 +25,28 @@ def create_params_supra(
 
     # Tini, Aini for transient cases??
     params_data = {"Parameters": []}
+    # for cfpdes only
+    if method_data[0] == "cfpdes" and method_data[3] in [
+        "thmagel",
+        "thmagel_hcurl",
+        "thmqsel",
+        "thmqsel_hcurl",
+    ]:
+        params_data["Parameters"].append({"name": "bool_laplace", "value": "1"})
+        params_data["Parameters"].append({"name": "bool_dilatation", "value": "1"})
+
+    # TODO : initialization of parameters with cooling model
+
+    params_data["Parameters"].append({"name": f"{mname}_Tinit", "value": 4})
     if "mag" in method_data[3] or "mqs" in method_data[3]:
         params_data["Parameters"].append(
             {"name": "mu0", "value": convert_data(units, 4 * math.pi * 1e-7, "mu0")}
         )
 
+    # TODO: get Nturns/Area where Nturns and Area depend on detail
+    # eg. detail=None: Nturns total number of tapes, Area
+    #     detail=dblpancake Nturns number of tapes per dblpancake, Area of a dblpancake
+    #     and so on for detail=pancake and detail=tape (NB turns=1)
     if debug:
         print(params_data)
 
@@ -65,31 +82,42 @@ def create_params_bitter(
 
     params_data["Parameters"].append({"name": f"{mname}_Tinit", "value": 293})
 
-    (name, snames, nturns, NCoolingSlits, Dh, Sh, ignore_index) = gdata
+    (name, snames, nturns, NCoolingSlits, Zmin, Zmax, Dh, Sh, ignore_index) = gdata
     for thbc in ["rInt", "rExt"]:
         bcname = f"{name}_{thbc}"
-        params_data['Parameters'].append({"name": f"{bcname}_hw", "value":convert_data(units, 58222.1, "h")})
-        params_data['Parameters'].append({"name": f"{bcname}_Tw", "value":290.671})
-        params_data['Parameters'].append({"name": f"{bcname}_dTw", "value":12.74})
-        params_data['Parameters'].append({"name": f"{bcname}_Zmin", "value": Zmin})
-        params_data['Parameters'].append({"name": f"{bcname}_Zmax", "value": Zmax})
-        for i in range(NCoolingSlits:)
+        params_data["Parameters"].append(
+            {"name": f"{bcname}_hw", "value": convert_data(units, 58222.1, "h")}
+        )
+        params_data["Parameters"].append({"name": f"{bcname}_Tw", "value": 290.671})
+        params_data["Parameters"].append({"name": f"{bcname}_dTw", "value": 12.74})
+        params_data["Parameters"].append({"name": f"{bcname}_Zmin", "value": Zmin})
+        params_data["Parameters"].append({"name": f"{bcname}_Zmax", "value": Zmax})
+        for i in range(NCoolingSlits):
             bcname = f"{name}_slit{i+1}"
-            params_data['Parameters'].append({"name": f"{bcname}_hw", "value":convert_data(units, 58222.1, "h")})
-            params_data['Parameters'].append({"name": f"{bcname}_Tw", "value":290.671})
-            params_data['Parameters'].append({"name": f"{bcname}_dTw", "value":12.74})
-            params_data['Parameters'].append({"name": f"{bcname}_Sh", "value": Sh[i]})
-            params_data['Parameters'].append({"name": f"{bcname}_Dh", "value": Dh[i]})
-            params_data['Parameters'].append({"name": f"{bcname}_Zmin", "value": Zmin})
-            params_data['Parameters'].append({"name": f"{bcname}_Zmax", "value": Zmax})
-        
+            params_data["Parameters"].append(
+                {"name": f"{bcname}_hw", "value": convert_data(units, 58222.1, "h")}
+            )
+            params_data["Parameters"].append({"name": f"{bcname}_Tw", "value": 290.671})
+            params_data["Parameters"].append({"name": f"{bcname}_dTw", "value": 12.74})
+            params_data["Parameters"].append({"name": f"{bcname}_Sh", "value": Sh[i]})
+            params_data["Parameters"].append({"name": f"{bcname}_Dh", "value": Dh[i]})
+            params_data["Parameters"].append({"name": f"{bcname}_Zmin", "value": Zmin})
+            params_data["Parameters"].append({"name": f"{bcname}_Zmax", "value": Zmax})
 
     # init values for U (Axi specific)
+    print(f"create_params_bitter/nturns: {nturns}")
+    print(f"create_params_bitter/snames: {snames}")
+    print(f"create_params_bitter/ignore_index: {ignore_index}")
     if method_data[2] == "Axi":
-        for i,sname in enumerate(snames):
+        num = 0
+        for i, sname in enumerate(snames):
             if not i in ignore_index:
-                params_data['Parameters'].append({"name": f"U_{sname}", "value":"1"})
-                params_data['Parameters'].append({"name": f"N_{sname}", "value":nturns[i]})
+                print(f"N_{sname}: i={i}")
+                params_data["Parameters"].append({"name": f"U_{sname}", "value": "1"})
+                params_data["Parameters"].append(
+                    {"name": f"N_{sname}", "value": nturns[num]}
+                )
+                num += 1
 
     if "mag" in method_data[3] or "mqs" in method_data[3]:
         params_data["Parameters"].append(
@@ -280,7 +308,7 @@ def create_materials_bitter(
             units, confdata["material"][prop], prop
         )
 
-    (name, snames, turns) = gdata
+    (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
     for sname in snames:
         if method_data[2] == "Axi":
             if debug:
@@ -299,6 +327,7 @@ def create_materials_bitter(
 
 def create_materials_insert(
     gdata: tuple,
+    maindata: dict,
     idata: Optional[List],
     confdata: dict,
     templates: dict,
@@ -373,36 +402,37 @@ def create_materials_insert(
                     materials_dict[name] = mdata[name]
         else:
             # section j==0:  treated as insulator in Axi
-            mdata = entry(
-                finsulator,
-                Merge({"name": f"H{i+1}_Cu0"}, confdata["Helix"][i]["material"]),
-                debug,
-            )
-            materials_dict[f"H{i+1}_Cu0"] = mdata[f"H{i+1}_Cu0"]
 
             # load conductor template
-            for j in range(1, Nsections[i] + 1):
-                # print("load conductor[{j}]: mat:", confdata["Helix"][i]["material"])
-                mdata = entry(
-                    fconductor,
-                    Merge({"name": f"H{i+1}_Cu{j}"}, confdata["Helix"][i]["material"]),
-                    debug,
-                )
-                # print("load conductor[{j}]:", mdata)
-                materials_dict[f"H{i+1}_Cu{j}"] = mdata[f"H{i+1}_Cu{j}"]
+            # for j in range(1, Nsections[i] + 1):
+            # print("load conductor[{j}]: mat:", confdata["Helix"][i]["material"])
+            mdata = entry(
+                fconductor,
+                Merge(
+                    {
+                        "name": f"Conductor_H{i+1}",
+                        "part_mat_conductor": maindata["part_mat_helices"][i],
+                    },
+                    confdata["Helix"][i]["material"],
+                ),
+                debug,
+            )
+            # print("load conductor[{j}]:", mdata)
+            materials_dict[f"Conductor_H{i+1}"] = mdata[f"Conductor_H{i+1}"]
 
             # section j==Nsections+1:  treated as insulator in Axi
             mdata = entry(
                 finsulator,
                 Merge(
-                    {"name": f"H{i+1}_Cu{Nsections[i]+1}"},
+                    {
+                        "name": f"Insulator_H{i+1}",
+                        "part_mat_insulator": maindata["part_mat_insulators"][i],
+                    },
                     confdata["Helix"][i]["material"],
                 ),
                 debug,
             )
-            materials_dict[f"H{i+1}_Cu{Nsections[i]+1}"] = mdata[
-                f"H{i+1}_Cu{Nsections[i]+1}"
-            ]
+            materials_dict[f"Insulator_H{i+1}"] = mdata[f"Insulator_H{i+1}"]
 
     # loop for Rings
     for i in range(NRings):
@@ -415,7 +445,15 @@ def create_materials_insert(
         else:
             mdata = entry(
                 finsulator,
-                Merge({"name": f"R{i+1}"}, confdata["Ring"][i]["material"]),
+                Merge(
+                    {
+                        "name": f"R{i+1}",
+                        "part_mat_insulator": maindata["part_mat_insulators"][
+                            NHelices + i
+                        ],
+                    },
+                    confdata["Ring"][i]["material"],
+                ),
                 debug,
             )
         materials_dict[f"R{i+1}"] = mdata[f"R{i+1}"]
@@ -440,13 +478,14 @@ def create_models_supra(
     confdata: dict,
     templates: dict,
     method_data: List[str],
+    equation: str,
     debug: bool = False,
 ) -> dict:
     models_dict = {}
     if debug:
         print("create_models_supra:", confdata)
 
-    fconductor = templates["conductor"]
+    fconductor = templates[equation + "-conductor"]
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5]  # "meter"
@@ -487,7 +526,7 @@ def create_models_bitter(
     unit_Length = method_data[5]  # "meter"
     units = load_units(unit_Length)
 
-    (name, snames, turns) = gdata
+    (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
     for sname in snames:
         if method_data[2] == "Axi":
             if debug:
@@ -506,6 +545,7 @@ def create_models_bitter(
 
 def create_models_insert(
     gdata: tuple,
+    maindata: dict,
     idata: Optional[List],
     confdata: dict,
     templates: dict,
@@ -525,25 +565,38 @@ def create_models_insert(
 
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
 
+    mdata = entry(
+        finsulator,
+        {"name": "Insulator_insert", "part_insulator": maindata["part_insulators"]},
+        debug,
+    )
+    models_dict[f"Insulator"] = mdata
+
+    mdata = entry(
+        fconductor,
+        {"name": "Conductor_insert", "part_conductor": maindata["part_helices"]},
+        debug,
+    )
+    models_dict[f"Conductor"] = mdata
     # Loop for Helix
-    for i in range(NHelices):
-        # section j==0:  treated as insulator in Axi
-        mdata = entry(finsulator, {"name": f"H{i+1}_Cu0"}, debug)
-        models_dict[f"H{i+1}_Cu0"] = mdata
+    # for i in range(NHelices):
+    #     # section j==0:  treated as insulator in Axi
+    #     mdata = entry(finsulator, {"name": f"H{i+1}_Cu0"}, debug)
+    #     models_dict[f"H{i+1}_Cu0"] = mdata
 
-        # load conductor template
-        for j in range(1, Nsections[i] + 1):
-            mdata = entry(fconductor, {"name": f"H{i+1}_Cu{j}"}, debug)
-            models_dict[f"H{i+1}_Cu{j}"] = mdata
+    #     # load conductor template
+    #     for j in range(1, Nsections[i] + 1):
+    #         mdata = entry(fconductor, {"name": f"H{i+1}_Cu{j}"}, debug)
+    #         models_dict[f"H{i+1}_Cu{j}"] = mdata
 
-        # section j==Nsections+1:  treated as insulator in Axi
-        mdata = entry(finsulator, {"name": f"H{i+1}_Cu{Nsections[i]+1}"}, debug)
-        models_dict[f"H{i+1}_Cu{Nsections[i]+1}"] = mdata
+    #     # section j==Nsections+1:  treated as insulator in Axi
+    #     mdata = entry(finsulator, {"name": f"H{i+1}_Cu{Nsections[i]+1}"}, debug)
+    #     models_dict[f"H{i+1}_Cu{Nsections[i]+1}"] = mdata
 
     # loop for Rings
-    for i in range(NRings):
-        mdata = entry(finsulator, {"name": f"R{i+1}"}, debug)
-        models_dict[f"R{i+1}"] = mdata
+    # for i in range(NRings):
+    #     mdata = entry(finsulator, {"name": f"R{i+1}"}, debug)
+    #     models_dict[f"R{i+1}"] = mdata
 
     return models_dict
 
@@ -584,7 +637,7 @@ def create_bcs_bitter(
     debug: bool = False,
 ) -> dict:
 
-    (name, snames, cad.axi.turns, NCoolingSlits, Dh, Sh, ignore_index)
+    (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
     print(f"create_bcs_bitter from templates for {name}")
     # print("snames=", snames)
 
@@ -618,10 +671,22 @@ def create_bcs_bitter(
             )
 
         for i in range(NCoolingSlits):
-            bcname =  f'{name}_slit{i+1}'
-            mdata = entry(fcooling, {'name': bcname, "markers": snames, 'hw': f'{bcname}_hw', 'Tw': f'{bcname}_Tw', 'dTw':'{bcname}_dTw'},  debug)
-            thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": bcname}, mdata[bcname]) )
-            
+            bcname = f"{name}_slit{i+1}"
+            mdata = entry(
+                fcooling,
+                {
+                    "name": bcname,
+                    "markers": snames,
+                    "hw": f"{bcname}_hw",
+                    "Tw": f"{bcname}_Tw",
+                    "dTw": "{bcname}_dTw",
+                },
+                debug,
+            )
+            thermic_bcs_rob["boundary_Therm_Robin"].append(
+                Merge({"name": bcname}, mdata[bcname])
+            )
+
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
 
     if method_data[3] == "thelec":
@@ -781,16 +846,19 @@ def create_json(
         for field in templates["stats"]:
             print(f"stats: {field}")
 
-    post_keywords = {
-        "Flux": {
-            "name": "Flux",
-            "physic": "heat",
-            "template": templates["flux"],
-            "data": mpost["Flux"] if "Flux" in mpost else {},
-        },
-    }
-    if debug:
-        print(f"mpost[Flux]={mpost['Flux']}")
+    if "th" in method_data[3]:
+        post_keywords = {
+            "Flux": {
+                "name": "Flux",
+                "physic": "heat",
+                "template": templates["flux"],
+                "data": mpost["Flux"] if "Flux" in mpost else {},
+            },
+        }
+        if debug:
+            print(f"mpost[Flux]={mpost['Flux']}")
+    else:
+        post_keywords = {}
 
     for field in templates["stats"]:
         _data = templates["stats"][field]

@@ -2,7 +2,7 @@
     "calcul18":{
 		"type": "compute",
 		"smp": "True",
-		"dns": "calcul18.grenoble.lncmi.local",
+		"dns": "calcul18.lncmig.local",
 		"jobmanager":{
 	    	"type":"none",
 	    	"queues":{}
@@ -14,7 +14,7 @@
     "calcul19":{
 		"type": "compute",
 		"smp": "True",
-		"dns": "calcul19.grenoble.lncmi.local",
+		"dns": "calcul19.lncmig.local",
 		"jobmanager":{
 	    	"type":"none",
 	    	"queues":{}
@@ -26,7 +26,7 @@
     "calcul22":{
 		"type": "compute",
 		"smp": "True",
-		"dns": "calcul22.grenoble.lncmi.local",
+		"dns": "calcul22.lncmig.local",
 		"jobmanager":{
 	    	"type":"none",
 	    	"queues":{}
@@ -38,7 +38,7 @@
     "kelvin":{
 		"type": "compute",
 		"smp": "True",
-		"dns": "kelvin.grenoble.lncmi.local",
+		"dns": "kelvin.lncmig.local",
 		"jobmanager":{
 	    	"type":"none",
 	    	"queues":{}
@@ -50,7 +50,7 @@
     "stokes":{
 		"type": "compute",
 		"smp": "True",
-		"dns": "stokes.grenoble.lncmi.local",
+		"dns": "stokes.lncmig.local",
 		"jobmanager":{
 	    	"type":"slurm",
 	    	"queues":{}
