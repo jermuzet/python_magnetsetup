@@ -1,9 +1,9 @@
 {
-    "name":"heat_Insulator",
-    "materials":"Insulator",
+    "name":"heat_{{name}}",
+    "materials":{{part_insulator}},
     "setup":{
         "coefficients":{
-            "c":"materials_Insulator_k*x:materials_Insulator_k:x"
+            "c":"materials_k*x:materials_k:x"
         }
     }
 }

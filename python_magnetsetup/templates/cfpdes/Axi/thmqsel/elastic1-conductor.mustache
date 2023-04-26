@@ -1,9 +1,9 @@
 {
-    "name":"elastic1_Conductor",
-    "materials":"Conductor",
+    "name":"elastic1_{{name}}",
+    "materials":{{part_conductor}},
     "setup":{
         "coefficients":{
-            "d":"materials_Conductor_rho*x:materials_Conductor_rho:x",
+            "d":"materials_rho*x:materials_rho:x",
             "f":"{x*elastic2_v_0,x*elastic2_v_1}:x:elastic2_v_0:elastic2_v_1"
         }
     }

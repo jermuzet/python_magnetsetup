@@ -1,10 +1,10 @@
 {
-    "name":"elastic1_Conduct_nosource",
-    "materials":"Conduct_nosource",
+    "name":"elastic1_{{name}}",
+    "materials":"{{name}}",
     "setup":{
         "coefficients":{
-            "gamma":"{-materials_Conduct_nosource_stress_rr*x,-materials_Conduct_nosource_stress_rz*x,- materials_Conduct_nosource_stress_rz*x, -materials_Conduct_nosource_stress_zz*x}:x:materials_Conduct_nosource_stress_rr:materials_Conduct_nosource_stress_rz:materials_Conduct_nosource_stress_zz",
-            "f":"{- materials_Conduct_nosource_stress_thth,0}:materials_Conduct_nosource_stress_thth"
+            "gamma":"{-materials_{{name}}_stress_rr*x,-materials_{{name}}_stress_rz*x,- materials_{{name}}_stress_rz*x, -materials_{{name}}_stress_zz*x}:x:materials_{{name}}_stress_rr:materials_{{name}}_stress_rz:materials_{{name}}_stress_zz",
+            "f":"{- materials_{{name}}_stress_thth,0}:materials_{{name}}_stress_thth"
         }
     }
 }

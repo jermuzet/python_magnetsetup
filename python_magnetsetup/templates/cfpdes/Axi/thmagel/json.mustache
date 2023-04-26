@@ -162,22 +162,22 @@
 		    		},
 		    		"U":
 		    		{
-						"expr":"materials_Conductor_U:materials_Conductor_U",
+						"expr":"materials_U:materials_U",
 						"markers": {{part_electric}}
 		    		},
 		    		"Jth":
 		    		{
-						"expr":"-materials_Conductor_sigma*materials_Conductor_U/(2*pi*x):materials_Conductor_sigma:materials_Conductor_U:x",
+						"expr":"-materials_sigma*materials_U/(2*pi*x):materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 		    		},
 		    		"Qth":
 		    		{
-						"expr":"materials_Conductor_sigma*(materials_Conductor_U/(2*pi*x))*(materials_Conductor_U/(2*pi*x)):materials_Conductor_sigma:materials_Conductor_U:x",
+						"expr":"materials_sigma*(materials_U/(2*pi*x))*(materials_U/(2*pi*x)):materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 		    		},
 		    		"Flaplace":
 		    		{
-						"expr":"{materials_Conductor_F_laplace_0,materials_Conductor_F_laplace_1}:materials_Conductor_F_laplace_0:materials_Conductor_F_laplace_1",
+						"expr":"{materials_F_laplace_0,materials_F_laplace_1}:materials_F_laplace_0:materials_F_laplace_1",
 						"markers": {{part_electric}}
 		    		},
 		    		"stress":
@@ -201,7 +201,6 @@
 		    		"strain":
 		    		{
 						"expr":"{elastic_grad_u_00,1/2*(elastic_grad_u_01+elastic_grad_u_10), 1/2*(elastic_grad_u_01+elastic_grad_u_10),elastic_grad_u_11}:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11",
-
 						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
@@ -209,7 +208,6 @@
 				{
 						"expr": "elastic_u_0/x:x:elastic_u_0",
 						"markers": {{part_thermic}},
-
 						"representation":["element"]
 				}
 				}
@@ -231,22 +229,22 @@
 		    		"MagneticEnergy":
 		    		{
 						"type":"integrate",
-						"expr":"-2*pi*magnetic_phi/x*materials_Conductor_sigma*(materials_Conductor_U/2/pi):magnetic_phi:materials_Conductor_sigma:materials_Conductor_U:x",
+						"expr":"-2*pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi):magnetic_phi:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 				}
-                                },
+				},
 				"Points":
 				{
-				"B0":
-				{
-                                    "coord":"{1e-7,0.}",
-                                    "fields":"Atheta",
-			            "expressions":
-                                    {
-                                          "Bz": "magnetic_grad_Atheta_0+magnetic_Atheta/x:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x"
-                                    }
+					"B0":
+					{
+							"coord":"{1e-7,0.}",
+							"fields":"phi",
+							"expressions":
+							{
+									"Bz": "magnetic_grad_phi_0/x:magnetic_grad_phi_0:magnetic_grad_phi_1:x"
+							}
+					}
 				}
-			}
 	    	}
 		},
 		"heat":
@@ -266,14 +264,14 @@
 					"Power_{{name}}":
 					{
         				"type": "integrate",
-        				"expr": "2*pi*materials_Conductor_sigma*(materials_Conductor_U/2/pi)*(materials_Conductor_U/2/pi)/x:materials_Conductor_sigma:materials_Conductor_U:x",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
         				"markers": {{magnet_parts}}
 					},
 					{{/power_magnet}}
 		    		"Power":
 				    {
         				"type": "integrate",
-        				"expr": "2*pi*materials_Conductor_sigma*(materials_Conductor_U/2/pi)*(materials_Conductor_U/2/pi)/x:materials_Conductor_sigma:materials_Conductor_U:x",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
         				"markers": {{part_electric}}
     				},
 				"Stat_T": 
