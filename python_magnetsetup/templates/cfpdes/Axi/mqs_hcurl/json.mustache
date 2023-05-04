@@ -87,12 +87,12 @@
 		    		},
 					"U":
 		    		{
-						"expr":"materials_Conductor_U:materials_Conductor_U",
+						"expr":"materials_U:materials_U",
 						"markers": {{part_electric}}
 		    		},
 		    		"Jth":
 		    		{
-						"expr":"-materials_Conductor_sigma*(materials_Conductor_U/(2*pi*x)+magnetic_dAtheta_dt):magnetic_dAtheta_dt:materials_Conductor_sigma:materials_Conductor_U:x",
+						"expr":"-materials_sigma*(materials_U/(2*pi*x)+magnetic_dAtheta_dt):magnetic_dAtheta_dt:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 		    		}
 				}
@@ -107,23 +107,23 @@
 		    		"MagneticEnergy":
 		    		{
 						"type":"integrate",
-						"expr":"-2*pi*magnetic_Atheta*materials_Conductor_sigma*(materials_Conductor_U/2/pi+magnetic_dAtheta_dt*x):magnetic_Atheta:magnetic_dAtheta_dt:materials_Conductor_sigma:materials_Conductor_U:x",
+						"expr":"-2*pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x):magnetic_Atheta:magnetic_dAtheta_dt:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 		    		}
 				},
 				"Points":
 				{
-				"B0":
-				{
-                                    "coord":"{1e-7,0.}",
-                                    "fields":"Atheta",
-			            "expressions":
-                                    {
-                                          "Bz": "magnetic_grad_Atheta_0+magnetic_Atheta/x:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x"
-                                    }
+					"B0":
+					{
+						"coord":"{1e-7,0.}",
+						"fields":"Atheta",
+						"expressions":
+						{
+							"Bz": "magnetic_grad_Atheta_0+magnetic_Atheta/x:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x"
+						}
+					}
 				}
-                                }
+			}
 		}
-                }
     }
 }
