@@ -3,8 +3,8 @@
     "materials":{{part_insulator}},
     "setup":{
         "coefficients":{
-            "gamma":"{-materials_stress_rr*x,-materials_stress_rz*x,- materials_stress_rz*x, -materials_stress_zz*x}:x:materials_stress_rr:materials_stress_rz:materials_stress_zz",
-            "f":"{- materials_stress_thth,0}:materials_stress_thth"
+            "d":"materials_rho*x:materials_rho:x",
+            "f":"{x*elastic2_v_0,x*elastic2_v_1}:x:elastic2_v_0:elastic2_v_1"
         }
     }
 }

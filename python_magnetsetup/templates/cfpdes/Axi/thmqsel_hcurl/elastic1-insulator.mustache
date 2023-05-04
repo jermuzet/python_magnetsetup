@@ -1,10 +1,10 @@
 {
-    "name":"elastic1_Insulator",
-    "materials":"Insulator",
+    "name":"elastic1_{{name}}",
+    "materials":{{part_insulator}},
     "setup":{
         "coefficients":{
-            "gamma":"{-materials_Insulator_stress_rr*x,-materials_Insulator_stress_rz*x,- materials_Insulator_stress_rz*x, -materials_Insulator_stress_zz*x}:x:materials_Insulator_stress_rr:materials_Insulator_stress_rz:materials_Insulator_stress_zz",
-            "f":"{- materials_Insulator_stress_thth,0}:materials_Insulator_stress_thth"
+            "d":"materials_rho*x:materials_rho:x",
+            "f":"{x*elastic2_v_0,x*elastic2_v_1}:x:elastic2_v_0:elastic2_v_1"
         }
     }
 }

@@ -1,12 +1,12 @@
 {
-    "name":"magnetic_Conductor",
-    "materials":"Conductor",
+    "name":"magnetic_{{name}}",
+    "materials":{{part_conductor}},
     "setup":{
         "coefficients":{
-            "c":"x/materials_Conductor_mu:x:materials_Conductor_mu",
-            "a":"1/materials_Conductor_mu/x:x:materials_Conductor_mu",
-            "f":"materials_Conductor_j_th*x:materials_Conductor_j_th:x",
-            "d":"materials_Conductor_sigma*x:x:materials_Conductor_sigma"
+            "c":"x/materials_mu:x:materials_mu",
+            "a":"1/materials_mu/x:x:materials_mu",
+            "f":"materials_j_th*x:materials_j_th:x",
+            "d":"materials_sigma*x:x:materials_sigma"
         }
     }
 }

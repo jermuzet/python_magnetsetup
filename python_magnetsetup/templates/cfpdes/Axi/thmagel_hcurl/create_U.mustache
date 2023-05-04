@@ -1,0 +1,36 @@
+import json
+
+import feelpp
+from feelpp.toolboxes.core import *
+from feelpp.toolboxes.cfpdes import *
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--jsonfile", help="give json name", type=str)
+parser.add_argument("--meshfile", help="give mesh name", type=str)
+parser.add_argument("--odir", help="give output directory", type=str)
+args = parser.parse_args()
+
+
+app = feelpp.Environment(["myapp"], config=feelpp.localRepository(""))
+comm = feelpp.Environment.worldCommPtr()
+
+m2d = feelpp.load(feelpp.mesh(dim=2), name=args.meshfile, verbose=1)
+Xh = feelpp.functionSpace(space="Pch", mesh=m2d, order=1)
+usave = Xh.element()
+
+
+with open(args.jsonfile, "r") as file:
+    data = json.load(file)
+    for param in data["Parameters"]:
+        if "U_" in param:
+            expr = data["Parameters"][param]
+            usave.on(
+                range=feelpp.markedelements(m2d, param[2:]), expr=feelpp.expr(f"{expr}")
+            )
+
+usave.save(
+    args.odir,
+    name="U",
+)

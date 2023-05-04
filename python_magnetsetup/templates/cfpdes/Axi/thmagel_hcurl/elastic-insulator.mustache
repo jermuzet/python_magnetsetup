@@ -1,11 +1,11 @@
 {
-    "name":"elastic_Insulator",
-    "materials":"Insulator",
+    "name":"elastic_{{name}}",
+    "materials":{{part_insulator}},
     "setup":{
         "coefficients":{
-            "c":"x*materials_Insulator_Lame_mu:x:materials_Insulator_Lame_mu",
-            "gamma":"{-materials_Insulator_Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*materials_Insulator_Lame_mu*elastic_grad_u_00-bool_dilatation*x*materials_Insulator_stress_T, -x*materials_Insulator_Lame_mu*elastic_grad_u_10, -x*materials_Insulator_Lame_mu*elastic_grad_u_01, -materials_Insulator_Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*materials_Insulator_Lame_mu*elastic_grad_u_11-bool_dilatation*x*materials_Insulator_stress_T}:bool_dilatation:x:materials_Insulator_Lame_lambda:materials_Insulator_Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11:materials_Insulator_stress_T",
-            "f":"{-materials_Insulator_Lame_lambda*elastic_grad_u_00-(materials_Insulator_Lame_lambda+2*materials_Insulator_Lame_mu)*elastic_u_0/x-materials_Insulator_Lame_lambda*elastic_grad_u_11-bool_dilatation*materials_Insulator_stress_T, 0}:bool_dilatation:x:materials_Insulator_Lame_mu:materials_Insulator_Lame_lambda:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_11:materials_Insulator_stress_T"
+            "c":"x*materials_Lame_mu:x:materials_Lame_mu",
+            "gamma":"{-materials_Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*materials_Lame_mu*elastic_grad_u_00-bool_dilatation*x*materials_stress_T, -x*materials_Lame_mu*elastic_grad_u_10, -x*materials_Lame_mu*elastic_grad_u_01, -materials_Lame_lambda*(x*elastic_grad_u_00+elastic_u_0+x*elastic_grad_u_11)-x*materials_Lame_mu*elastic_grad_u_11-bool_dilatation*x*materials_stress_T}:bool_dilatation:x:materials_Lame_lambda:materials_Lame_mu:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_10:elastic_grad_u_11:materials_stress_T",
+            "f":"{-materials_Lame_lambda*elastic_grad_u_00-(materials_Lame_lambda+2*materials_Lame_mu)*elastic_u_0/x-materials_Lame_lambda*elastic_grad_u_11-bool_dilatation*materials_stress_T, 0}:bool_dilatation:x:materials_Lame_mu:materials_Lame_lambda:elastic_u_0:elastic_grad_u_00:elastic_grad_u_01:elastic_grad_u_11:materials_stress_T"
         }
     }
 }
