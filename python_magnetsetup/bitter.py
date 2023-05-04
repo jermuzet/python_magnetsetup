@@ -49,6 +49,10 @@ def Bitter_setup(
 
     part_thermic = []
     part_electric = []
+    part_bitters = []
+    part_mat_bitters = []
+    part_insulators = []
+    part_mat_insulators = []
     index_Bitters = ""
 
     boundary_meca = []
@@ -68,20 +72,26 @@ def Bitter_setup(
     name = f"{mname}_{cad.name}"  # .replace('Bitter_','')
     if method_data[2] == "Axi":
         shift = 0
+        part_bitters.append(f"Conductor_{name}")
+        part_insulators.append(f"Insulator_{name}")
         if cad.z[0] < -cad.axi.h:
             snames.append(f"{name}_B0")
+            part_mat_insulators.append(snames[-1])
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames) - 1)
             shift = 1
         for i in range(len(cad.axi.turns)):
             snames.append(f"{name}_B{i+shift}")
             part_electric.append(snames[-1])
+            part_mat_bitters.append(snames[-1])
             if "th" in method_data[3]:
                 part_thermic.append(snames[-1])
         if cad.z[1] > cad.axi.h:
             snames.append(f"{name}_B{len(cad.axi.turns)+1}")
+            part_mat_insulators.append(snames[-1])
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames) - 1)
+
         index_Bitters = f"shift:{NSections+shift}"
         if debug:
             print("sname:", snames)
@@ -90,7 +100,17 @@ def Bitter_setup(
         if "th" in method_data[3]:
             part_thermic.append(cad.name)
 
-    gdata = (name, snames, cad.axi.turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index)
+    gdata = (
+        name,
+        snames,
+        cad.axi.turns,
+        NCoolingSlits,
+        z0,
+        z1,
+        Dh,
+        Sh,
+        ignore_index,
+    )
 
     if debug:
         print("bitter part_thermic:", part_thermic)
@@ -159,6 +179,10 @@ def Bitter_setup(
     main_data = {
         "part_thermic": part_thermic,
         "part_electric": part_electric,
+        "part_insulators": part_insulators,
+        "part_mat_insulators": part_mat_insulators,
+        "part_bitters": part_bitters,
+        "part_mat_bitters": part_mat_bitters,
         "index_V0": boundary_electric,
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5",
@@ -228,12 +252,67 @@ def Bitter_setup(
 
     # check mpost output
     # print(f"bitter {name}: mpost={mpost}")
-    mmat = create_materials_bitter(gdata, confdata, templates, method_data, debug)
+    mmat = create_materials_bitter(
+        gdata, main_data, confdata, templates, method_data, debug
+    )
 
     mmodels = {}
-    for physic in templates["physic"]:
-        mmodels[physic] = create_models_bitter(
-            gdata, confdata, templates, method_data, physic, debug
+    if "th" in method_data[3]:
+        mmodels["heat"] = create_models_bitter(
+            mname,
+            gdata,
+            main_data,
+            confdata,
+            templates,
+            method_data,
+            "heat",
+            debug,
+        )
+
+    if "mag" in method_data[3] or "mqs" in method_data[3]:
+        mmodels["magnetic"] = create_models_bitter(
+            mname,
+            gdata,
+            main_data,
+            confdata,
+            templates,
+            method_data,
+            "magnetic",
+            debug,
+        )
+
+    if "magel" in method_data[3]:
+        mmodels["elastic"] = create_models_bitter(
+            mname,
+            gdata,
+            main_data,
+            confdata,
+            templates,
+            method_data,
+            "elastic",
+            debug,
+        )
+
+    if "mqsel" in method_data[3]:
+        mmodels["elastic1"] = create_models_bitter(
+            mname,
+            gdata,
+            main_data,
+            confdata,
+            templates,
+            method_data,
+            "elastic1",
+            debug,
+        )
+        mmodels["elastic2"] = create_models_bitter(
+            mname,
+            gdata,
+            main_data,
+            confdata,
+            templates,
+            method_data,
+            "elastic2",
+            debug,
         )
 
     # update U and hw, dTw param
@@ -245,12 +324,13 @@ def Bitter_setup(
         import math
 
         params = params_data["Parameters"]
+        mat = mmat[f"Conductor_{name}"]
         for j in range(len(cad.axi.turns)):
             marker = f"{name}_B{j+1}"
             # print("marker:", marker)
             item = {"name": f"U_{marker}", "value": "1"}
             index = params.index(item)
-            mat = mmat[marker]
+
             # print("U=", params[index], mat['sigma'], R1[i], pitch_h[i][j])
             if method_data[6]:
                 sigma = float(mat["sigma0"])
