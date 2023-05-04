@@ -248,8 +248,6 @@ def Insert_setup(
         print("insert part_helices:", part_helices)
         print("insert part_mat_helices:", part_mat_helices)
 
-    print("insert part_mat_insulators:", part_mat_insulators)
-
     # params section
     params_data = create_params_insert(mname, gdata + (turns_h,), method_data, debug)
 
