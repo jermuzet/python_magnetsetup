@@ -5,11 +5,20 @@ from typing import List, Optional
 from decouple import Config, RepositoryEnv
 
 
-class appenv():
-    
-    def __init__(self, envfile: str = "settings.env", debug: bool = False, url_api: str = None,
-                 yaml_repo: str = None, cad_repo: str = None, mesh_repo: str = None, template_repo: str = None,
-                 simage_repo: str = None, mrecord_repo: str = None, optim_repo: str = None):
+class appenv:
+    def __init__(
+        self,
+        envfile: str = "settings.env",
+        debug: bool = False,
+        url_api: str = None,
+        yaml_repo: str = None,
+        cad_repo: str = None,
+        mesh_repo: str = None,
+        template_repo: str = None,
+        simage_repo: str = None,
+        mrecord_repo: str = None,
+        optim_repo: str = None,
+    ):
         self.url_api: str = url_api
         self.yaml_repo: Optional[str] = yaml_repo
         self.cad_repo: Optional[str] = cad_repo
@@ -25,19 +34,19 @@ class appenv():
             if debug:
                 print("appenv:", RepositoryEnv("settings.env").data)
 
-            self.url_api = data.get('URL_API')
-            self.compute_server = data.get('COMPUTE_SERVER')
-            self.visu_server = data.get('VISU_SERVER')
-            if 'TEMPLATE_REPO' in envdata:
-                self.template_repo = data.get('TEMPLATE_REPO')
-            if 'SIMAGE_REPO' in envdata:
-                self.simage_repo = data.get('SIMAGE_REPO')
-            if 'DATA_REPO' in envdata:
-                self.yaml_repo = data.get('DATA_REPO') + "/geometries"
-                self.cad_repo = data.get('DATA_REPO') + "/cad"
-                self.mesh_repo = data.get('DATA_REPO') + "/meshes"
-                self.mrecord_repo = data.get('DATA_REPO') + "/mrecords"
-                self.optim_repo = data.get('DATA_REPO') + "/optims"
+            self.url_api = data.get("URL_API")
+            self.compute_server = data.get("COMPUTE_SERVER")
+            self.visu_server = data.get("VISU_SERVER")
+            if "TEMPLATE_REPO" in envdata:
+                self.template_repo = data.get("TEMPLATE_REPO")
+            if "SIMAGE_REPO" in envdata:
+                self.simage_repo = data.get("SIMAGE_REPO")
+            if "DATA_REPO" in envdata:
+                self.yaml_repo = data.get("DATA_REPO") + "/geometries"
+                self.cad_repo = data.get("DATA_REPO") + "/cad"
+                self.mesh_repo = data.get("DATA_REPO") + "/meshes"
+                self.mrecord_repo = data.get("DATA_REPO") + "/mrecords"
+                self.optim_repo = data.get("DATA_REPO") + "/optims"
         if debug:
             print(f"DATA: {self.yaml_repo}")
 
@@ -75,11 +84,14 @@ def loadconfig():
     """
 
     default_path = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(default_path, 'magnetsetup.json'), 'r') as appcfg:
+    with open(os.path.join(default_path, "magnetsetup.json"), "r") as appcfg:
         magnetsetup = json.load(appcfg)
     return magnetsetup
 
-def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: bool=False):
+
+def loadtemplates(
+    appenv: appenv, appcfg: dict, method_data: List[str], debug: bool = False
+):
     """
     Load templates into a dict
 
@@ -107,7 +119,7 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
             json_model = modelcfg["model-nonlinear"]
         conductor_model = modelcfg["conductor-nonlinear"]
     insulator_model = modelcfg["insulator"]
-    
+
     fcfg = os.path.join(template_path, cfg_model)
     if debug:
         print(f"fcfg: {fcfg} type={type(fcfg)}")
@@ -116,41 +128,50 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
     fconductor = os.path.join(template_path, conductor_model)
     finsulator = os.path.join(template_path, insulator_model)
 
+    if geom == "Axi":
+        pyfeelU = modelcfg["create_U"]
+        fpyfeelU = os.path.join(template_path, pyfeelU)
+
     material_generic_def = ["conductor", "insulator"]
     if time == "transient":
-        material_generic_def.append("conduct-nosource") # only for transient with mqs
+        material_generic_def.append("conduct-nosource")  # only for transient with mqs
 
     dict = {
-        'physic': modelcfg["physic"],
+        "physic": modelcfg["physic"],
         "cfg": fcfg,
         "model": fmodel,
         "conductor": fconductor,
         "insulator": finsulator,
         "stats": {},
-        "plots":{},
-        "material_def" : material_generic_def
+        "plots": {},
+        "material_def": material_generic_def,
     }
 
-    if 'stats' in modelcfg:
+    if geom == "Axi":
+        dict["create_U"] = fpyfeelU
+
+    if "stats" in modelcfg:
         _cfg = modelcfg["stats"]
         for field in _cfg:
             # print(f'stats[{field}]: {_cfg} (type={type(_cfg)})')
-            dict['stats'][field] = _cfg[field]
-            dict['stats'][field]['template'] = os.path.join(template_path, _cfg[field]['template'])
+            dict["stats"][field] = _cfg[field]
+            dict["stats"][field]["template"] = os.path.join(
+                template_path, _cfg[field]["template"]
+            )
         if debug:
             print(f"dict[stats]={dict['stats']}")
 
-    if 'plots' in modelcfg:
+    if "plots" in modelcfg:
         _cfg = modelcfg["plots"]
         for field in _cfg:
-            dict['plots'][field] = os.path.join(template_path, _cfg[field])
+            dict["plots"][field] = os.path.join(template_path, _cfg[field])
         if debug:
             print(f"dict[plots]={dict['plots']}")
 
     for kdata in modelcfg["models"]:
         dict[kdata] = os.path.join(template_path, modelcfg["models"][kdata])
-    
-    if 'th' in model:
+
+    if "th" in model:
         cooling_model = modelcfg["cooling"][cooling]
         flux_model = modelcfg["cooling-post"][cooling]
 
@@ -167,6 +188,7 @@ def loadtemplates(appenv: appenv, appcfg: dict, method_data: List[str], debug: b
 
     return dict
 
+
 def check_templates(templates: dict):
     """
     check if template file exist
@@ -174,16 +196,19 @@ def check_templates(templates: dict):
     print("=== Checking Templates ===")
     for key in templates:
         if isinstance(templates[key], str):
-            print(f'{key}: {templates[key]}')
-            with open(templates[key], "r") as f: pass
+            print(f"{key}: {templates[key]}")
+            with open(templates[key], "r") as f:
+                pass
 
         elif isinstance(templates[key], str):
             for s in templates[key]:
-                print(f'{key}: {s}')
-                with open(s, "r") as f: pass
+                print(f"{key}: {s}")
+                with open(s, "r") as f:
+                    pass
     print("==========================")
 
     return True
+
 
 def supported_models(Appcfg, method: str, geom: str, time: str) -> List:
     """
@@ -199,6 +224,7 @@ def supported_models(Appcfg, method: str, geom: str, time: str) -> List:
 
     return models
 
+
 def supported_methods(Appcfg) -> List:
     """
     get supported methods as a dict
@@ -206,7 +232,7 @@ def supported_methods(Appcfg) -> List:
 
     methods = []
     for key in Appcfg:
-        if Appcfg[key] and not key in ['mesh', 'post']:
+        if Appcfg[key] and not key in ["mesh", "post"]:
             methods.append(key)
 
     return methods
