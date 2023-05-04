@@ -36,8 +36,7 @@ def create_params_supra(
         params_data["Parameters"].append({"name": "bool_dilatation", "value": "1"})
 
     # TODO : initialization of parameters with cooling model
-
-    params_data["Parameters"].append({"name": f"{mname}_Tinit", "value": 4})
+    params_data["Parameters"].append({"name": f"{mname}_Tinit", "value": 293})
     if "mag" in method_data[3] or "mqs" in method_data[3]:
         params_data["Parameters"].append(
             {"name": "mu0", "value": convert_data(units, 4 * math.pi * 1e-7, "mu0")}
@@ -79,7 +78,6 @@ def create_params_bitter(
         params_data["Parameters"].append({"name": "bool_dilatation", "value": "1"})
 
     # TODO : initialization of parameters with cooling model
-
     params_data["Parameters"].append({"name": f"{mname}_Tinit", "value": 293})
 
     (name, snames, nturns, NCoolingSlits, Zmin, Zmax, Dh, Sh, ignore_index) = gdata
@@ -192,7 +190,6 @@ def create_params_insert(
         params_data["Parameters"].append({"name": "bool_dilatation", "value": "1"})
 
     # TODO : initialization of parameters with cooling model
-
     params_data["Parameters"].append({"name": f"{mname}_Tinit", "value": 293})
     # get value from coolingmethod and Flow(I) value
     params_data["Parameters"].append(
@@ -283,6 +280,7 @@ def create_materials_supra(
 
 def create_materials_bitter(
     gdata: tuple,
+    maindata: dict,
     confdata: dict,
     templates: dict,
     method_data: List[str],
@@ -293,6 +291,7 @@ def create_materials_bitter(
         print("create_material_bitter:", confdata)
 
     fconductor = templates["conductor"]
+    finsulator = templates["insulator"]
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5]  # "meter"
@@ -309,16 +308,39 @@ def create_materials_bitter(
         )
 
     (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
-    for sname in snames:
-        if method_data[2] == "Axi":
-            if debug:
-                print("create_material_bitter:", sname)
-            mdata = entry(
-                fconductor, Merge({"name": f"{sname}"}, confdata["material"]), debug
-            )
-            materials_dict[f"{sname}"] = mdata[f"{sname}"]
-        else:
-            return {}
+
+    if method_data[2] == "Axi":
+        if debug:
+            print("create_material_bitter: Conductor_", name)
+        mdata = entry(
+            fconductor,
+            Merge(
+                {
+                    "name": f"Conductor_{name}",
+                    "part_mat_conductor": maindata["part_mat_bitters"],
+                },
+                confdata["material"],
+            ),
+            debug,
+        )
+        materials_dict[f"Conductor_{name}"] = mdata[f"Conductor_{name}"]
+
+        if debug:
+            print("create_material_bitter: Insulator_", name)
+        mdata = entry(
+            finsulator,
+            Merge(
+                {
+                    "name": f"Insulator_{name}",
+                    "part_mat_insulator": maindata["part_mat_insulators"],
+                },
+                confdata["material"],
+            ),
+            debug,
+        )
+        materials_dict[f"Insulator_{name}"] = mdata[f"Insulator_{name}"]
+    else:
+        return {}
 
     if debug:
         print(materials_dict)
@@ -509,7 +531,9 @@ def create_models_supra(
 
 
 def create_models_bitter(
+    mname: str,
     gdata: tuple,
+    maindata: dict,
     confdata: dict,
     templates: dict,
     method_data: List[str],
@@ -521,22 +545,36 @@ def create_models_bitter(
         print("create_model_bitter:", confdata)
 
     fconductor = templates[equation + "-conductor"]
+    finsulator = templates[equation + "-insulator"]
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5]  # "meter"
     units = load_units(unit_Length)
 
     (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
-    for sname in snames:
-        if method_data[2] == "Axi":
-            if debug:
-                print("create_model_bitter:", sname)
-            mdata = entry(
-                fconductor, Merge({"name": f"{sname}"}, confdata["material"]), debug
-            )
-            models_dict[f"{sname}"] = mdata
-        else:
-            return {}
+
+    if method_data[2] == "Axi":
+        mdata = entry(
+            finsulator,
+            {
+                "name": f"Insulator_{name}",
+                "part_insulator": maindata["part_insulators"],
+            },
+            debug,
+        )
+        models_dict[f"Insulator_{name}"] = mdata
+
+        mdata = entry(
+            fconductor,
+            {
+                "name": f"Conductor_{name}",
+                "part_conductor": maindata["part_bitters"],
+            },
+            debug,
+        )
+        models_dict[f"Conductor_{name}"] = mdata
+    else:
+        return {}
 
     if debug:
         print(models_dict)
@@ -570,14 +608,14 @@ def create_models_insert(
         {"name": "Insulator_insert", "part_insulator": maindata["part_insulators"]},
         debug,
     )
-    models_dict[f"Insulator"] = mdata
+    models_dict[f"Insulator_insert"] = mdata
 
     mdata = entry(
         fconductor,
         {"name": "Conductor_insert", "part_conductor": maindata["part_helices"]},
         debug,
     )
-    models_dict[f"Conductor"] = mdata
+    models_dict[f"Conductor_insert"] = mdata
     # Loop for Helix
     # for i in range(NHelices):
     #     # section j==0:  treated as insulator in Axi
@@ -662,7 +700,7 @@ def create_bcs_bitter(
                     "markers": snames,
                     "hw": f"{bcname}_hw",
                     "Tw": f"{bcname}_Tw",
-                    "dTw": "{bcname}_dTw",
+                    "dTw": f"{bcname}_dTw",
                 },
                 debug,
             )
@@ -679,7 +717,7 @@ def create_bcs_bitter(
                     "markers": snames,
                     "hw": f"{bcname}_hw",
                     "Tw": f"{bcname}_Tw",
-                    "dTw": "{bcname}_dTw",
+                    "dTw": f"{bcname}_dTw",
                 },
                 debug,
             )
