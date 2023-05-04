@@ -43,10 +43,10 @@
 						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post": {
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
+						"mean": "stats_Flux-mean.mustache",
+						"grad": "stats_Flux-grad.mustache",
+						"meanH": "stats_Flux-meanH.mustache",
+						"gradH": "stats_Flux-gradH.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-static.json",
@@ -75,6 +75,14 @@
 							"physic": "heat",
 							"data": {
 								"current_H": ""
+							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
 							}
 						}
 					},
@@ -178,10 +186,10 @@
 						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post": {
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
+						"mean": "stats_Flux-mean.mustache",
+						"grad": "stats_Flux-grad.mustache",
+						"meanH": "stats_Flux-meanH.mustache",
+						"gradH": "stats_Flux-gradH.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-static.json",
@@ -210,6 +218,14 @@
 							"physic": "heat",
 							"data": {
 								"current_H": ""
+							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
 							}
 						}
 					},
@@ -243,10 +259,10 @@
 						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post": {
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
+						"mean": "stats_Flux-mean.mustache",
+						"grad": "stats_Flux-grad.mustache",
+						"meanH": "stats_Flux-meanH.mustache",
+						"gradH": "stats_Flux-gradH.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-static.json",
@@ -275,6 +291,14 @@
 							"physic": "heat",
 							"data": {
 								"current_H": ""
+							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
 							}
 						}
 					},
@@ -311,10 +335,10 @@
 						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post": {
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
+						"mean": "stats_Flux-mean.mustache",
+						"grad": "stats_Flux-grad.mustache",
+						"meanH": "stats_Flux-meanH.mustache",
+						"gradH": "stats_Flux-gradH.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-static.json",
@@ -359,6 +383,14 @@
 							"physic": "elastic",
 							"data": {
 								"VonMises_H": ""
+							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
 							}
 						}
 					},
@@ -395,10 +427,10 @@
 						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post": {
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
+						"mean": "stats_Flux-mean.mustache",
+						"grad": "stats_Flux-grad.mustache",
+						"meanH": "stats_Flux-meanH.mustache",
+						"gradH": "stats_Flux-gradH.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-static.json",
@@ -443,6 +475,14 @@
 							"physic": "heat",
 							"data": {
 								"VonMises_H": ""
+							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
 							}
 						}
 					},
@@ -504,6 +544,14 @@
 							"physic": "heat",
 							"data": {
 								"current_H": ""
+							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
 							}
 						}
 					}
@@ -592,10 +640,10 @@
 						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post": {
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
+						"mean": "stats_Flux-mean.mustache",
+						"grad": "stats_Flux-grad.mustache",
+						"meanH": "stats_Flux-meanH.mustache",
+						"gradH": "stats_Flux-gradH.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-transient.json",
@@ -625,6 +673,14 @@
 							"physic": "heat",
 							"data": {
 								"current_H": ""
+							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
 							}
 						}
 					},
@@ -661,10 +717,10 @@
 						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post": {
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
+						"mean": "stats_Flux-mean.mustache",
+						"grad": "stats_Flux-grad.mustache",
+						"meanH": "stats_Flux-meanH.mustache",
+						"gradH": "stats_Flux-gradH.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-transient.json",
@@ -694,6 +750,14 @@
 							"physic": "heat",
 							"data": {
 								"Current_H": ""
+							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
 							}
 						}
 					},
@@ -738,10 +802,10 @@
 						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post": {
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
+						"mean": "stats_Flux-mean.mustache",
+						"grad": "stats_Flux-grad.mustache",
+						"meanH": "stats_Flux-meanH.mustache",
+						"gradH": "stats_Flux-gradH.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-transient.json",
@@ -787,6 +851,14 @@
 							"physic": "elastic1",
 							"data": {
 								"VonMises_H": ""
+							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
 							}
 						}
 					},
@@ -831,10 +903,10 @@
 						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post": {
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
+						"mean": "stats_Flux-mean.mustache",
+						"grad": "stats_Flux-grad.mustache",
+						"meanH": "stats_Flux-meanH.mustache",
+						"gradH": "stats_Flux-gradH.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-transient.json",
@@ -881,6 +953,14 @@
 							"data": {
 								"VonMises_H": ""
 							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
+							}
 						}
 					},
 					"plots": {
@@ -913,10 +993,10 @@
 						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post": {
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-gradH.mustache"
+						"mean": "stats_Flux-mean.mustache",
+						"grad": "stats_Flux-grad.mustache",
+						"meanH": "stats_Flux-meanH.mustache",
+						"gradH": "stats_Flux-gradH.mustache"
 					},
 					"filename": {},
 					"stats": {
@@ -942,6 +1022,14 @@
 							"physic": "heat",
 							"data": {
 								"current_H": ""
+							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
 							}
 						}
 					}
@@ -971,10 +1059,10 @@
 						"gradH": "channel-gradH.mustache"
 					},
 					"cooling-post": {
-						"mean": "flux-channel-mean.mustache",
-						"grad": "flux-channel-grad.mustache",
-						"meanH": "flux-channel-meanH.mustache",
-						"gradH": "flux-channel-grad.mustache"
+						"mean": "stats_Flux-mean.mustache",
+						"grad": "stats_Flux-grad.mustache",
+						"meanH": "stats_Flux-meanH.mustache",
+						"gradH": "stats_Flux-gradH.mustache"
 					},
 					"filename": {},
 					"stats": {
@@ -1000,6 +1088,14 @@
 							"physic": "heat",
 							"data": {
 								"current_H": ""
+							}
+						},
+						"Flux": {
+							"name": "Stats_Flux",
+							"template": "stats_Flux.mustache",
+							"physic": "heat",
+							"data": {
+								"Flux_H": ""
 							}
 						}
 					}

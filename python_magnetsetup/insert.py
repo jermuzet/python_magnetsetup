@@ -16,6 +16,7 @@ from .file_utils import MyOpen, findfile, search_paths
 
 import os
 
+
 # MyEnv: Union[Type[appenv]|None]
 def Insert_simfile(
     MyEnv, confdata: dict, cad: Insert, addAir: bool = False, debug: bool = False
@@ -400,10 +401,24 @@ def Insert_setup(
             )
             meanT_data.append({"header": f"T_R{i+1}", "markers": {"name": f"R{i+1}"}})
 
+    bcname = ""
+    if "H" in method_data[4]:
+        bcname = f"%1%"
+
     mpost = {
         "Power": powerH_data,
         "Current": currentH_data,
-        "Flux": {"prefix": "Channel", "index_h": f"0:{str(NChannels)}"},
+        "Flux": [
+            {
+                "prefix": "Channel",
+                "hw": f"hw{bcname}",
+                "Tw": f"Tw{bcname}",
+                "dTw": f"dTw{bcname}",
+                "Zmin": f"{bcname}_Zmin",
+                "Zmax": f"{bcname}_dZmax",
+                "index_h": f"0:{str(NChannels)}",
+            }
+        ],
         "T": meanT_data,
         "Stress": Stress_data,
         "VonMises": VonMises_data,

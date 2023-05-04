@@ -43,16 +43,19 @@ def Bitter_setup(
         print(f"Bitter_setup/Bitter confdata: {confdata}")
 
     print(f"Bitter_setup:  magnet={mname}, cad={cad.name}")
-    # print(f'cad={cad}')
+    print(f"cad={cad}")
     print(f"cad.get_params={cad.get_params(MyEnv.yaml_repo)}")
     (NCoolingSlits, z0, z1, Dh, Sh) = cad.get_params(MyEnv.yaml_repo)
 
     part_thermic = []
     part_electric = []
+
     part_bitters = []
     part_mat_bitters = []
     part_insulators = []
     part_mat_insulators = []
+
+    index_ABitters = ""
     index_Bitters = ""
 
     boundary_meca = []
@@ -74,6 +77,7 @@ def Bitter_setup(
         shift = 0
         part_bitters.append(f"Conductor_{name}")
         part_insulators.append(f"Insulator_{name}")
+
         if cad.z[0] < -cad.axi.h:
             snames.append(f"{name}_B0")
             part_mat_insulators.append(snames[-1])
@@ -91,26 +95,17 @@ def Bitter_setup(
             part_mat_insulators.append(snames[-1])
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames) - 1)
-
         index_Bitters = f"shift:{NSections+shift}"
+        start = snames[0].replace(f"{name}_B", "")
+        index_ABitters = f"{start}:{len(snames)}"
+        index_Bitters = f"{shift}:{len(cad.axi.turns)}"
         if debug:
             print("sname:", snames)
     else:
         part_electric.append(cad.name)
         if "th" in method_data[3]:
             part_thermic.append(cad.name)
-
-    gdata = (
-        name,
-        snames,
-        cad.axi.turns,
-        NCoolingSlits,
-        z0,
-        z1,
-        Dh,
-        Sh,
-        ignore_index,
-    )
+    gdata = (name, snames, cad.axi.turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index)
 
     if debug:
         print("bitter part_thermic:", part_thermic)
@@ -219,29 +214,43 @@ def Bitter_setup(
         meanT_data.append(
             {
                 "header": f"T_{name}",
-                "markers": {"name": f"{name}_B%1%", "index1": index_Bitters},
+                "markers": {"name": f"{name}_B%1%", "index1": index_ABitters},
             }
         )
         Stress_data.append(
             {
                 "header": f"Stress_{name}",
-                "markers": {"name": f"{name}_B%1%", "index1": index_Bitters},
+                "markers": {"name": f"{name}_B%1%", "index1": index_ABitters},
             }
         )
         VonMises_data.append(
             {
                 "header": f"VonMises_{name}",
-                "markers": {"name": f"{name}_B%1%", "index1": index_Bitters},
+                "markers": {"name": f"{name}_B%1%", "index1": index_ABitters},
             }
         )
 
     else:
         print("bitter3D post not implemented")
 
+    bcname = name
+    if "H" in method_data[4]:
+        bcname = f"{name}_Slit%1%"
+
     mpost = {
         "Power": powerH_data,
         "Current": currentH_data,
-        "Flux": {"prefix": f"{name}_Slit", "index_h": f"1:{str(NCoolingSlits+1)}"},
+        "Flux": [
+            {
+                "prefix": f"{name}_Slit",
+                "hw": f"{bcname}_hw",
+                "Tw": f"{bcname}_Tw",
+                "dTw": f"{bcname}_dTw",
+                "Zmin": f"{bcname}_Zmin",
+                "Zmax": f"{bcname}_dZmax",
+                "index_h": f"1:{str(NCoolingSlits+1)}",
+            }
+        ],
         "T": meanT_data,
         "Stress": Stress_data,
         "VonMises": VonMises_data,
@@ -324,7 +333,9 @@ def Bitter_setup(
         import math
 
         params = params_data["Parameters"]
-        mat = mmat[f"Conductor_{name}"]
+
+        mat = mmat[f"Conductor_{name}"]  ### ??? A VOIR
+
         for j in range(len(cad.axi.turns)):
             marker = f"{name}_B{j+1}"
             # print("marker:", marker)

@@ -36,7 +36,7 @@ def create_params_supra(
         params_data["Parameters"].append({"name": "bool_dilatation", "value": "1"})
 
     # TODO : initialization of parameters with cooling model
-    params_data["Parameters"].append({"name": f"{mname}_Tinit", "value": 293})
+    params_data["Parameters"].append({"name": f"{mname}_Tinit", "value": 4})
     if "mag" in method_data[3] or "mqs" in method_data[3]:
         params_data["Parameters"].append(
             {"name": "mu0", "value": convert_data(units, 4 * math.pi * 1e-7, "mu0")}
@@ -81,6 +81,25 @@ def create_params_bitter(
     params_data["Parameters"].append({"name": f"{mname}_Tinit", "value": 293})
 
     (name, snames, nturns, NCoolingSlits, Zmin, Zmax, Dh, Sh, ignore_index) = gdata
+    if debug:
+        print("unit_Length", unit_Length)
+        print("Zmax:", Zmax)
+        print("Zmin:", Zmin)
+    if unit_Length == "meter":
+        Zmin = convert_data(units, Zmin, "Length")
+        Zmax = convert_data(units, Zmax, "Length")
+        Dh = convert_data(units, Dh, "Length")
+        Sh = convert_data(units, Sh, "Area")
+
+    # depending on method_data[4] (aka args.cooling)
+    params_data["Parameters"].append(
+        {"name": f"{name}_hw", "value": convert_data(units, 58222.1, "h")}
+    )
+    params_data["Parameters"].append({"name": f"{name}_Tw", "value": 290.671})
+    params_data["Parameters"].append({"name": f"{name}_dTw", "value": 12.74})
+    params_data["Parameters"].append({"name": f"{name}_Zmin", "value": Zmin})
+    params_data["Parameters"].append({"name": f"{name}_Zmax", "value": Zmax})
+
     for thbc in ["rInt", "rExt"]:
         bcname = f"{name}_{thbc}"
         params_data["Parameters"].append(
@@ -90,17 +109,18 @@ def create_params_bitter(
         params_data["Parameters"].append({"name": f"{bcname}_dTw", "value": 12.74})
         params_data["Parameters"].append({"name": f"{bcname}_Zmin", "value": Zmin})
         params_data["Parameters"].append({"name": f"{bcname}_Zmax", "value": Zmax})
-        for i in range(NCoolingSlits):
-            bcname = f"{name}_slit{i+1}"
-            params_data["Parameters"].append(
-                {"name": f"{bcname}_hw", "value": convert_data(units, 58222.1, "h")}
-            )
-            params_data["Parameters"].append({"name": f"{bcname}_Tw", "value": 290.671})
-            params_data["Parameters"].append({"name": f"{bcname}_dTw", "value": 12.74})
-            params_data["Parameters"].append({"name": f"{bcname}_Sh", "value": Sh[i]})
-            params_data["Parameters"].append({"name": f"{bcname}_Dh", "value": Dh[i]})
-            params_data["Parameters"].append({"name": f"{bcname}_Zmin", "value": Zmin})
-            params_data["Parameters"].append({"name": f"{bcname}_Zmax", "value": Zmax})
+
+    for i in range(NCoolingSlits):
+        bcname = f"{name}_Slit{i+1}"
+        params_data["Parameters"].append(
+            {"name": f"{bcname}_hw", "value": convert_data(units, 58222.1, "h")}
+        )
+        params_data["Parameters"].append({"name": f"{bcname}_Tw", "value": 290.671})
+        params_data["Parameters"].append({"name": f"{bcname}_dTw", "value": 12.74})
+        params_data["Parameters"].append({"name": f"{bcname}_Sh", "value": Sh[i]})
+        params_data["Parameters"].append({"name": f"{bcname}_Dh", "value": Dh[i]})
+        params_data["Parameters"].append({"name": f"{bcname}_Zmin", "value": Zmin})
+        params_data["Parameters"].append({"name": f"{bcname}_Zmax", "value": Zmax})
 
     # init values for U (Axi specific)
     print(f"create_params_bitter/nturns: {nturns}")
@@ -140,6 +160,8 @@ def create_params_insert(
     unit_Length = method_data[5]  # "meter"
     units = load_units(unit_Length)
 
+    # TDO how to get insert name?
+    # is it provided by mname??
     (
         NHelices,
         NRings,
@@ -197,6 +219,8 @@ def create_params_insert(
     )
     params_data["Parameters"].append({"name": "Tw", "value": 290.671})
     params_data["Parameters"].append({"name": "dTw", "value": 12.74})
+    params_data["Parameters"].append({"name": "Zmin", "value": Zmin})
+    params_data["Parameters"].append({"name": "Zmax", "value": Zmax})
 
     # params per cooling channels
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
@@ -424,7 +448,6 @@ def create_materials_insert(
                     materials_dict[name] = mdata[name]
         else:
             # section j==0:  treated as insulator in Axi
-
             # load conductor template
             # for j in range(1, Nsections[i] + 1):
             # print("load conductor[{j}]: mat:", confdata["Helix"][i]["material"])
@@ -552,7 +575,6 @@ def create_models_bitter(
     units = load_units(unit_Length)
 
     (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
-
     if method_data[2] == "Axi":
         mdata = entry(
             finsulator,
@@ -649,7 +671,6 @@ def create_bcs_supra(
     method_data: List[str],
     debug: bool = False,
 ) -> dict:
-
     print("create_bcs_supra from templates")
     electric_bcs_dir = {"boundary_Electric_Dir": []}  # name, value, vol
     electric_bcs_neu = {"boundary_Electric_Neu": []}  # name, value
@@ -686,17 +707,25 @@ def create_bcs_bitter(
     meca_bcs_dir = {"boundary_Meca_Dir": []}  # name, value
     maxwell_bcs_dir = {"boundary_Maxwell_Dir": []}  # name, value
 
+    # TODO bcname depends on method_data[4] aka args.cooling
+    # mean: bcname = name_
+    # meanH: bcname = name_bcdomain with bcdomain = [rInt, rExt, Slit0, ...]
+    # grad: bcname = name_
+    # gradH: bcname = name_bcdomain with bcdomain = [rInt, rExt, Slit0, ...]
+
     if "th" in method_data[3]:
         fcooling = templates["robin"]
 
         # TODO make only one Bc for rInt and on for RExt
         for thbc in ["rInt", "rExt"]:
-            bcname = f"{name}_{thbc}"
+            bcname = name
+            if "H" in method_data[4]:
+                bcname = f"{name}_{thbc}"
             # Add markers list
             mdata = entry(
                 fcooling,
                 {
-                    "name": bcname,
+                    "name": f"{name}_{thbc}",
                     "markers": snames,
                     "hw": f"{bcname}_hw",
                     "Tw": f"{bcname}_Tw",
@@ -705,15 +734,17 @@ def create_bcs_bitter(
                 debug,
             )
             thermic_bcs_rob["boundary_Therm_Robin"].append(
-                Merge({"name": bcname}, mdata[bcname])
+                Merge({"name": bcname}, mdata[f"{name}_{thbc}"])
             )
 
         for i in range(NCoolingSlits):
-            bcname = f"{name}_slit{i+1}"
+            bcname = name
+            if "H" in method_data[4]:
+                bcname = f"{name}_Slit{i+1}"
             mdata = entry(
                 fcooling,
                 {
-                    "name": bcname,
+                    "name": f"{name}_Slit{i+1}",
                     "markers": snames,
                     "hw": f"{bcname}_hw",
                     "Tw": f"{bcname}_Tw",
@@ -722,7 +753,7 @@ def create_bcs_bitter(
                 debug,
             )
             thermic_bcs_rob["boundary_Therm_Robin"].append(
-                Merge({"name": bcname}, mdata[bcname])
+                Merge({"name": bcname}, mdata[f"{name}_Slit{i+1}"])
             )
 
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
@@ -760,7 +791,6 @@ def create_bcs_insert(
     method_data: List[str],
     debug: bool = False,
 ) -> dict:
-
     print("create_bcs_insert from templates")
     electric_bcs_dir = {"boundary_Electric_Dir": []}  # name, value, vol
     electric_bcs_neu = {"boundary_Electric_Neu": []}  # name, value
@@ -884,19 +914,11 @@ def create_json(
         for field in templates["stats"]:
             print(f"stats: {field}")
 
-    if "th" in method_data[3]:
-        post_keywords = {
-            "Flux": {
-                "name": "Flux",
-                "physic": "heat",
-                "template": templates["flux"],
-                "data": mpost["Flux"] if "Flux" in mpost else {},
-            },
-        }
-        if debug:
-            print(f"mpost[Flux]={mpost['Flux']}")
-    else:
-        post_keywords = {}
+    post_keywords = {}
+
+    print("templates[stats]")
+    for field in templates["stats"]:
+        print(field)
 
     for field in templates["stats"]:
         _data = templates["stats"][field]
@@ -907,8 +929,23 @@ def create_json(
             "physic": _data["physic"],
             "data": {_name: mpost[field] if field in mpost else {}},
         }
-        if debug:
-            print(f"{field}: post_keywords[{_name}]={post_keywords[_name]}")
+
+    if "th" in method_data[3] and "Stats_Flux" in post_keywords:
+        print(f"cooling={method_data[4]}")
+        print(f"templates keywords: {templates.keys()}")
+        templatefile = templates["flux"]
+        post_keywords["Stats_Flux"]["template"] = templatefile
+        print(
+            f'post_keywords[Stats_Flux][template]={post_keywords["Stats_Flux"]["template"]}'
+        )
+
+    print("post_keywords")
+    for key in post_keywords:
+        msg = key
+        field = post_keywords[key]
+        if field["physic"] in data["PostProcess"]:
+            msg += " - written to {field['physic']}"
+        print(msg)
 
     for key in post_keywords:
         field = post_keywords[key]
@@ -916,12 +953,16 @@ def create_json(
             if debug:
                 print(f"{key}: field={field}")
             _data = field["data"]
+            if key == "Stats_Flux":
+                print(f"{key} (type={type(_data)}): {_data}")
             if debug:
                 print(f"{key} (type={type(_data)}): {_data}")
             add = data["PostProcess"][field["physic"]]["Measures"]["Statistics"]
             # print(f"{key}: add={add}")
             odata = entry(field["template"], _data, debug)
             if debug:
+                print(f"{key}: odata={odata}")
+            if field == "Stats_Flux":
                 print(f"{key}: odata={odata}")
             for md in odata[key]:
                 # print(f'{key}: add[{md}], odata[{key}][{md}]={odata[key][md]}')
