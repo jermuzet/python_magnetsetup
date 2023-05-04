@@ -44,6 +44,7 @@ from .objects import load_object
 from .utils import NMerge
 from .cfg import create_cfg
 from .jsonmodel import create_json
+from .create_U import add_create_U
 
 from .insert import Insert_setup, Insert_simfile
 from .bitter import Bitter_setup, Bitter_simfile
@@ -196,11 +197,21 @@ def magnet_setup(
 
                 if debug:
                     print(f"tmodels: {tmodels}")
-                NMerge(tmodels, mmodels, debug, "magnet_setup Bitter/Supra mmodels ")
+                for physic in tmodels:
+                    if physic not in mmodels:
+                        mmodels[physic] = {}
+                    NMerge(
+                        tmodels[physic],
+                        mmodels[physic],
+                        debug,
+                        name="magnet_setup Bitter/Supra mmodels ",
+                    )
 
                 if debug:
                     print(f"tpost: {tpost}")
-                NMerge(tpost, mpost, debug, "magnet_setup Bitter/Supra mpost")  # debug)
+                NMerge(
+                    tpost, mpost, debug, name="magnet_setup Bitter/Supra mpost"
+                )  # debug)
                 if debug:
                     print(f"magnet_setup {mname}: tpost[Current]={tpost['Current']}")
                     print(f"magnet_setup {mname}: mpost[Current]={mpost['Current']}")
@@ -353,7 +364,7 @@ def msite_setup(
         if debug:
             print("NewMerge:", mpost)
 
-    print(f"msite_setup: mdict[init_temp]={mdict['init_temp']}")
+    # print(f'msite_setup: mdict[init_temp]={mdict["init_temp"]}')
     # print(f"msite_setup: mdict[power_magnet]={mdict['power_magnet']}")
 
     if debug:
@@ -541,6 +552,9 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
         jsonfile, mdict, mmat, mmodels, mpost, templates, method_data, args.debug
     )
 
+    if args.geom == "Axi" and args.method == "cfpdes":
+        add_create_U(templates["create_U"], args.debug)
+
     if "geom" in confdata:
         print(f'magnet geo: {confdata["geom"]}')
         yamlfile = confdata["geom"]
@@ -655,7 +669,7 @@ def setup_cmds(
             )
 
         # let xao decide mesh caracteristic length ??:
-        meshcmd = f"python3 -m python_magnetgmsh.xao {xaofile} --wd data/geometries --geo {yamlfile} mesh --group CoolingChannels"
+        meshcmd = f"python3 -m python_magnetgmsh.xao2msh {xaofile} --wd data/geometries --geo {yamlfile} mesh --group CoolingChannels"
     else:
         gmshfile = meshfile.replace(".med", ".msh")
         meshconvert = f"gmsh -0 {meshfile} -bin -o {gmshfile}"
@@ -696,8 +710,20 @@ def setup_cmds(
         )
         cmds["Update_Partition"] = update_partition
     if args.geom == "Axi":
-        update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale =|' {cfgfile}"
-        cmds["Update_cfg"] = update_cfg
+        cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd} --dim 2"
+        meshfile = h5file
+        # update_partition = (
+        #     f"perl -pi -e 's|gmsh.partition=.*|#gmsh.partition = 0|' {cfgfile}"
+        # )
+        # cmds["Update_Partition"] = update_partition
+        # update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale =|' {cfgfile}"
+        # cmds["Update_cfg"] = update_cfg
+
+        pyfeelU = " create_U.py"  # create U.h5
+        pyfeelU_args = f"--jsonfile $PWD/{jsonfile} --meshfile $PWD/data/geometries/{meshfile} --odir $PWD"
+
+        pyfeelUcmds = f"mpirun -np {NP} python {pyfeelU} {pyfeelU_args} "
+        cmds["Create_U"] = f"singularity exec {simage_path}/{feelpp} {pyfeelUcmds}"
 
     # TODO add command to change mesh.filename in cfgfile
     update_cfgmesh = f"perl -pi -e 's|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|' {cfgfile}"
