@@ -171,6 +171,7 @@ def check_templates(templates: dict):
     """
     check if template file exist
     """
+    print(f'=== Templates keys ===\n {templates.keys()}')
     print("=== Checking Templates ===")
     for key in templates:
         if isinstance(templates[key], str):

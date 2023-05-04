@@ -204,7 +204,9 @@ def magnet_setup(
                 if debug:
                     print(f"magnet_setup {mname}: tpost[Current]={tpost['Current']}")
                     print(f"magnet_setup {mname}: mpost[Current]={mpost['Current']}")
-
+                print(f"magnet_setup: {mtype}, mname={mname}, tpost={tpost}")
+                print(f"magnet_setup: {mtype}, mname={mname}, mpost={mpost}")
+                
                 list_current = []
                 for item in mpost["Current"]:
                     if isinstance(item, dict) and "part_electric" in item:
@@ -489,7 +491,8 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
             args.debug or args.verbose,
             session,
         )
-
+    print(f'setup: mpost[]={mpost}')
+    
     name = jsonfile
     if name in confdata:
         name = confdata["name"]
