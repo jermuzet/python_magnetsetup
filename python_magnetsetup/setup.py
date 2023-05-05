@@ -334,7 +334,7 @@ def msite_setup(
         (tdict, tmat, tmodels, tpost) = magnet_setup(
             MyEnv, mname, mconfdata, method_data, templates, current, debug
         )
-        # print(f"msite_setup({mname}): tdict[init_temp]={tdict['init_temp']}")
+        # print(f"msite_setup({mname}): tdict={tdict}")
         # print(f"msite_setup({mname}): tdict[power_magnet]={tdict['power_magnet']}")
         if debug:
             print(f"tpost[{mname}][Current]: {tpost['Current']}")
@@ -350,9 +350,25 @@ def msite_setup(
         if debug:
             print("mmat:", mmat)
 
-        NMerge(tmodels, mmodels, debug, "msite_setup/tmodels")
+        if debug:
+            print(f"tmodels: {tmodels}")
+        for physic in tmodels:
+            if physic not in mmodels:
+                mmodels[physic] = {}
+            NMerge(
+                tmodels[physic],
+                mmodels[physic],
+                debug,
+                name="msite_setup mmodels ",
+            )
 
         NMerge(tpost, mpost, debug, "msite_setup/tpost")
+
+        tdict.clear()
+        tmat.clear()
+        tmodels.clear()
+        tpost.clear()
+
         list_current = []
         for item in mpost["Current"]:
             if isinstance(item, dict) and "part_electric" in item:
