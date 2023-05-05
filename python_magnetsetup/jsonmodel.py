@@ -219,8 +219,8 @@ def create_params_insert(
     )
     params_data["Parameters"].append({"name": "Tw", "value": 290.671})
     params_data["Parameters"].append({"name": "dTw", "value": 12.74})
-    params_data["Parameters"].append({"name": "Zmin", "value": Zmin})
-    params_data["Parameters"].append({"name": "Zmax", "value": Zmax})
+    params_data["Parameters"].append({"name": "Zmin", "value": min(Zmin)})
+    params_data["Parameters"].append({"name": "Zmax", "value": max(Zmax)})
 
     # params per cooling channels
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
@@ -734,7 +734,7 @@ def create_bcs_bitter(
                 debug,
             )
             thermic_bcs_rob["boundary_Therm_Robin"].append(
-                Merge({"name": bcname}, mdata[f"{name}_{thbc}"])
+                Merge({"name": f"{name}_{thbc}"}, mdata[f"{name}_{thbc}"])
             )
 
         for i in range(NCoolingSlits):
@@ -753,7 +753,7 @@ def create_bcs_bitter(
                 debug,
             )
             thermic_bcs_rob["boundary_Therm_Robin"].append(
-                Merge({"name": bcname}, mdata[f"{name}_Slit{i+1}"])
+                Merge({"name": f"{name}_Slit{i+1}"}, mdata[f"{name}_Slit{i+1}"])
             )
 
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
