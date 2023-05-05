@@ -36,7 +36,6 @@
 						"heat-insulator": "heat-insulator.mustache"
 					},
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -176,7 +175,6 @@
 						"magnetic-insulator": "magnetic-insulator.mustache"
 					},
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -248,7 +246,6 @@
 						"magnetic-insulator": "magnetic-insulator.mustache"
 					},
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -323,7 +320,6 @@
 						"elastic-insulator": "elastic-insulator.mustache"
 					},
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -414,7 +410,6 @@
 						"elastic-insulator": "elastic-insulator.mustache"
 					},
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -498,7 +493,6 @@
 					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
 					"insulator": "insulator-static.mustache",
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -624,7 +618,6 @@
 						"magnetic-insulator": "magnetic-insulator.mustache"
 					},
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -700,7 +693,6 @@
 						"magnetic-insulator": "magnetic-insulator.mustache"
 					},
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -784,7 +776,6 @@
 						"elastic2-insulator": "elastic2-insulator.mustache"
 					},
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -884,7 +875,6 @@
 						"elastic2-insulator": "elastic2-insulator.mustache"
 					},
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -973,7 +963,6 @@
 					"conductor-nonlinear": "conductor-nonlinear-static-thel.mustache",
 					"insulator": "insulator-static-thel.mustache",
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
@@ -1039,7 +1028,6 @@
 					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
 					"insulator": "insulator-static.mustache",
 					"cooling": {
-						"robin": "T_robin.mustache",
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",

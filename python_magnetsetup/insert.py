@@ -125,7 +125,7 @@ def Insert_setup(
     current: float = 31.0e3,
     debug: bool = False,
 ):
-    print(f"Insert_setup: magnet={mname}, cad={cad.name}")
+    print(f"Insert_setup: mname={mname}, cad={cad.name}")
     print(f"MyEnv: {type(MyEnv)}")
 
     part_thermic = []
@@ -148,6 +148,10 @@ def Insert_setup(
     pitch_h = []
     turns_h = []
 
+    prefix = ""
+    if mname:
+        prefix = f"{mname}_"
+
     for i in range(NHelices):
         with MyOpen(
             cad.Helices[i] + ".yaml", "r", paths=search_paths(MyEnv, "geom")
@@ -158,59 +162,62 @@ def Insert_setup(
 
         if method_data[2] == "Axi":
             for j in range(1, Nsections[i] + 1):
-                part_electric.append(f"H{i+1}_Cu{j}")
+                part_electric.append(f"{prefix}H{i+1}_Cu{j}")
             for j in range(Nsections[i] + 2):
                 if "th" in method_data[3]:
-                    part_thermic.append(f"H{i+1}_Cu{j}")
+                    part_thermic.append(f"{prefix}H{i+1}_Cu{j}")
             for j in range(Nsections[i]):
                 index_Helices.append([f"0:{Nsections[i]+2}"])
                 index_Helices_e.append([f"1:{Nsections[i]+1}"])
 
         else:
-            part_electric.append(f"H{i+1}")
+            part_electric.append(f"{prefix}H{i+1}")
             if "th" in method_data[3]:
-                part_thermic.append(f"H{i+1}")
+                part_thermic.append(f"{prefix}H{i+1}")
 
             (insulator_name, insulator_number) = hhelix.insulators()
+            insulator_name = f"{prefix}{insulator_name}"
             index_Insulators.append((insulator_name, insulator_number))
             if "th" in method_data[3]:
                 part_thermic.append(insulator_name)
 
     for i in range(NRings):
         if "th" in method_data[3]:
-            part_thermic.append(f"R{i+1}")
+            part_thermic.append(f"{prefix}R{i+1}")
         if method_data[2] == "3D":
-            part_electric.append(f"R{i+1}")
+            part_electric.append(f"{prefix}R{i+1}")
 
     # Add currentLeads
     if method_data[2] == "3D":
         if cad.CurrentLeads:
             if "th" in method_data[3]:
-                part_thermic.append("iL1")
-                part_thermic.append("oL2")
-            part_electric.append("iL1")
-            part_electric.append("oL2")
-            boundary_electric.append(["Inner1_LV0", "iL1", "0"])
-            boundary_electric.append(["OuterL2_LV0", "oL2", "V0:V0"])
+                part_thermic.append(f"{prefix}iL1")
+                part_thermic.append(f"{prefix}oL2")
+            part_electric.append(f"{prefix}iL1")
+            part_electric.append(f"{prefix}oL2")
+            boundary_electric.append([f"{prefix}Inner1_LV0", f"{prefix}iL1", "0"])
+            boundary_electric.append([f"{prefix}OuterL2_LV0", f"{prefix}oL2", "V0:V0"])
 
             if "el" in method_data[3] and method_data[3] != "thelec":
-                boundary_meca.append("Inner1_LV0")
-                boundary_meca.append("OuterL2_LV0")
+                boundary_meca.append(f"{prefix}Inner1_LV0")
+                boundary_meca.append(f"{prefix}OuterL2_LV0")
 
             if "mag" in method_data[3]:
                 boundary_maxwell.append("InfV00")
                 boundary_maxwell.append("InfV01")
         else:
-            boundary_electric.append(["H1_V0", "H1", "0"])
-            boundary_electric.append([f"H{NHelices}_V0", f"H{NHelices}", "V0:V0"])
+            boundary_electric.append([f"{prefix}H1_V0", "H1", "0"])
+            boundary_electric.append(
+                [f"{prefix}H{NHelices}_V0", f"{prefix}H{NHelices}", "V0:V0"]
+            )
 
         if "mag" in method_data[3]:
             boundary_maxwell.append("InfV1")
             boundary_maxwell.append("InfR1")
 
     else:
-        boundary_meca.append("H1_HP")
-        boundary_meca.append("H_HP")
+        boundary_meca.append(f"{prefix}H1_HP")
+        boundary_meca.append(f"{prefix}H_HP")
 
         if "mag" in method_data[3]:
             boundary_maxwell.append("ZAxis")
@@ -219,9 +226,9 @@ def Insert_setup(
     if "el" in method_data[3] and method_data[3] != "thelec":
         for i in range(1, NRings + 1):
             if i % 2 == 1:
-                boundary_meca.append(f"R{i}_BP")
+                boundary_meca.append(f"{prefix}R{i}_BP")
             else:
-                boundary_meca.append(f"R{i}_HP")
+                boundary_meca.append(f"{prefix}R{i}_HP")
 
     if debug:
         print("insert part_electric:", part_electric)
@@ -235,7 +242,7 @@ def Insert_setup(
         boundary_meca,
         boundary_maxwell,
         boundary_electric,
-        gdata,
+        (mname,) + gdata,
         confdata,
         templates,
         method_data,
@@ -253,12 +260,16 @@ def Insert_setup(
     # mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "insert_setup mdict")
 
     # add power per magnet data: mdict = NMerge( mdict, {'power_ma    # add init data:
+    iname = cad.name
+    if prefix:
+        iname = mname
     init_temp_data = []
     init_temp_data.append(
         {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
     )
     init_temp_dict = {"init_temp": init_temp_data}
     NMerge(init_temp_dict, mdict, debug, "insert_setup mdict")
+    # print('insert_setup: add init_temp mdict[init_temp] = {mdict["init_temp"]}')
     # print(f'init_tem_data({mname}): {init_temp_data}')
 
     # add power per magnet data: mdict = NMerge( mdict, {'power_magnet': power_data}, debug, "bitter_setup mdict")
@@ -295,101 +306,154 @@ def Insert_setup(
         "Zinf": convert_data(units, Zmax[-1], "Length"),
     }
 
+    if prefix:
+        meanT_data.append(
+            {"header": f"T_{prefix}", "markers": copy.deepcopy(part_thermic)}
+        )
+
     # if method_data[3] != 'mag' and method_data[3] != 'mag_hcurl':
     if method_data[2] == "Axi":
         currentH_data.append({"part_electric": part_electric})
         for i in range(NHelices):
             meanT_data.append(
                 {
-                    "header": f"T_H{i+1}",
-                    "markers": {"name": f"H{i+1}_Cu%1%", "index1": index_Helices[i]},
+                    "header": f"T_{prefix}H{i+1}",
+                    "markers": {
+                        "name": f"{prefix}H{i+1}_Cu%1%",
+                        "index1": index_Helices[i],
+                    },
                 }
             )
             powerH_data.append(
                 {
-                    "header": f"Power_H{i+1}",
-                    "markers": {"name": f"H{i+1}_Cu%1%", "index1": index_Helices_e[i]},
+                    "header": f"Power_{prefix}H{i+1}",
+                    "markers": {
+                        "name": f"{prefix}H{i+1}_Cu%1%",
+                        "index1": index_Helices_e[i],
+                    },
                 }
             )
             Stress_data.append(
                 {
-                    "header": f"Stress_H{i+1}",
-                    "markers": {"name": f"H{i+1}_Cu%1%", "index1": index_Helices[i]},
+                    "header": f"Stress_{prefix}H{i+1}",
+                    "markers": {
+                        "name": f"{prefix}H{i+1}_Cu%1%",
+                        "index1": index_Helices[i],
+                    },
                 }
             )
             VonMises_data.append(
                 {
-                    "header": f"VonMises_H{i+1}",
-                    "markers": {"name": f"H{i+1}_Cu%1%", "index1": index_Helices[i]},
+                    "header": f"VonMises_{prefix}H{i+1}",
+                    "markers": {
+                        "name": f"{prefix}H{i+1}_Cu%1%",
+                        "index1": index_Helices[i],
+                    },
                 }
             )
 
         for i in range(NRings):
-            meanT_data.append({"header": f"T_R{i+1}", "markers": {"name": f"R{i+1}"}})
+            meanT_data.append(
+                {"header": f"T_{prefix}R{i+1}", "markers": {"name": f"{prefix}R{i+1}"}}
+            )
 
     else:
         for i in range(NHelices):
             powerH_data.append(
-                {"header": f"Power_H{i+1}", "markers": {"name": f"H{i+1}_Cu"}}
+                {
+                    "header": f"Power_{prefix}H{i+1}",
+                    "markers": {"name": f"{prefix}H{i+1}_Cu"},
+                }
             )
             meanT_data.append(
-                {"header": f"T_H{i+1}", "markers": {"name": f"H{i+1}_Cu"}}
+                {
+                    "header": f"T_{prefix}H{i+1}",
+                    "markers": {"name": f"{prefix}H{i+1}_Cu"},
+                }
             )
             Stress_data.append(
-                {"header": f"Stress_H{i+1}", "markers": {"name": f"H{i+1}_Cu"}}
+                {
+                    "header": f"Stress_{prefix}H{i+1}",
+                    "markers": {"name": f"{prefix}H{i+1}_Cu"},
+                }
             )
             VonMises_data.append(
                 {
-                    "header": f"VonMises_H{i+1}",
-                    "markers": {"name": f"H{i+1}_Cu%1%", "index1": index_Helices[i]},
+                    "header": f"VonMises_{prefix}H{i+1}",
+                    "markers": {
+                        "name": f"{prefix}H{i+1}_Cu%1%",
+                        "index1": index_Helices[i],
+                    },
                 }
             )
 
         if cad.CurrentLeads:
             print("insert: 3D currentH, powerH, meanT for leads")
             currentH_data.append(
-                {"header": "Intensity_iL1", "markers": {"name:": "iL1_V0"}}
-            )
-            currentH_data.append(
-                {"header": "Intensity_oL2", "markers": {"name:": "oL2_V0"}}
-            )
-            powerH_data.append({"header": "Power_iL1", "markers": {"name": "iL1"}})
-            powerH_data.append({"header": "Power_oL2", "markers": {"name": "oL2"}})
-            meanT_data.append({"header": "T_iL1", "markers": {"name": "iL1"}})
-            meanT_data.append({"header": "T_oL2", "markers": {"name": "oL2"}})
-        else:
-            currentH_data.append(
-                {"header": "Intensity_H1", "markers": {"name:": "H1_V0"}}
+                {
+                    "header": f"Intensity_{prefix}iL1",
+                    "markers": {"name:": f"{prefix}iL1_V0"},
+                }
             )
             currentH_data.append(
                 {
-                    "header": f"Intensity_H{NHelices}",
-                    "markers": {"name:": f"H{NHelices}_V0"},
+                    "header": f"Intensity_{prefix}oL2",
+                    "markers": {"name:": f"{prefix}oL2_V0"},
+                }
+            )
+            powerH_data.append(
+                {"header": f"Power_{prefix}iL1", "markers": {"name": f"{prefix}iL1"}}
+            )
+            powerH_data.append(
+                {"header": f"Power_{prefix}oL2", "markers": {"name": f"{prefix}oL2"}}
+            )
+            meanT_data.append(
+                {"header": f"T_{prefix}iL1", "markers": {"name": f"{prefix}iL1"}}
+            )
+            meanT_data.append(
+                {"header": f"T_{prefix}oL2", "markers": {"name": f"{prefix}oL2"}}
+            )
+        else:
+            currentH_data.append(
+                {
+                    "header": f"Intensity_{prefix}H1",
+                    "markers": {"name:": f"{prefix}H1_V0"},
+                }
+            )
+            currentH_data.append(
+                {
+                    "header": f"Intensity_{prefix}H{NHelices}",
+                    "markers": {"name:": f"{prefix}H{NHelices}_V0"},
                 }
             )
 
         print(f"insert: 3D powerH for {NRings} rings")
         for i in range(NRings):
             powerH_data.append(
-                {"header": f"Power_R{i+1}", "markers": {"name": f"R{i+1}"}}
+                {
+                    "header": f"Power_{prefix}R{i+1}",
+                    "markers": {"name": f"{prefix}R{i+1}"},
+                }
             )
-            meanT_data.append({"header": f"T_R{i+1}", "markers": {"name": f"R{i+1}"}})
+            meanT_data.append(
+                {"header": f"T_{prefix}R{i+1}", "markers": {"name": f"{prefix}R{i+1}"}}
+            )
 
-    bcname = ""
+    suffix = ""
     if "H" in method_data[4]:
-        bcname = f"%1%"
+        suffix = "%1%"
 
     mpost = {
         "Power": powerH_data,
         "Current": currentH_data,
         "Flux": [
             {
-                "prefix": "Channel",
-                "hw": f"hw{bcname}",
-                "Tw": f"Tw{bcname}",
-                "dTw": f"dTw{bcname}",
-                "Zmin": f"{bcname}_Zmin",
-                "Zmax": f"{bcname}_dZmax",
+                "prefix": f"{prefix}Channel",
+                "hw": f"{prefix}hw{suffix}",
+                "Tw": f"{prefix}Tw{suffix}",
+                "dTw": f"{prefix}dTw{suffix}",
+                "Zmin": f"{prefix}Zmin{suffix}",
+                "Zmax": f"{prefix}Zmax{suffix}",
                 "index_h": f"0:{str(NChannels)}",
             }
         ],
@@ -404,7 +468,7 @@ def Insert_setup(
     # check mpost output
     # print(f"insert: mpost={mpost}")
     mmat = create_materials_insert(
-        gdata, index_Insulators, confdata, templates, method_data, debug
+        (mname,) + gdata, index_Insulators, confdata, templates, method_data, debug
     )
 
     mmodels = {}
@@ -432,7 +496,7 @@ def Insert_setup(
         )
 
     # update U and hw, dTw param
-    print(f"{mname}: Update U for I0={current}A")
+    print(f"{iname}: Update U for I0={current}A")  # ?? mname
     # print(f"insert: mmat: {mmat}")
     # print(f"insert: mdict['Parameters']: {mdict['Parameters']}")
     I0 = current  # 31.e+3
@@ -444,7 +508,7 @@ def Insert_setup(
             pitch = pitch_h[i]
             turns = turns_h[i]
             for j in range(Nsections[i]):
-                marker = f"H{i+1}_Cu{j+1}"
+                marker = f"{prefix}H{i+1}_Cu{j+1}"
                 item = {"name": f"U_{marker}", "value": "1"}
                 index = params.index(item)
                 mat = mmat[marker]
