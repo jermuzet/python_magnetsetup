@@ -723,7 +723,7 @@ def setup_cmds(
         # cmds["Update_cfg"] = update_cfg
 
         pyfeelU = " create_U.py"  # create U.h5
-        pyfeelU_args = f"--jsonfile $PWD/{jsonfile} --meshfile $PWD/data/geometries/{meshfile} --odir $PWD"
+        pyfeelU_args = f"--cfgfile $PWD/{cfgfile} --odir $PWD"
 
         pyfeelUcmds = f"mpirun -np {NP} python {pyfeelU} {pyfeelU_args} "
         cmds["Create_U"] = f"singularity exec {simage_path}/{feelpp} {pyfeelUcmds}"
