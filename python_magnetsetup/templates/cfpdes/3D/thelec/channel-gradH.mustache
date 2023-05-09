@@ -1,7 +1,8 @@
 {
-    "Channel{{i}}":
+    "{{name}}":
 {
-    "expr1":"h{{i}}:h{{i}}",
-    "expr2":"h{{i}}*(Tw{{i}}*(z<Zmin{{i}}) + (dTw{{i}}/(Zmax{{i}}-Zmin{{i}})*(z-Zmin{{i}})+Tw{{i}})*(z>Zmin{{i}})*(z<Zmax{{i}}) + (Tw{{i}}+dTw{{i}})*(y>Zmax{{i}})):z:h{{i}}:Tw{{i}}:dTw{{i}}:Zmin{{i}}:Zmax{{i}}"
+    "expr1":"{{hw}}:{{hw}}",
+    "expr2":"{{hw}}*({{Tw}}*(z<{{Zmin}}) + ({{dTw}}/({{Zmax}}-{{Zmin}})*(z-{{Zmin}})+Tw)*(z>{{Zmin}})*(z<{{Zmax}}) + ({{Tw}}+{{dTw}})*(z>{{Zmax}}))):z:{{hw}}:{{Tw}}:{{dTw}}:{{Zmin}}:{{Zmax}}",
+      
 }
 }

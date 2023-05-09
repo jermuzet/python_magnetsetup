@@ -176,11 +176,9 @@ def loadtemplates(
         flux_model = modelcfg["cooling-post"][cooling]
 
         fcooling = os.path.join(template_path, cooling_model)
-        frobin = os.path.join(template_path, modelcfg["cooling"]["robin"])
         fflux = os.path.join(template_path, flux_model)
 
         dict["cooling"] = fcooling
-        dict["robin"] = frobin
         dict["flux"] = fflux
 
     if check_templates(dict):
@@ -193,7 +191,7 @@ def check_templates(templates: dict):
     """
     check if template file exist
     """
-    print(f'=== Templates keys ===\n {templates.keys()}')
+    print(f"=== Templates keys ===\n {templates.keys()}")
     print("=== Checking Templates ===")
     for key in templates:
         if isinstance(templates[key], str):

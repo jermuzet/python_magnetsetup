@@ -123,7 +123,6 @@ def magnet_setup(
     """
 
     print(f"magnet_setup: mname={mname}")
-    print(f"magnet_setup: confdata={confdata}")
     if debug:
         print(f"magnet_setup: confdata={confdata}"),
 
@@ -185,8 +184,8 @@ def magnet_setup(
                     debug,
                     name=f"magnet_setup {mtype} mdict for {mname}/{yamlfile}",
                 )
-                print(f"magnet_setup: {mtype}, mname={mname}, tdict={tdict}")
-                print(f"magnet_setup: {mtype}, mname={mname}, mdict={mdict}")
+                # print(f"magnet_setup: {mtype}, mname={mname}, tdict={tdict}")
+                # print(f"magnet_setup: {mtype}, mname={mname}, mdict={mdict}")
                 # print(f"magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict['init_temp']}")
                 # print(f"magnet_setup: {mtype}, mname={mname}, mdict[power_magnet]={mdict['power_magnet']}")
                 # list_name = [item['name'] for item in mdict['int_temp']]
@@ -253,8 +252,8 @@ def magnet_setup(
                             print(
                                 f"setup/magnet_setup mname={mname}: force mdict[{key}] to = {{'name': _keys[0], 'magnet_parts': _lists}}"
                             )
-        else:
-            print(f"{mtype} not in confdata={confdata}")
+        # else:
+        #     print(f"{mtype} not in confdata={confdata}")
 
     if debug:
         print(f"magnet_setup: mdict={mdict}")
@@ -314,6 +313,7 @@ def msite_setup(
     """
     Creating dict for setup for msite
     """
+    print(f"msite_setup: confdata={confdata}")
     if debug:
         print("msite_setup:", "confdata=", confdata)
         print("msite_setup: confdata[magnets]=", confdata["magnets"])
@@ -335,6 +335,7 @@ def msite_setup(
             MyEnv, mname, mconfdata, method_data, templates, current, debug
         )
         # print(f"msite_setup({mname}): tdict={tdict}")
+        # print(f"msite_setup({mname}): tdict[init_temp]={tdict['init_temp']}")
         # print(f"msite_setup({mname}): tdict[power_magnet]={tdict['power_magnet']}")
         if debug:
             print(f"tpost[{mname}][Current]: {tpost['Current']}")
@@ -382,7 +383,8 @@ def msite_setup(
         if debug:
             print("NewMerge:", mpost)
 
-    # print(f'msite_setup: mdict[init_temp]={mdict["init_temp"]}')
+    # print(f"msite_setup: mdict={mdict}")
+    # print(f"msite_setup: mdict[init_temp]={mdict['init_temp']}")
     # print(f"msite_setup: mdict[power_magnet]={mdict['power_magnet']}")
 
     if debug:
@@ -428,7 +430,7 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
     mpost = {}
 
     if args.debug:
-        print("confdata:", confdata)
+        print(f"setup: confdata={confdata}")
     cad_basename = ""
     if "geom" in confdata:
         if args.debug:
@@ -453,7 +455,7 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
         current = currents[mname]["value"]
         (mdict, mmat, mmodels, mpost) = magnet_setup(
             MyEnv,
-            mname,
+            "",
             confdata,
             method_data,
             templates,
@@ -502,13 +504,13 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
             yamldata["r_offset"] = [0 for key in todict]
             yamldata["paralax"] = [0 for key in todict]
 
-            print(f"try to create {MyEnv.yaml_repo}/{confdata['name']}.yaml")
             # for obj in confdata[mtype]:
             with open(f"{MyEnv.yaml_repo}/{confdata['name']}.yaml", "x") as out:
                 out.write("!<MSite>\n")
                 yaml.dump(yamldata, out)
-            print(f"try to create {confdata['name']}.yaml done")
+            print(f"create {MyEnv.yaml_repo}/{confdata['name']}.yaml done")
 
+        # print(f"{confdata['name']}: {confdata}")
         (mdict, mmat, mmodels, mpost) = msite_setup(
             MyEnv,
             confdata,
