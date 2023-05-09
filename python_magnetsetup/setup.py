@@ -186,7 +186,9 @@ def magnet_setup(
                 )
                 # print(f"magnet_setup: {mtype}, mname={mname}, tdict={tdict}")
                 # print(f"magnet_setup: {mtype}, mname={mname}, mdict={mdict}")
-                # print(f"magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict['init_temp']}")
+                print(
+                    f'magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict["init_temp"]}'
+                )
                 # print(f"magnet_setup: {mtype}, mname={mname}, mdict[power_magnet]={mdict['power_magnet']}")
                 # list_name = [item['name'] for item in mdict['int_temp']]
 
@@ -240,6 +242,9 @@ def magnet_setup(
                         # print(f"setup/magnet_setup mname={mname}: mdict[{key}]={mdict[key]}")
                         _key = [item["name"] for item in mdict[key]]
                         _keys = list(set(_key))
+                        if key == "init_temp":
+                            _pref = [item["prefix"] for item in mdict[key]]
+                            _prefs = list(set(_pref))
                         if len(_keys) > 1:
                             raise Exception(
                                 f"setup/magnet_setup mname={mname}: mdict[{key}] seems broken - mdict[{key}]={mdict[key]}"
@@ -247,7 +252,16 @@ def magnet_setup(
 
                         _list = [item["magnet_parts"] for item in mdict[key]]
                         _lists = list(set(list(itertools.chain(*_list))))
-                        mdict[key] = [{"name": _keys[0], "magnet_parts": _lists}]
+                        if key == "init_temp":
+                            mdict[key] = [
+                                {
+                                    "name": _keys[0],
+                                    "prefix": _prefs[0],
+                                    "magnet_parts": _lists,
+                                }
+                            ]
+                        else:
+                            mdict[key] = [{"name": _keys[0], "magnet_parts": _lists}]
                         if debug:
                             print(
                                 f"setup/magnet_setup mname={mname}: force mdict[{key}] to = {{'name': _keys[0], 'magnet_parts': _lists}}"
@@ -730,6 +744,9 @@ def setup_cmds(
             f"perl -pi -e 's|gmsh.partition=.*|gmsh.partition = 0|' {cfgfile}"
         )
         cmds["Update_Partition"] = update_partition
+
+        update_cfgmesh = f"perl -pi -e 's|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|' {cfgfile}"
+        cmds["Update_Mesh"] = update_cfgmesh
     if args.geom == "Axi":
         cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd} --dim 2"
         meshfile = h5file
@@ -740,6 +757,9 @@ def setup_cmds(
         # update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale =|' {cfgfile}"
         # cmds["Update_cfg"] = update_cfg
 
+        update_cfgmesh = f"perl -pi -e 's|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|' {cfgfile}"
+        cmds["Update_Mesh"] = update_cfgmesh
+
         pyfeelU = " create_U.py"  # create U.h5
         pyfeelU_args = f"--cfgfile $PWD/{cfgfile} --odir $PWD"
 
@@ -747,9 +767,6 @@ def setup_cmds(
         cmds["Create_U"] = f"singularity exec {simage_path}/{feelpp} {pyfeelUcmds}"
 
     # TODO add command to change mesh.filename in cfgfile
-    update_cfgmesh = f"perl -pi -e 's|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|' {cfgfile}"
-
-    cmds["Update_Mesh"] = update_cfgmesh
 
     feelcmd = f"{exec} --directory {root_directory} --config-file {cfgfile}"
     pyfeelcmd = f"python {pyfeel} {cfgfile} {pyfeel_args}"

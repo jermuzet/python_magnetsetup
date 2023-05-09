@@ -227,7 +227,7 @@ def create_params_insert(
     params_data["Parameters"].append({"name": f"{prefix}Tinit", "value": 293})
     # get value from coolingmethod and Flow(I) value
     params_data["Parameters"].append(
-        {"name": "hw", "value": convert_data(units, 58222.1, "h")}
+        {"name": f"{prefix}hw", "value": convert_data(units, 58222.1, "h")}
     )
     params_data["Parameters"].append({"name": f"{prefix}Tw", "value": 290.671})
     params_data["Parameters"].append({"name": f"{prefix}dTw", "value": 12.74})
@@ -485,7 +485,7 @@ def create_materials_insert(
                 fconductor,
                 Merge(
                     {
-                        "name": f"Conductor_H{i+1}",
+                        "name": f"Conductor_{prefix}H{i+1}",
                         "part_mat_conductor": maindata["part_mat_helices"][i],
                     },
                     confdata["Helix"][i]["material"],
@@ -493,21 +493,25 @@ def create_materials_insert(
                 debug,
             )
             # print("load conductor[{j}]:", mdata)
-            materials_dict[f"Conductor_H{i+1}"] = mdata[f"Conductor_H{i+1}"]
+            materials_dict[f"Conductor_{prefix}H{i+1}"] = mdata[
+                f"Conductor_{prefix}H{i+1}"
+            ]
 
             # section j==Nsections+1:  treated as insulator in Axi
             mdata = entry(
                 finsulator,
                 Merge(
                     {
-                        "name": f"Insulator_H{i+1}",
+                        "name": f"Insulator_{prefix}H{i+1}",
                         "part_mat_insulator": maindata["part_mat_insulators"][i],
                     },
                     confdata["Helix"][i]["material"],
                 ),
                 debug,
             )
-            materials_dict[f"Insulator_H{i+1}"] = mdata[f"Insulator_H{i+1}"]
+            materials_dict[f"Insulator_{prefix}H{i+1}"] = mdata[
+                f"Insulator_{prefix}H{i+1}"
+            ]
 
     # loop for Rings
     for i in range(NRings):
@@ -522,7 +526,7 @@ def create_materials_insert(
                 finsulator,
                 Merge(
                     {
-                        "name": f"R{i+1}",
+                        "name": f"{prefix}R{i+1}",
                         "part_mat_insulator": maindata["part_mat_insulators"][
                             NHelices + i
                         ],

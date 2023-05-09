@@ -42,6 +42,10 @@ def Bitter_setup(
     if debug:
         print(f"Bitter_setup/Bitter confdata: {confdata}")
 
+    prefix = ""
+    if mname:
+        prefix = mname + "_"
+
     print(f"Bitter_setup:  magnet={mname}, cad={cad.name}")
     print(f"cad={cad}")
     print(f"cad.get_params={cad.get_params(MyEnv.yaml_repo)}")
@@ -72,7 +76,7 @@ def Bitter_setup(
 
     ignore_index = []
     snames = []
-    name = f"{mname}_{cad.name}"  # .replace('Bitter_','')
+    name = f"{prefix}{cad.name}"  # .replace('Bitter_','')
     if method_data[2] == "Axi":
         shift = 0
         part_bitters.append(f"Conductor_{name}")
@@ -151,11 +155,15 @@ def Bitter_setup(
     init_temp_data = []
     # init_temp_data.append( {'name': f'{mname}', "part_thermic_part": part_thermic } )
     init_temp_data.append(
-        {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
+        {
+            "name": f"{mname}",
+            "prefix": f"{prefix}",
+            "magnet_parts": copy.deepcopy(part_thermic),
+        }
     )
     init_temp_dict = {"init_temp": init_temp_data}
     NMerge(init_temp_dict, mdict, debug, name="bitter_setup init")
-    print('bitter_setup: add init_temp mdict[init_temp] = {mdict["init_temp"]}')
+    print(f'bitter_setup: add init_temp mdict[init_temp] = {mdict["init_temp"]}')
     # print(f'init_tem_data({mname}): {init_temp_data}')
 
     # add power per magnet data: mdict = NMerge( mdict, {'power_magnet': power_data}, debug, "bitter_setup mdict")

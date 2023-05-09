@@ -171,10 +171,11 @@ def Insert_setup(
             part_insulator.append(f"{prefix}H{i+1}_Cu{Nsections[i] + 1}")
             part_mat_insulators.append(part_insulator)
 
-            part_helices.append(f"Conductor_H{i+1}")
-            part_insulators.append(f"Insulator_H{i+1}")
+            part_helices.append(f"Conductor_{prefix}H{i+1}")
+            part_insulators.append(f"Insulator_{prefix}H{i+1}")
             for j in range(1, Nsections[i] + 1):
                 part_electric.append(f"{prefix}H{i+1}_Cu{j}")
+                part_helix.append(f"{prefix}H{i+1}_Cu{j}")
             for j in range(Nsections[i] + 2):
                 if "th" in method_data[3]:
                     part_thermic.append(f"{prefix}H{i+1}_Cu{j}")
@@ -286,7 +287,11 @@ def Insert_setup(
         iname = mname
     init_temp_data = []
     init_temp_data.append(
-        {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
+        {
+            "name": f"{mname}",
+            "prefix": f"{prefix}",
+            "magnet_parts": copy.deepcopy(part_thermic),
+        }
     )
     init_temp_dict = {"init_temp": init_temp_data}
     NMerge(init_temp_dict, mdict, debug, "insert_setup mdict")
@@ -573,7 +578,7 @@ def Insert_setup(
         for i in range(NHelices):
             pitch = pitch_h[i]
             turns = turns_h[i]
-            mat = mmat[f"Conductor_H{i+1}"]
+            mat = mmat[f"Conductor_{prefix}H{i+1}"]
             for j in range(Nsections[i]):
                 marker = f"{prefix}H{i+1}_Cu{j+1}"
                 item = {"name": f"U_{marker}", "value": "1"}
