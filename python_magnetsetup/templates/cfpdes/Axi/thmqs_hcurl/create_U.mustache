@@ -21,7 +21,7 @@ with open(args.cfgfile, "r") as fp:
         if line.startswith("filename="):
             jsonfile = line.replace("filename=$cfgdir", PWD).rstrip()
 
-        if "mesh.filename=" in line:
+        if line.startswith("mesh.filename="):
             meshfile = line.replace("mesh.filename=$cfgdir", PWD).rstrip()
 
 
