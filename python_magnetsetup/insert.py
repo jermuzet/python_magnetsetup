@@ -516,9 +516,8 @@ def Insert_setup(
     mmodels = {}
     for physic in templates["physic"]:
         mmodels[physic] = create_models_insert(
-            gdata,
+            prefix,
             main_data,
-            index_Insulators,
             confdata,
             templates,
             method_data,

@@ -594,7 +594,6 @@ def create_models_supra(
 
 
 def create_models_bitter(
-    mname: str,
     gdata: tuple,
     maindata: dict,
     confdata: dict,
@@ -644,9 +643,8 @@ def create_models_bitter(
 
 
 def create_models_insert(
-    gdata: tuple,
+    prefix: str,
     maindata: dict,
-    idata: Optional[List],
     confdata: dict,
     templates: dict,
     method_data: List[str],
@@ -662,22 +660,28 @@ def create_models_insert(
     fconductor = templates[equation + "-conductor"]
     finsulator = templates[equation + "-insulator"]
     # print('\n\nfconductor :', fconductor)
+    if method_data[2] == "Axi":
+        mdata = entry(
+            finsulator,
+            {
+                "name": f"Insulator_{prefix}Insert",
+                "part_insulator": maindata["part_insulators"],
+            },
+            debug,
+        )
+        models_dict[f"Insulator_{prefix}Insert"] = mdata
 
-    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
-
-    mdata = entry(
-        finsulator,
-        {"name": "Insulator_insert", "part_insulator": maindata["part_insulators"]},
-        debug,
-    )
-    models_dict[f"Insulator_insert"] = mdata
-
-    mdata = entry(
-        fconductor,
-        {"name": "Conductor_insert", "part_conductor": maindata["part_conductors"]},
-        debug,
-    )
-    models_dict[f"Conductor_insert"] = mdata
+        mdata = entry(
+            fconductor,
+            {
+                "name": f"Conductor_{prefix}Insert",
+                "part_conductor": maindata["part_conductors"],
+            },
+            debug,
+        )
+        models_dict[f"Conductor_{prefix}Insert"] = mdata
+    else:
+        return {}
     # Loop for Helix
     # for i in range(NHelices):
     #     # section j==0:  treated as insulator in Axi

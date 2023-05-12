@@ -267,7 +267,6 @@ def Bitter_setup(
     mmodels = {}
     for physic in templates["physic"]:
         mmodels[physic] = create_models_bitter(
-            mname,
             gdata,
             main_data,
             confdata,
