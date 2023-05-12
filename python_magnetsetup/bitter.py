@@ -265,61 +265,15 @@ def Bitter_setup(
     )
 
     mmodels = {}
-    if "th" in method_data[3]:
-        mmodels["heat"] = create_models_bitter(
+    for physic in templates["physic"]:
+        mmodels[physic] = create_models_bitter(
             mname,
             gdata,
             main_data,
             confdata,
             templates,
             method_data,
-            "heat",
-            debug,
-        )
-
-    if "mag" in method_data[3] or "mqs" in method_data[3]:
-        mmodels["magnetic"] = create_models_bitter(
-            mname,
-            gdata,
-            main_data,
-            confdata,
-            templates,
-            method_data,
-            "magnetic",
-            debug,
-        )
-
-    if "magel" in method_data[3]:
-        mmodels["elastic"] = create_models_bitter(
-            mname,
-            gdata,
-            main_data,
-            confdata,
-            templates,
-            method_data,
-            "elastic",
-            debug,
-        )
-
-    if "mqsel" in method_data[3]:
-        mmodels["elastic1"] = create_models_bitter(
-            mname,
-            gdata,
-            main_data,
-            confdata,
-            templates,
-            method_data,
-            "elastic1",
-            debug,
-        )
-        mmodels["elastic2"] = create_models_bitter(
-            mname,
-            gdata,
-            main_data,
-            confdata,
-            templates,
-            method_data,
-            "elastic2",
+            physic,
             debug,
         )
 
