@@ -87,8 +87,7 @@ def Bitter_setup(
         for i in range(len(cad.axi.turns)):
             snames.append(f"{name}_B{i+shift}")
             part_electric.append(snames[-1])
-            if "th" in method_data[3]:
-                part_thermic.append(snames[-1])
+            part_thermic.append(snames[-1])
         if cad.z[1] > cad.axi.h:
             snames.append(f"{name}_B{len(cad.axi.turns)+1}")
             part_thermic.append(snames[-1])
