@@ -130,8 +130,8 @@ def Insert_setup(
 
     part_thermic = []
     part_electric = []
-    part_helices = []
-    part_mat_helices = []
+    part_conductors = []
+    part_mat_conductors = []
     part_insulators = []
     part_mat_insulators = []
     index_Helices = []
@@ -171,18 +171,14 @@ def Insert_setup(
             part_insulator.append(f"{prefix}H{i+1}_Cu{Nsections[i] + 1}")
             part_mat_insulators.append(part_insulator)
 
-            part_helices.append(f"Conductor_{prefix}H{i+1}")
+            part_conductors.append(f"Conductor_{prefix}H{i+1}")
             part_insulators.append(f"Insulator_{prefix}H{i+1}")
             for j in range(1, Nsections[i] + 1):
-                part_electric.append(f"{prefix}H{i+1}_Cu{j}")
                 part_helix.append(f"{prefix}H{i+1}_Cu{j}")
-            for j in range(Nsections[i] + 2):
-                if "th" in method_data[3]:
-                    part_thermic.append(f"{prefix}H{i+1}_Cu{j}")
             for j in range(Nsections[i]):
                 index_Helices.append([f"0:{Nsections[i]+2}"])
                 index_Helices_e.append([f"1:{Nsections[i]+1}"])
-            part_mat_helices.append(part_helix)
+            part_mat_conductors.append(part_helix)
         else:
             part_electric.append(f"{prefix}H{i+1}")
             if "th" in method_data[3]:
@@ -194,16 +190,26 @@ def Insert_setup(
             if "th" in method_data[3]:
                 part_thermic.append(insulator_name)
 
+    if method_data[2] == "Axi":
+        import numpy as np
+
+        part_electric = part_electric + list(np.concatenate(part_mat_conductors).flat)
+        if "th" in method_data[3]:
+            part_thermic = (
+                part_thermic
+                + part_electric
+                + list(np.concatenate(part_mat_insulators).flat)
+            )
+
     for i in range(NRings):
         if "th" in method_data[3]:
             part_thermic.append(f"{prefix}R{i+1}")
-        part_insulator = []
-        part_insulator.append(f"{prefix}R{i+1}")
-        part_mat_insulators.append(part_insulator)
-        part_insulators.append(f"{prefix}R{i+1}")
 
         if method_data[2] == "3D":
             part_electric.append(f"{prefix}R{i+1}")
+        else:
+            part_mat_insulators.append([f"{prefix}R{i+1}"])
+            part_insulators.append(f"{prefix}R{i+1}")
 
     # Add currentLeads
     if method_data[2] == "3D":
@@ -253,8 +259,8 @@ def Insert_setup(
         print("insert part_thermic:", part_thermic)
         print("insert part_insulators:", part_insulators)
         print("insert part_mat_insulators:", part_mat_insulators)
-        print("insert part_helices:", part_helices)
-        print("insert part_mat_helices:", part_mat_helices)
+        print("insert part_conductors:", part_conductors)
+        print("insert part_mat_conductors:", part_mat_conductors)
 
     # params section
     params_data = create_params_insert(mname, gdata + (turns_h,), method_data, debug)
@@ -312,8 +318,8 @@ def Insert_setup(
         "part_electric": part_electric,
         "part_insulators": part_insulators,
         "part_mat_insulators": part_mat_insulators,
-        "part_helices": part_helices,
-        "part_mat_helices": part_mat_helices,
+        "part_conductors": part_conductors,
+        "part_mat_conductors": part_mat_conductors,
         "index_V0": boundary_electric,
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5",

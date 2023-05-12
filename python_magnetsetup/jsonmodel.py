@@ -488,7 +488,7 @@ def create_materials_insert(
                 Merge(
                     {
                         "name": f"Conductor_{prefix}H{i+1}",
-                        "part_mat_conductor": maindata["part_mat_helices"][i],
+                        "part_mat_conductor": maindata["part_mat_conductors"][i],
                     },
                     confdata["Helix"][i]["material"],
                 ),
@@ -674,7 +674,7 @@ def create_models_insert(
 
     mdata = entry(
         fconductor,
-        {"name": "Conductor_insert", "part_conductor": maindata["part_helices"]},
+        {"name": "Conductor_insert", "part_conductor": maindata["part_conductors"]},
         debug,
     )
     models_dict[f"Conductor_insert"] = mdata
