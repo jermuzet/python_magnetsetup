@@ -353,7 +353,7 @@ def create_materials_bitter(
             Merge(
                 {
                     "name": f"Conductor_{name}",
-                    "part_mat_conductor": maindata["part_mat_bitters"],
+                    "part_mat_conductor": maindata["part_electric"],
                 },
                 confdata["material"],
             ),
@@ -368,7 +368,9 @@ def create_materials_bitter(
             Merge(
                 {
                     "name": f"Insulator_{name}",
-                    "part_mat_insulator": maindata["part_mat_insulators"],
+                    "part_mat_insulator": list(
+                        set(maindata["part_thermic"]) - set(maindata["part_electric"])
+                    ),
                 },
                 confdata["material"],
             ),
@@ -628,7 +630,7 @@ def create_models_bitter(
             fconductor,
             {
                 "name": f"Conductor_{name}",
-                "part_conductor": maindata["part_bitters"],
+                "part_conductor": maindata["part_conductors"],
             },
             debug,
         )

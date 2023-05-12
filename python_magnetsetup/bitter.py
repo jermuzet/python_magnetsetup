@@ -54,10 +54,8 @@ def Bitter_setup(
     part_thermic = []
     part_electric = []
 
-    part_bitters = []
-    part_mat_bitters = []
+    part_conductors = []
     part_insulators = []
-    part_mat_insulators = []
 
     index_ABitters = ""
     index_Bitters = ""
@@ -79,24 +77,20 @@ def Bitter_setup(
     name = f"{prefix}{cad.name}"  # .replace('Bitter_','')
     if method_data[2] == "Axi":
         shift = 0
-        part_bitters.append(f"Conductor_{name}")
+        part_conductors.append(f"Conductor_{name}")
         part_insulators.append(f"Insulator_{name}")
-
         if cad.z[0] < -cad.axi.h:
             snames.append(f"{name}_B0")
-            part_mat_insulators.append(snames[-1])
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames) - 1)
             shift = 1
         for i in range(len(cad.axi.turns)):
             snames.append(f"{name}_B{i+shift}")
             part_electric.append(snames[-1])
-            part_mat_bitters.append(snames[-1])
             if "th" in method_data[3]:
                 part_thermic.append(snames[-1])
         if cad.z[1] > cad.axi.h:
             snames.append(f"{name}_B{len(cad.axi.turns)+1}")
-            part_mat_insulators.append(snames[-1])
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames) - 1)
         index_Bitters = f"shift:{NSections+shift}"
@@ -183,9 +177,7 @@ def Bitter_setup(
         "part_thermic": part_thermic,
         "part_electric": part_electric,
         "part_insulators": part_insulators,
-        "part_mat_insulators": part_mat_insulators,
-        "part_bitters": part_bitters,
-        "part_mat_bitters": part_mat_bitters,
+        "part_conductors": part_conductors,
         "index_V0": boundary_electric,
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5",
