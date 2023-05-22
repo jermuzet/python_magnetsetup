@@ -87,8 +87,7 @@
 					},
 					"post": {
 						"heat.temperature": "T[K]"
-					},
-					"create_U": "create_U.mustache"
+					}
 				},
 				"mag_hcurl": {
 					"physic": [
@@ -109,8 +108,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				},
 				"mag": {
 					"physic": [
@@ -157,8 +155,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				},
 				"thmag_hcurl": {
 					"physic": [
@@ -229,8 +226,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				},
 				"thmag": {
 					"physic": [
@@ -301,8 +297,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				},
 				"thmagel_hcurl": {
 					"physic": [
@@ -392,8 +387,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				},
 				"thmagel": {
 					"physic": [
@@ -483,8 +477,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				}
 			},
 			"3D": {
@@ -578,8 +571,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				},
 				"mqs": {
 					"physic": [
@@ -603,8 +595,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				},
 				"thmqs_hcurl": {
 					"physic": [
@@ -679,8 +670,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				},
 				"thmqs": {
 					"physic": [
@@ -755,8 +745,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				},
 				"thmqsel_hcurl": {
 					"physic": [
@@ -855,8 +844,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				},
 				"thmqsel": {
 					"physic": [
@@ -955,8 +943,7 @@
 					},
 					"plots": {
 						"B": "plot_B.mustache"
-					},
-					"create_U": "create_U.mustache"
+					}
 				}
 			},
 			"3D": {

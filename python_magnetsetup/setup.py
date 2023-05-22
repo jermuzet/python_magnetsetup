@@ -44,7 +44,6 @@ from .objects import load_object
 from .utils import NMerge
 from .cfg import create_cfg
 from .jsonmodel import create_json
-from .create_U import add_create_U
 
 from .insert import Insert_setup, Insert_simfile
 from .bitter import Bitter_setup, Bitter_simfile
@@ -587,9 +586,6 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
         jsonfile, mdict, mmat, mmodels, mpost, templates, method_data, args.debug
     )
 
-    if args.geom == "Axi" and args.method == "cfpdes":
-        add_create_U(templates["create_U"], args.debug)
-
     if "geom" in confdata:
         print(f'magnet geo: {confdata["geom"]}')
         yamlfile = confdata["geom"]
@@ -745,26 +741,12 @@ def setup_cmds(
         )
         cmds["Update_Partition"] = update_partition
 
-        update_cfgmesh = f"perl -pi -e 's|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|' {cfgfile}"
-        cmds["Update_Mesh"] = update_cfgmesh
     if args.geom == "Axi":
         cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd} --dim 2"
         meshfile = h5file
-        # update_partition = (
-        #     f"perl -pi -e 's|gmsh.partition=.*|#gmsh.partition = 0|' {cfgfile}"
-        # )
-        # cmds["Update_Partition"] = update_partition
-        # update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale =|' {cfgfile}"
-        # cmds["Update_cfg"] = update_cfg
 
-        update_cfgmesh = f"perl -pi -e 's|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|' {cfgfile}"
-        cmds["Update_Mesh"] = update_cfgmesh
-
-        pyfeelU = " create_U.py"  # create U.h5
-        pyfeelU_args = f"--cfgfile $PWD/{cfgfile} --odir $PWD"
-
-        pyfeelUcmds = f"mpirun -np {NP} python {pyfeelU} {pyfeelU_args} "
-        cmds["Create_U"] = f"singularity exec {simage_path}/{feelpp} {pyfeelUcmds}"
+    update_cfgmesh = f"perl -pi -e 's|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|' {cfgfile}"
+    cmds["Update_Mesh"] = update_cfgmesh
 
     # TODO add command to change mesh.filename in cfgfile
 

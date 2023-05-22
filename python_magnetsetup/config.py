@@ -128,10 +128,6 @@ def loadtemplates(
     fconductor = os.path.join(template_path, conductor_model)
     finsulator = os.path.join(template_path, insulator_model)
 
-    if geom == "Axi":
-        pyfeelU = modelcfg["create_U"]
-        fpyfeelU = os.path.join(template_path, pyfeelU)
-
     material_generic_def = ["conductor", "insulator"]
     if time == "transient":
         material_generic_def.append("conduct-nosource")  # only for transient with mqs
@@ -146,9 +142,6 @@ def loadtemplates(
         "plots": {},
         "material_def": material_generic_def,
     }
-
-    if geom == "Axi":
-        dict["create_U"] = fpyfeelU
 
     if "stats" in modelcfg:
         _cfg = modelcfg["stats"]
