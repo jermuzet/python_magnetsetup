@@ -6,7 +6,7 @@ filename=$cfgdir/{{jsonfile}}
 
 mesh.filename=$cfgdir/{{mesh}}
 # mesh.scale = {{scale}}
-gmsh.partition={{partition}}
+# gmsh.partition={{partition}}
 
 solver=Newton
 verbose_solvertimer=1
@@ -17,14 +17,14 @@ snes-maxit=40
 snes-line-search-type=basic
 
 # Fieldsplit
-pc-type=fieldsplit
-fieldsplit-type=additive #additive, multiplicative, symmetric-multiplicative
-[cfpdes.fieldsplit-0]
-pc-type=gamg
-[cfpdes.fieldsplit-1]
-pc-type=gamg
-[cfpdes.fieldsplit-2]
-pc-type=gamg
+#pc-type=fieldsplit
+#fieldsplit-type=additive #additive, multiplicative, symmetric-multiplicative
+#[cfpdes.fieldsplit-0]
+#pc-type=gamg
+#[cfpdes.fieldsplit-1]
+#pc-type=gamg
+#[cfpdes.fieldsplit-2]
+#pc-type=gamg
 
 [cfpdes.magnetic]
 #time-stepping=Theta

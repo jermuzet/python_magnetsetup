@@ -606,7 +606,7 @@
 					"model": "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
 					"conductor-linear": "conductor-linear-transient.mustache",
-					"conductor-nonlinear": "conductor-nonlinear.mustache",
+					"conductor-nonlinear": "conductor-nonlinear-transient.mustache",
 					"conduct-nosource": "conduct-nosource.mustache",
 					"insulator": "insulator-transient.mustache",
 					"models": {
@@ -681,7 +681,7 @@
 					"model": "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
 					"conductor-linear": "conductor-linear-transient.mustache",
-					"conductor-nonlinear": "conductor-nonlinear.mustache",
+					"conductor-nonlinear": "conductor-nonlinear-transient.mustache",
 					"conduct-nosource": "conduct-nosource.mustache",
 					"insulator": "insulator-transient.mustache",
 					"models": {
