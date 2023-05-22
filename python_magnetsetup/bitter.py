@@ -95,7 +95,7 @@ def Bitter_setup(
         index_Bitters = f"shift:{NSections+shift}"
         start = snames[0].replace(f"{name}_B", "")
         index_ABitters = f"{start}:{len(snames)}"
-        index_Bitters = f"{shift}:{len(cad.axi.turns)}"
+        index_Bitters = f"{shift}:{len(cad.axi.turns)+1}"
         if debug:
             print("sname:", snames)
     else:
