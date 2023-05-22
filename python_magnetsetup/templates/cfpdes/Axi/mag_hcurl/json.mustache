@@ -39,6 +39,16 @@
 
 		"T0":"293."
     },
+	"Meshes": {
+        "cfpdes": {
+            "Fields": {
+                "U": {
+                    "filename": "$cfgdir/U.h5",
+                    "basis": "Pch1"
+                }
+            }
+        }
+    },
     "Materials":
     {
 		"Air":
@@ -103,17 +113,17 @@
 				},
 				"Points":
 				{
-				"B0":
-				{
-                                    "coord":"{1e-7,0.}",
-                                    "fields":"Atheta",
-			            "expressions":
-                                    {
-                                          "Bz": "magnetic_grad_Atheta_0+magnetic_Atheta/x:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x"
-                                    }
+					"B0":
+					{
+						"coord":"{1e-7,0.}",
+						"fields":"Atheta",
+						"expressions":
+						{
+							"Bz": "magnetic_grad_Atheta_0+magnetic_Atheta/x:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x"
+						}
+					}
 				}
-                                }
+			}
 		}
-                }
     }
 }

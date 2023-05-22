@@ -1,4 +1,11 @@
 {
     "name":"elastic2_{{name}}",
-    "materials":"{{name}}"
+    "materials":{{part_insulator}},
+    "setup":{
+        "coefficients":{
+            "d":"x:x",
+            "gamma":"{-materials_stress_rr*x,-materials_stress_rz*x,- materials_stress_rz*x, -materials_stress_zz*x}:x:materials_stress_rr:materials_stress_rz:materials_stress_zz",
+            "f":"{- materials_stress_thth,0}:x:materials_stress_thth"
+        }
+    }
 }

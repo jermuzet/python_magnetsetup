@@ -185,7 +185,9 @@ def magnet_setup(
                 )
                 # print(f"magnet_setup: {mtype}, mname={mname}, tdict={tdict}")
                 # print(f"magnet_setup: {mtype}, mname={mname}, mdict={mdict}")
-                # print(f"magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict['init_temp']}")
+                print(
+                    f'magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict["init_temp"]}'
+                )
                 # print(f"magnet_setup: {mtype}, mname={mname}, mdict[power_magnet]={mdict['power_magnet']}")
                 # list_name = [item['name'] for item in mdict['int_temp']]
 
@@ -195,11 +197,21 @@ def magnet_setup(
 
                 if debug:
                     print(f"tmodels: {tmodels}")
-                NMerge(tmodels, mmodels, debug, "magnet_setup Bitter/Supra mmodels ")
+                for physic in tmodels:
+                    if physic not in mmodels:
+                        mmodels[physic] = {}
+                    NMerge(
+                        tmodels[physic],
+                        mmodels[physic],
+                        debug,
+                        name="magnet_setup Bitter/Supra mmodels ",
+                    )
 
                 if debug:
                     print(f"tpost: {tpost}")
-                NMerge(tpost, mpost, debug, "magnet_setup Bitter/Supra mpost")  # debug)
+                NMerge(
+                    tpost, mpost, debug, name="magnet_setup Bitter/Supra mpost"
+                )  # debug)
                 if debug:
                     print(f"magnet_setup {mname}: tpost[Current]={tpost['Current']}")
                     print(f"magnet_setup {mname}: mpost[Current]={mpost['Current']}")
@@ -229,6 +241,9 @@ def magnet_setup(
                         # print(f"setup/magnet_setup mname={mname}: mdict[{key}]={mdict[key]}")
                         _key = [item["name"] for item in mdict[key]]
                         _keys = list(set(_key))
+                        if key == "init_temp":
+                            _pref = [item["prefix"] for item in mdict[key]]
+                            _prefs = list(set(_pref))
                         if len(_keys) > 1:
                             raise Exception(
                                 f"setup/magnet_setup mname={mname}: mdict[{key}] seems broken - mdict[{key}]={mdict[key]}"
@@ -236,7 +251,16 @@ def magnet_setup(
 
                         _list = [item["magnet_parts"] for item in mdict[key]]
                         _lists = list(set(list(itertools.chain(*_list))))
-                        mdict[key] = [{"name": _keys[0], "magnet_parts": _lists}]
+                        if key == "init_temp":
+                            mdict[key] = [
+                                {
+                                    "name": _keys[0],
+                                    "prefix": _prefs[0],
+                                    "magnet_parts": _lists,
+                                }
+                            ]
+                        else:
+                            mdict[key] = [{"name": _keys[0], "magnet_parts": _lists}]
                         if debug:
                             print(
                                 f"setup/magnet_setup mname={mname}: force mdict[{key}] to = {{'name': _keys[0], 'magnet_parts': _lists}}"
@@ -340,9 +364,25 @@ def msite_setup(
         if debug:
             print("mmat:", mmat)
 
-        NMerge(tmodels, mmodels, debug, "msite_setup/tmodels")
+        if debug:
+            print(f"tmodels: {tmodels}")
+        for physic in tmodels:
+            if physic not in mmodels:
+                mmodels[physic] = {}
+            NMerge(
+                tmodels[physic],
+                mmodels[physic],
+                debug,
+                name="msite_setup mmodels ",
+            )
 
         NMerge(tpost, mpost, debug, "msite_setup/tpost")
+
+        tdict.clear()
+        tmat.clear()
+        tmodels.clear()
+        tpost.clear()
+
         list_current = []
         for item in mpost["Current"]:
             if isinstance(item, dict) and "part_electric" in item:
@@ -660,7 +700,7 @@ def setup_cmds(
             )
 
         # let xao decide mesh caracteristic length ??:
-        meshcmd = f"python3 -m python_magnetgmsh.xao {xaofile} --wd data/geometries --geo {yamlfile} mesh --group CoolingChannels"
+        meshcmd = f"python3 -m python_magnetgmsh.xao2msh {xaofile} --wd data/geometries --geo {yamlfile} mesh --group CoolingChannels"
     else:
         gmshfile = meshfile.replace(".med", ".msh")
         meshconvert = f"gmsh -0 {meshfile} -bin -o {gmshfile}"
@@ -700,14 +740,15 @@ def setup_cmds(
             f"perl -pi -e 's|gmsh.partition=.*|gmsh.partition = 0|' {cfgfile}"
         )
         cmds["Update_Partition"] = update_partition
+
     if args.geom == "Axi":
-        update_cfg = f"perl -pi -e 's|# mesh.scale =|mesh.scale =|' {cfgfile}"
-        cmds["Update_cfg"] = update_cfg
+        cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd} --dim 2"
+        meshfile = h5file
+
+    update_cfgmesh = f"perl -pi -e 's|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|' {cfgfile}"
+    cmds["Update_Mesh"] = update_cfgmesh
 
     # TODO add command to change mesh.filename in cfgfile
-    update_cfgmesh = f"perl -pi -e 's|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|' {cfgfile}"
-
-    cmds["Update_Mesh"] = update_cfgmesh
 
     feelcmd = f"{exec} --directory {root_directory} --config-file {cfgfile}"
     pyfeelcmd = f"python {pyfeel} {cfgfile} {pyfeel_args}"

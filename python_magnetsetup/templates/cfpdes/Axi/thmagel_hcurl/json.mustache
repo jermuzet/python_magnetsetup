@@ -70,6 +70,16 @@
 		"T0":"293.",
 		"Tin":"284.15"
     },
+	"Meshes": {
+        "cfpdes": {
+            "Fields": {
+                "U": {
+                    "filename": "$cfgdir/U.h5",
+                    "basis": "Pch1"
+                }
+            }
+        }
+    },
     "Materials":
     {
 		"Air":
@@ -127,7 +137,7 @@
 					"{{name}}":
 					{
 						"markers": {{magnet_parts}},
-						"expr":"{{name}}_Tinit:{{name}}_Tinit"
+						"expr":"{{prefix}}Tinit:{{prefix}}Tinit"
 					},
 					{{/init_temp}}
 				}

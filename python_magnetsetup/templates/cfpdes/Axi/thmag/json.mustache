@@ -55,6 +55,16 @@
 		"T0":"293.",
 		"Tin":"284.15"
     },
+	"Meshes": {
+        "cfpdes": {
+            "Fields": {
+                "U": {
+                    "filename": "$cfgdir/U.h5",
+                    "basis": "Pch1"
+                }
+            }
+        }
+    },
     "Materials":
     {
 		"Air":
@@ -100,7 +110,7 @@
 					"{{name}}":
 					{
 						"markers": {{magnet_parts}},
-						"expr":"{{name}}_Tinit:{{name}}_Tinit"
+						"expr":"{{prefix}}Tinit:{{prefix}}Tinit"
 					},
 					{{/init_temp}}
 				}
@@ -161,6 +171,18 @@
 						"markers": {{part_electric}}
 		    		}
 
+				},
+				"Points":
+				{
+					"B0":
+					{
+							"coord":"{1e-7,0.}",
+							"fields":"phi",
+							"expressions":
+							{
+									"Bz": "magnetic_grad_phi_0/x:magnetic_grad_phi_0:magnetic_grad_phi_1:x"
+							}
+					}
 				}
 	    	}
 		},

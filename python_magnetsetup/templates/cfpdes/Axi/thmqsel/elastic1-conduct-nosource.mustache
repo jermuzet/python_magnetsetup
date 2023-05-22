@@ -3,8 +3,8 @@
     "materials":"{{name}}",
     "setup":{
         "coefficients":{
-            "gamma":"{-materials_{{name}}_stress_rr*x,-materials_{{name}}_stress_rz*x,- materials_{{name}}_stress_rz*x, -materials_{{name}}_stress_zz*x}:x:materials_{{name}}_stress_rr:materials_{{name}}_stress_rz:materials_{{name}}_stress_zz",
-            "f":"{- materials_{{name}}_stress_thth,0}:materials_{{name}}_stress_thth"
+            "d":"materials_{{name}}_rho*x:materials_{{name}}_rho:x",
+            "f":"{x*elastic2_v_0,x*elastic2_v_1}:x:elastic2_v_0:elastic2_v_1"
         }
     }
 }

@@ -227,7 +227,7 @@ def create_params_insert(
     params_data["Parameters"].append({"name": f"{prefix}Tinit", "value": 293})
     # get value from coolingmethod and Flow(I) value
     params_data["Parameters"].append(
-        {"name": "hw", "value": convert_data(units, 58222.1, "h")}
+        {"name": f"{prefix}hw", "value": convert_data(units, 58222.1, "h")}
     )
     params_data["Parameters"].append({"name": f"{prefix}Tw", "value": 290.671})
     params_data["Parameters"].append({"name": f"{prefix}dTw", "value": 12.74})
@@ -316,6 +316,7 @@ def create_materials_supra(
 
 def create_materials_bitter(
     gdata: tuple,
+    maindata: dict,
     confdata: dict,
     templates: dict,
     method_data: List[str],
@@ -326,6 +327,7 @@ def create_materials_bitter(
         print("create_material_bitter:", confdata)
 
     fconductor = templates["conductor"]
+    finsulator = templates["insulator"]
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5]  # "meter"
@@ -342,16 +344,41 @@ def create_materials_bitter(
         )
 
     (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
-    for sname in snames:
-        if method_data[2] == "Axi":
-            if debug:
-                print("create_material_bitter:", sname)
-            mdata = entry(
-                fconductor, Merge({"name": f"{sname}"}, confdata["material"]), debug
-            )
-            materials_dict[f"{sname}"] = mdata[f"{sname}"]
-        else:
-            return {}
+
+    if method_data[2] == "Axi":
+        if debug:
+            print("create_material_bitter: Conductor_", name)
+        mdata = entry(
+            fconductor,
+            Merge(
+                {
+                    "name": f"Conductor_{name}",
+                    "part_mat_conductor": maindata["part_electric"],
+                },
+                confdata["material"],
+            ),
+            debug,
+        )
+        materials_dict[f"Conductor_{name}"] = mdata[f"Conductor_{name}"]
+
+        if debug:
+            print("create_material_bitter: Insulator_", name)
+        mdata = entry(
+            finsulator,
+            Merge(
+                {
+                    "name": f"Insulator_{name}",
+                    "part_mat_insulator": list(
+                        set(maindata["part_thermic"]) - set(maindata["part_electric"])
+                    ),
+                },
+                confdata["material"],
+            ),
+            debug,
+        )
+        materials_dict[f"Insulator_{name}"] = mdata[f"Insulator_{name}"]
+    else:
+        return {}
 
     if debug:
         print(materials_dict)
@@ -360,6 +387,7 @@ def create_materials_bitter(
 
 def create_materials_insert(
     gdata: tuple,
+    maindata: dict,
     idata: Optional[List],
     confdata: dict,
     templates: dict,
@@ -452,40 +480,39 @@ def create_materials_insert(
                     materials_dict[name] = mdata[name]
         else:
             # section j==0:  treated as insulator in Axi
+            # load conductor template
+            # for j in range(1, Nsections[i] + 1):
+            # print("load conductor[{j}]: mat:", confdata["Helix"][i]["material"])
             mdata = entry(
-                finsulator,
+                fconductor,
                 Merge(
-                    {"name": f"{prefix}H{i+1}_Cu0"}, confdata["Helix"][i]["material"]
+                    {
+                        "name": f"Conductor_{prefix}H{i+1}",
+                        "part_mat_conductor": maindata["part_mat_conductors"][i],
+                    },
+                    confdata["Helix"][i]["material"],
                 ),
                 debug,
             )
-            materials_dict[f"{prefix}H{i+1}_Cu0"] = mdata[f"{prefix}H{i+1}_Cu0"]
-
-            # load conductor template
-            for j in range(1, Nsections[i] + 1):
-                # print("load conductor[{j}]: mat:", confdata["Helix"][i]["material"])
-                mdata = entry(
-                    fconductor,
-                    Merge(
-                        {"name": f"{prefix}H{i+1}_Cu{j}"},
-                        confdata["Helix"][i]["material"],
-                    ),
-                    debug,
-                )
-                # print("load conductor[{j}]:", mdata)
-                materials_dict[f"{prefix}H{i+1}_Cu{j}"] = mdata[f"{prefix}H{i+1}_Cu{j}"]
+            # print("load conductor[{j}]:", mdata)
+            materials_dict[f"Conductor_{prefix}H{i+1}"] = mdata[
+                f"Conductor_{prefix}H{i+1}"
+            ]
 
             # section j==Nsections+1:  treated as insulator in Axi
             mdata = entry(
                 finsulator,
                 Merge(
-                    {"name": f"{prefix}H{i+1}_Cu{Nsections[i]+1}"},
+                    {
+                        "name": f"Insulator_{prefix}H{i+1}",
+                        "part_mat_insulator": maindata["part_mat_insulators"][i],
+                    },
                     confdata["Helix"][i]["material"],
                 ),
                 debug,
             )
-            materials_dict[f"{prefix}H{i+1}_Cu{Nsections[i]+1}"] = mdata[
-                f"{prefix}H{i+1}_Cu{Nsections[i]+1}"
+            materials_dict[f"Insulator_{prefix}H{i+1}"] = mdata[
+                f"Insulator_{prefix}H{i+1}"
             ]
 
     # loop for Rings
@@ -499,7 +526,15 @@ def create_materials_insert(
         else:
             mdata = entry(
                 finsulator,
-                Merge({"name": f"{prefix}R{i+1}"}, confdata["Ring"][i]["material"]),
+                Merge(
+                    {
+                        "name": f"{prefix}R{i+1}",
+                        "part_mat_insulator": maindata["part_mat_insulators"][
+                            NHelices + i
+                        ],
+                    },
+                    confdata["Ring"][i]["material"],
+                ),
                 debug,
             )
         materials_dict[f"{prefix}R{i+1}"] = mdata[f"{prefix}R{i+1}"]
@@ -560,6 +595,7 @@ def create_models_supra(
 
 def create_models_bitter(
     gdata: tuple,
+    maindata: dict,
     confdata: dict,
     templates: dict,
     method_data: List[str],
@@ -571,22 +607,35 @@ def create_models_bitter(
         print("create_model_bitter:", confdata)
 
     fconductor = templates[equation + "-conductor"]
+    finsulator = templates[equation + "-insulator"]
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5]  # "meter"
     units = load_units(unit_Length)
 
     (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
-    for sname in snames:
-        if method_data[2] == "Axi":
-            if debug:
-                print("create_model_bitter:", sname)
-            mdata = entry(
-                fconductor, Merge({"name": f"{sname}"}, confdata["material"]), debug
-            )
-            models_dict[f"{sname}"] = mdata
-        else:
-            return {}
+    if method_data[2] == "Axi":
+        mdata = entry(
+            finsulator,
+            {
+                "name": f"Insulator_{name}",
+                "part_insulator": maindata["part_insulators"],
+            },
+            debug,
+        )
+        models_dict[f"Insulator_{name}"] = mdata
+
+        mdata = entry(
+            fconductor,
+            {
+                "name": f"Conductor_{name}",
+                "part_conductor": maindata["part_conductors"],
+            },
+            debug,
+        )
+        models_dict[f"Conductor_{name}"] = mdata
+    else:
+        return {}
 
     if debug:
         print(models_dict)
@@ -594,8 +643,8 @@ def create_models_bitter(
 
 
 def create_models_insert(
-    gdata: tuple,
-    idata: Optional[List],
+    prefix: str,
+    maindata: dict,
     confdata: dict,
     templates: dict,
     method_data: List[str],
@@ -611,28 +660,47 @@ def create_models_insert(
     fconductor = templates[equation + "-conductor"]
     finsulator = templates[equation + "-insulator"]
     # print('\n\nfconductor :', fconductor)
+    if method_data[2] == "Axi":
+        mdata = entry(
+            finsulator,
+            {
+                "name": f"Insulator_{prefix}Insert",
+                "part_insulator": maindata["part_insulators"],
+            },
+            debug,
+        )
+        models_dict[f"Insulator_{prefix}Insert"] = mdata
 
-    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
-
+        mdata = entry(
+            fconductor,
+            {
+                "name": f"Conductor_{prefix}Insert",
+                "part_conductor": maindata["part_conductors"],
+            },
+            debug,
+        )
+        models_dict[f"Conductor_{prefix}Insert"] = mdata
+    else:
+        return {}
     # Loop for Helix
-    for i in range(NHelices):
-        # section j==0:  treated as insulator in Axi
-        mdata = entry(finsulator, {"name": f"H{i+1}_Cu0"}, debug)
-        models_dict[f"H{i+1}_Cu0"] = mdata
+    # for i in range(NHelices):
+    #     # section j==0:  treated as insulator in Axi
+    #     mdata = entry(finsulator, {"name": f"H{i+1}_Cu0"}, debug)
+    #     models_dict[f"H{i+1}_Cu0"] = mdata
 
-        # load conductor template
-        for j in range(1, Nsections[i] + 1):
-            mdata = entry(fconductor, {"name": f"H{i+1}_Cu{j}"}, debug)
-            models_dict[f"H{i+1}_Cu{j}"] = mdata
+    #     # load conductor template
+    #     for j in range(1, Nsections[i] + 1):
+    #         mdata = entry(fconductor, {"name": f"H{i+1}_Cu{j}"}, debug)
+    #         models_dict[f"H{i+1}_Cu{j}"] = mdata
 
-        # section j==Nsections+1:  treated as insulator in Axi
-        mdata = entry(finsulator, {"name": f"H{i+1}_Cu{Nsections[i]+1}"}, debug)
-        models_dict[f"H{i+1}_Cu{Nsections[i]+1}"] = mdata
+    #     # section j==Nsections+1:  treated as insulator in Axi
+    #     mdata = entry(finsulator, {"name": f"H{i+1}_Cu{Nsections[i]+1}"}, debug)
+    #     models_dict[f"H{i+1}_Cu{Nsections[i]+1}"] = mdata
 
     # loop for Rings
-    for i in range(NRings):
-        mdata = entry(finsulator, {"name": f"R{i+1}"}, debug)
-        models_dict[f"R{i+1}"] = mdata
+    # for i in range(NRings):
+    #     mdata = entry(finsulator, {"name": f"R{i+1}"}, debug)
+    #     models_dict[f"R{i+1}"] = mdata
 
     return models_dict
 
@@ -671,6 +739,7 @@ def create_bcs_bitter(
     method_data: List[str],
     debug: bool = False,
 ) -> dict:
+
     (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
     print(f"create_bcs_bitter from templates for {name}")
     # print("snames=", snames)

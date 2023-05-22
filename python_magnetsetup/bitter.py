@@ -42,6 +42,10 @@ def Bitter_setup(
     if debug:
         print(f"Bitter_setup/Bitter confdata: {confdata}")
 
+    prefix = ""
+    if mname:
+        prefix = mname + "_"
+
     print(f"Bitter_setup:  magnet={mname}, cad={cad.name}")
     print(f"cad={cad}")
     print(f"cad.get_params={cad.get_params(MyEnv.yaml_repo)}")
@@ -49,6 +53,10 @@ def Bitter_setup(
 
     part_thermic = []
     part_electric = []
+
+    part_conductors = []
+    part_insulators = []
+
     index_ABitters = ""
     index_Bitters = ""
 
@@ -66,9 +74,11 @@ def Bitter_setup(
 
     ignore_index = []
     snames = []
-    name = f"{mname}_{cad.name}"  # .replace('Bitter_','')
+    name = f"{prefix}{cad.name}"  # .replace('Bitter_','')
     if method_data[2] == "Axi":
         shift = 0
+        part_conductors.append(f"Conductor_{name}")
+        part_insulators.append(f"Insulator_{name}")
         if cad.z[0] < -cad.axi.h:
             snames.append(f"{name}_B0")
             part_thermic.append(snames[-1])
@@ -77,23 +87,21 @@ def Bitter_setup(
         for i in range(len(cad.axi.turns)):
             snames.append(f"{name}_B{i+shift}")
             part_electric.append(snames[-1])
-            if "th" in method_data[3]:
-                part_thermic.append(snames[-1])
+            part_thermic.append(snames[-1])
         if cad.z[1] > cad.axi.h:
             snames.append(f"{name}_B{len(cad.axi.turns)+1}")
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames) - 1)
-
+        index_Bitters = f"shift:{NSections+shift}"
         start = snames[0].replace(f"{name}_B", "")
         index_ABitters = f"{start}:{len(snames)}"
-        index_Bitters = f"{shift}:{len(cad.axi.turns)}"
+        index_Bitters = f"{shift}:{len(cad.axi.turns)+1}"
         if debug:
             print("sname:", snames)
     else:
         part_electric.append(cad.name)
         if "th" in method_data[3]:
             part_thermic.append(cad.name)
-
     gdata = (name, snames, cad.axi.turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index)
 
     if debug:
@@ -140,11 +148,15 @@ def Bitter_setup(
     init_temp_data = []
     # init_temp_data.append( {'name': f'{mname}', "part_thermic_part": part_thermic } )
     init_temp_data.append(
-        {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
+        {
+            "name": f"{mname}",
+            "prefix": f"{prefix}",
+            "magnet_parts": copy.deepcopy(part_thermic),
+        }
     )
     init_temp_dict = {"init_temp": init_temp_data}
     NMerge(init_temp_dict, mdict, debug, name="bitter_setup init")
-    print('bitter_setup: add init_temp mdict[init_temp] = {mdict["init_temp"]}')
+    print(f'bitter_setup: add init_temp mdict[init_temp] = {mdict["init_temp"]}')
     # print(f'init_tem_data({mname}): {init_temp_data}')
 
     # add power per magnet data: mdict = NMerge( mdict, {'power_magnet': power_data}, debug, "bitter_setup mdict")
@@ -163,6 +175,8 @@ def Bitter_setup(
     main_data = {
         "part_thermic": part_thermic,
         "part_electric": part_electric,
+        "part_insulators": part_insulators,
+        "part_conductors": part_conductors,
         "index_V0": boundary_electric,
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5",
@@ -246,12 +260,20 @@ def Bitter_setup(
 
     # check mpost output
     # print(f"bitter {name}: mpost={mpost}")
-    mmat = create_materials_bitter(gdata, confdata, templates, method_data, debug)
+    mmat = create_materials_bitter(
+        gdata, main_data, confdata, templates, method_data, debug
+    )
 
     mmodels = {}
     for physic in templates["physic"]:
         mmodels[physic] = create_models_bitter(
-            gdata, confdata, templates, method_data, physic, debug
+            gdata,
+            main_data,
+            confdata,
+            templates,
+            method_data,
+            physic,
+            debug,
         )
 
     # update U and hw, dTw param
@@ -263,12 +285,15 @@ def Bitter_setup(
         import math
 
         params = params_data["Parameters"]
+
+        mat = mmat[f"Conductor_{name}"]  ### ??? A VOIR
+
         for j in range(len(cad.axi.turns)):
             marker = f"{name}_B{j+1}"
             # print("marker:", marker)
             item = {"name": f"U_{marker}", "value": "1"}
             index = params.index(item)
-            mat = mmat[marker]
+
             # print("U=", params[index], mat['sigma'], R1[i], pitch_h[i][j])
             if method_data[6]:
                 sigma = float(mat["sigma0"])

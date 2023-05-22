@@ -130,6 +130,10 @@ def Insert_setup(
 
     part_thermic = []
     part_electric = []
+    part_conductors = []
+    part_mat_conductors = []
+    part_insulators = []
+    part_mat_insulators = []
     index_Helices = []
     index_Helices_e = []
     index_Insulators = []
@@ -153,6 +157,7 @@ def Insert_setup(
         prefix = f"{mname}_"
 
     for i in range(NHelices):
+        part_helix = []
         with MyOpen(
             cad.Helices[i] + ".yaml", "r", paths=search_paths(MyEnv, "geom")
         ) as f:
@@ -161,15 +166,19 @@ def Insert_setup(
             turns_h.append(hhelix.axi.turns)
 
         if method_data[2] == "Axi":
+            part_insulator = []
+            part_insulator.append(f"{prefix}H{i+1}_Cu{0}")
+            part_insulator.append(f"{prefix}H{i+1}_Cu{Nsections[i] + 1}")
+            part_mat_insulators.append(part_insulator)
+
+            part_conductors.append(f"Conductor_{prefix}H{i+1}")
+            part_insulators.append(f"Insulator_{prefix}H{i+1}")
             for j in range(1, Nsections[i] + 1):
-                part_electric.append(f"{prefix}H{i+1}_Cu{j}")
-            for j in range(Nsections[i] + 2):
-                if "th" in method_data[3]:
-                    part_thermic.append(f"{prefix}H{i+1}_Cu{j}")
+                part_helix.append(f"{prefix}H{i+1}_Cu{j}")
             for j in range(Nsections[i]):
                 index_Helices.append([f"0:{Nsections[i]+2}"])
                 index_Helices_e.append([f"1:{Nsections[i]+1}"])
-
+            part_mat_conductors.append(part_helix)
         else:
             part_electric.append(f"{prefix}H{i+1}")
             if "th" in method_data[3]:
@@ -181,11 +190,26 @@ def Insert_setup(
             if "th" in method_data[3]:
                 part_thermic.append(insulator_name)
 
+    if method_data[2] == "Axi":
+        import numpy as np
+
+        part_electric = part_electric + list(np.concatenate(part_mat_conductors).flat)
+        if "th" in method_data[3]:
+            part_thermic = (
+                part_thermic
+                + part_electric
+                + list(np.concatenate(part_mat_insulators).flat)
+            )
+
     for i in range(NRings):
         if "th" in method_data[3]:
             part_thermic.append(f"{prefix}R{i+1}")
+
         if method_data[2] == "3D":
             part_electric.append(f"{prefix}R{i+1}")
+        else:
+            part_mat_insulators.append([f"{prefix}R{i+1}"])
+            part_insulators.append(f"{prefix}R{i+1}")
 
     # Add currentLeads
     if method_data[2] == "3D":
@@ -233,6 +257,10 @@ def Insert_setup(
     if debug:
         print("insert part_electric:", part_electric)
         print("insert part_thermic:", part_thermic)
+        print("insert part_insulators:", part_insulators)
+        print("insert part_mat_insulators:", part_mat_insulators)
+        print("insert part_conductors:", part_conductors)
+        print("insert part_mat_conductors:", part_mat_conductors)
 
     # params section
     params_data = create_params_insert(mname, gdata + (turns_h,), method_data, debug)
@@ -265,7 +293,11 @@ def Insert_setup(
         iname = mname
     init_temp_data = []
     init_temp_data.append(
-        {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
+        {
+            "name": f"{mname}",
+            "prefix": f"{prefix}",
+            "magnet_parts": copy.deepcopy(part_thermic),
+        }
     )
     init_temp_dict = {"init_temp": init_temp_data}
     NMerge(init_temp_dict, mdict, debug, "insert_setup mdict")
@@ -284,6 +316,10 @@ def Insert_setup(
     main_data = {
         "part_thermic": part_thermic,
         "part_electric": part_electric,
+        "part_insulators": part_insulators,
+        "part_mat_insulators": part_mat_insulators,
+        "part_conductors": part_conductors,
+        "part_mat_conductors": part_mat_conductors,
         "index_V0": boundary_electric,
         "temperature_initfile": "tini.h5",
         "V_initfile": "Vini.h5",
@@ -468,31 +504,25 @@ def Insert_setup(
     # check mpost output
     # print(f"insert: mpost={mpost}")
     mmat = create_materials_insert(
-        (mname,) + gdata, index_Insulators, confdata, templates, method_data, debug
+        (mname,) + gdata,
+        main_data,
+        index_Insulators,
+        confdata,
+        templates,
+        method_data,
+        debug,
     )
 
     mmodels = {}
-    if "th" in method_data[3]:
-        mmodels["heat"] = create_models_insert(
-            gdata, index_Insulators, confdata, templates, method_data, "heat", debug
-        )
-
-    if "mag" in method_data[3] or "mqs" in method_data[3]:
-        mmodels["magnetic"] = create_models_insert(
-            gdata, index_Insulators, confdata, templates, method_data, "magnetic", debug
-        )
-
-    if "magel" in method_data[3]:
-        mmodels["elastic"] = create_models_insert(
-            gdata, index_Insulators, confdata, templates, method_data, "elastic", debug
-        )
-
-    if "mqsel" in method_data[3]:
-        mmodels["elastic1"] = create_models_insert(
-            gdata, index_Insulators, confdata, templates, method_data, "elastic1", debug
-        )
-        mmodels["elastic2"] = create_models_insert(
-            gdata, index_Insulators, confdata, templates, method_data, "elastic2", debug
+    for physic in templates["physic"]:
+        mmodels[physic] = create_models_insert(
+            prefix,
+            main_data,
+            confdata,
+            templates,
+            method_data,
+            physic,
+            debug,
         )
 
     # update U and hw, dTw param
@@ -507,11 +537,11 @@ def Insert_setup(
         for i in range(NHelices):
             pitch = pitch_h[i]
             turns = turns_h[i]
+            mat = mmat[f"Conductor_{prefix}H{i+1}"]
             for j in range(Nsections[i]):
                 marker = f"{prefix}H{i+1}_Cu{j+1}"
                 item = {"name": f"U_{marker}", "value": "1"}
                 index = params.index(item)
-                mat = mmat[marker]
                 # print(f"mat[{marker}]: {mat}")
                 # print("U=", params[index], mat['sigma'], R1[i], pitch_h[j])
                 if method_data[6]:
