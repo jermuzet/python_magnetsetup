@@ -175,10 +175,6 @@ def create_params_insert(
         NRings,
         NChannels,
         Nsections,
-        R1,
-        R2,
-        Z1,
-        Z2,
         Zmin,
         Zmax,
         Dh,
@@ -188,13 +184,8 @@ def create_params_insert(
 
     if debug:
         print("unit_Length", unit_Length)
-        print("R1:", R1)
         print("Zmin:", Zmin)
     if unit_Length == "meter":
-        R1 = convert_data(units, R1, "Length")
-        R2 = convert_data(units, R2, "Length")
-        Z1 = convert_data(units, Z1, "Length")
-        Z2 = convert_data(units, Z2, "Length")
         Zmin = convert_data(units, Zmin, "Length")
         Zmax = convert_data(units, Zmax, "Length")
         Dh = convert_data(units, Dh, "Length")
@@ -202,9 +193,8 @@ def create_params_insert(
 
     # chech dim
     if debug:
-        print("corrected R1:", R1)
         print("unit_Length", unit_Length)
-        print("R1:", R1, "R2:", R2, "Zmin:", Zmin, "Zmax:", Zmax)
+        print("Zmin:", Zmin, "Zmax:", Zmax)
 
     # Tini, Aini for transient cases??
     params_data = {"Parameters": []}
@@ -361,22 +351,25 @@ def create_materials_bitter(
         )
         materials_dict[f"Conductor_{name}"] = mdata[f"Conductor_{name}"]
 
-        if debug:
-            print("create_material_bitter: Insulator_", name)
-        mdata = entry(
-            finsulator,
-            Merge(
-                {
-                    "name": f"Insulator_{name}",
-                    "part_mat_insulator": list(
-                        set(maindata["part_thermic"]) - set(maindata["part_electric"])
-                    ),
-                },
-                confdata["material"],
-            ),
-            debug,
+        bitter_insulator = list(
+            set(maindata["part_thermic"]) - set(maindata["part_electric"])
         )
-        materials_dict[f"Insulator_{name}"] = mdata[f"Insulator_{name}"]
+
+        if bitter_insulator:
+            if debug:
+                print("create_material_bitter: Insulator_", name)
+            mdata = entry(
+                finsulator,
+                Merge(
+                    {
+                        "name": f"Insulator_{name}",
+                        "part_mat_insulator": bitter_insulator,
+                    },
+                    confdata["material"],
+                ),
+                debug,
+            )
+            materials_dict[f"Insulator_{name}"] = mdata[f"Insulator_{name}"]
     else:
         return {}
 
@@ -408,10 +401,6 @@ def create_materials_insert(
         NRings,
         NChannels,
         Nsections,
-        R1,
-        R2,
-        Z1,
-        Z2,
         Zmin,
         Zmax,
         Dh,
@@ -615,15 +604,16 @@ def create_models_bitter(
 
     (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
     if method_data[2] == "Axi":
-        mdata = entry(
-            finsulator,
-            {
-                "name": f"Insulator_{name}",
-                "part_insulator": maindata["part_insulators"],
-            },
-            debug,
-        )
-        models_dict[f"Insulator_{name}"] = mdata
+        if maindata["part_insulators"]:
+            mdata = entry(
+                finsulator,
+                {
+                    "name": f"Insulator_{name}",
+                    "part_insulator": maindata["part_insulators"],
+                },
+                debug,
+            )
+            models_dict[f"Insulator_{name}"] = mdata
 
         mdata = entry(
             fconductor,
@@ -849,10 +839,6 @@ def create_bcs_insert(
         NRings,
         NChannels,
         Nsections,
-        R1,
-        R2,
-        Z1,
-        Z2,
         Zmin,
         Zmax,
         Dh,
