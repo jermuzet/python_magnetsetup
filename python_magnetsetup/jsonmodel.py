@@ -175,6 +175,10 @@ def create_params_insert(
         NRings,
         NChannels,
         Nsections,
+        R1,
+        R2,
+        Z1,
+        Z2,
         Zmin,
         Zmax,
         Dh,
@@ -184,8 +188,13 @@ def create_params_insert(
 
     if debug:
         print("unit_Length", unit_Length)
+        print("R1:", R1)
         print("Zmin:", Zmin)
     if unit_Length == "meter":
+        R1 = convert_data(units, R1, "Length")
+        R2 = convert_data(units, R2, "Length")
+        Z1 = convert_data(units, Z1, "Length")
+        Z2 = convert_data(units, Z2, "Length")
         Zmin = convert_data(units, Zmin, "Length")
         Zmax = convert_data(units, Zmax, "Length")
         Dh = convert_data(units, Dh, "Length")
@@ -193,8 +202,9 @@ def create_params_insert(
 
     # chech dim
     if debug:
+        print("corrected R1:", R1)
         print("unit_Length", unit_Length)
-        print("Zmin:", Zmin, "Zmax:", Zmax)
+        print("R1:", R1, "R2:", R2, "Zmin:", Zmin, "Zmax:", Zmax)
 
     # Tini, Aini for transient cases??
     params_data = {"Parameters": []}
@@ -363,7 +373,10 @@ def create_materials_bitter(
                 Merge(
                     {
                         "name": f"Insulator_{name}",
-                        "part_mat_insulator": bitter_insulator,
+                        "part_mat_insulator": list(
+                            set(maindata["part_thermic"])
+                            - set(maindata["part_electric"])
+                        ),
                     },
                     confdata["material"],
                 ),
@@ -401,6 +414,10 @@ def create_materials_insert(
         NRings,
         NChannels,
         Nsections,
+        R1,
+        R2,
+        Z1,
+        Z2,
         Zmin,
         Zmax,
         Dh,
@@ -839,6 +856,10 @@ def create_bcs_insert(
         NRings,
         NChannels,
         Nsections,
+        R1,
+        R2,
+        Z1,
+        Z2,
         Zmin,
         Zmax,
         Dh,
