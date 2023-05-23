@@ -190,13 +190,22 @@ def magnet_setup(
                         pdict = {"name": f"{prefix}{cad.name}_Slit0_Sh", "value": Sh}
                         parameters.append(pdict)
 
-                        pdict = {"name": f"{prefix}{cad.name}_Slit0_hw", "value": 12345}
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit0_hw",
+                            "value": 58222.1,
+                        }
                         parameters.append(pdict)
 
-                        pdict = {"name": f"{prefix}{cad.name}_Slit0_Tw", "value": 292}
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit0_Tw",
+                            "value": 290.671,
+                        }
                         parameters.append(pdict)
 
-                        pdict = {"name": f"{prefix}{cad.name}_Slit0_dTw", "value": 30}
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit0_dTw",
+                            "value": 12.74,
+                        }
                         parameters.append(pdict)
 
                         pdict = {
@@ -252,6 +261,12 @@ def magnet_setup(
                         Sh = math.pi * (ncad.r[0] - cad.r[1]) * (ncad.r[0] + cad.r[1])
                         Dh = 4 * Sh / (2 * math.pi * (ncad.r[0] + cad.r[1]))
 
+                        # for better grad Tw model
+                        # get Zh from cad and ncad
+                        # concat 2 lists
+                        # sort
+                        # remove duplicates see python_magnetgeo/Insert.py def filter
+
                         Nslits = len(cad.coolingslits)
                         parameters = tdict["Parameters"]
                         pdict = {
@@ -268,19 +283,19 @@ def magnet_setup(
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
-                            "value": 12345,
+                            "value": 58222.1,
                         }
                         parameters.append(pdict)
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
-                            "value": 292,
+                            "value": 290.671,
                         }
                         parameters.append(pdict)
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
-                            "value": 30,
+                            "value": 12.74,
                         }
                         parameters.append(pdict)
 
@@ -327,7 +342,6 @@ def magnet_setup(
                         print(f"tpost={tpost}")
 
                     # add and update Params for Slit(N+1) for i == len(confdata[mtype])-1
-
                     else:
                         print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
                         Sh = math.pi * (outerbore - cad.r[0]) * (outerbore + cad.r[0])
@@ -348,19 +362,19 @@ def magnet_setup(
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
-                            "value": 12345,
+                            "value": 58222.1,
                         }
                         parameters.append(pdict)
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
-                            "value": 292,
+                            "value": 290.671,
                         }
                         parameters.append(pdict)
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
-                            "value": 30,
+                            "value": 12.74,
                         }
                         parameters.append(pdict)
 
@@ -938,6 +952,10 @@ def setup_cmds(
 
         # let xao decide mesh caracteristic length ??:
         meshcmd = f"python3 -m python_magnetgmsh.xao2msh {xaofile} --wd data/geometries --geo {yamlfile} mesh --group CoolingChannels"
+
+        # or use gmsh api (do not support Supra with details)
+        # meshcmd = f"python3 -m python_magnetgmsh.cli {yamlfile} --wd data/geometries --tickslit --mesh --group CoolingChannels"
+
     else:
         gmshfile = meshfile.replace(".med", ".msh")
         meshconvert = f"gmsh -0 {meshfile} -bin -o {gmshfile}"
@@ -956,16 +974,11 @@ def setup_cmds(
         "CAD": f"singularity exec {simage_path}/{salome} {geocmd}",
     }
 
-    # TODO add mount point for MeshGems if 3D otherwise use gmsh for Axi
-    # to be changed in the future by using an entry from magnetsetup.conf MeshGems or gmsh
-    # MeshGems_licdir = f"-B {node_spec.mgkeydir}:/opt/DISTENE/license:ro" if node_spec.mgkeydir is not None else ""
-    # cmds["Mesh"] = f"singularity exec {MeshGems_licdir} {simage_path}/{salome} {meshcmd}"
+    # TODO add mount specific point for selected node
     if args.geom == "Axi":
         cmds["Mesh"] = f"singularity exec {simage_path}/{gmsh} {meshcmd}"
     else:
         cmds["Mesh"] = f"singularity exec {simage_path}/{salome} {meshcmd}"
-    # if gmsh:
-    #    cmds["Mesh"] = f"singularity exec -B /opt/MeshGems:/opt/DISTENE/license:ro {simage_path}/{salome} {meshcmd}"
 
     if meshconvert:
         cmds["Convert"] = f"singularity exec {simage_path}/{salome} {meshconvert}"
