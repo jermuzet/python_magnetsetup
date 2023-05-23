@@ -76,26 +76,25 @@ def Bitter_setup(
     snames = []
     name = f"{prefix}{cad.name}"  # .replace('Bitter_','')
     if method_data[2] == "Axi":
-        shift = 0
-        part_conductors.append(f"Conductor_{name}")
-        part_insulators.append(f"Insulator_{name}")
         if cad.z[0] < -cad.axi.h:
             snames.append(f"{name}_B0")
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames) - 1)
-            shift = 1
-        for i in range(len(cad.axi.turns)):
-            snames.append(f"{name}_B{i+shift}")
+        for i in range(NSections):
+            snames.append(f"{name}_B{i+1}")
             part_electric.append(snames[-1])
             part_thermic.append(snames[-1])
         if cad.z[1] > cad.axi.h:
-            snames.append(f"{name}_B{len(cad.axi.turns)+1}")
+            snames.append(f"{name}_B{NSections+1}")
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames) - 1)
-        index_Bitters = f"shift:{NSections+shift}"
         start = snames[0].replace(f"{name}_B", "")
         index_ABitters = f"{start}:{len(snames)}"
-        index_Bitters = f"{shift}:{len(cad.axi.turns)+1}"
+        index_Bitters = f"{1}:{NSections+1}"
+
+        part_conductors.append(f"Conductor_{name}")
+        if list(set(part_thermic) - set(part_electric)):
+            part_insulators.append(f"Insulator_{name}")
         if debug:
             print("sname:", snames)
     else:
@@ -288,7 +287,7 @@ def Bitter_setup(
 
         mat = mmat[f"Conductor_{name}"]  ### ??? A VOIR
 
-        for j in range(len(cad.axi.turns)):
+        for j in range(NSections):
             marker = f"{name}_B{j+1}"
             # print("marker:", marker)
             item = {"name": f"U_{marker}", "value": "1"}
