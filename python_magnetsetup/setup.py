@@ -335,10 +335,9 @@ def magnet_setup(
 
                         # update post (index for slits) for i == 0
                         fpost = tpost["Flux"][0]["index_h"]
+                        fpost = f"1:{str(Nslits+2)}"
                         if i == 0:
                             fpost = f"0:{str(Nslits+2)}"
-                        else:
-                            fpost = f"1:{str(Nslits+2)}"
                         tpost["Flux"][0]["index_h"] = fpost
                         print(f"tpost={tpost}")
 
@@ -347,7 +346,9 @@ def magnet_setup(
                         print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
                         Sh = math.pi * (outerbore - cad.r[0]) * (outerbore + cad.r[0])
                         Dh = 4 * Sh / (2 * math.pi * (outerbore + cad.r[0]))
-                        Nslits = len(cad.coolingslits)
+                        Nslits = 0
+                        if cad.coolingslits :
+                            Nslits = len(cad.coolingslits)
                         parameters = tdict["Parameters"]
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Dh",
@@ -416,6 +417,8 @@ def magnet_setup(
                         # update post (index for slits) for i == 0
                         fpost = tpost["Flux"][0]["index_h"]
                         fpost = f"1:{str(Nslits+2)}"
+                        if i == 0:
+                            fpost = f"0:{str(Nslits+2)}"
                         tpost["Flux"][0]["index_h"] = fpost
                         print(f"tpost={tpost}")
 
