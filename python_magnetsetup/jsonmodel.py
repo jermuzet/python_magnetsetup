@@ -111,6 +111,7 @@ def create_params_bitter(
         params_data["Parameters"].append({"name": f"{name}_Tw", "value": 290.671})
         params_data["Parameters"].append({"name": f"{name}_dTw", "value": 12.74})
         for i in range(NCoolingSlits):
+            bcname = f"{name}_Slit{i+1}"
             params_data["Parameters"].append({"name": f"{bcname}_Sh", "value": Sh[i]})
             params_data["Parameters"].append({"name": f"{bcname}_Dh", "value": Dh[i]})
         params_data["Parameters"].append({"name": f"{name}_Zmin", "value": Zmin})
