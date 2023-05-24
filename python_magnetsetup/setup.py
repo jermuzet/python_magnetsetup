@@ -339,6 +339,7 @@ def magnet_setup(
                             fpost = f"0:{str(Nslits+2)}"
                         else:
                             fpost = f"1:{str(Nslits+2)}"
+                        tpost["Flux"][0]["index_h"] = fpost
                         print(f"tpost={tpost}")
 
                     # add and update Params for Slit(N+1) for i == len(confdata[mtype])-1
@@ -415,6 +416,7 @@ def magnet_setup(
                         # update post (index for slits) for i == 0
                         fpost = tpost["Flux"][0]["index_h"]
                         fpost = f"1:{str(Nslits+2)}"
+                        tpost["Flux"][0]["index_h"] = fpost
                         print(f"tpost={tpost}")
 
                 elif isinstance(cad, Supra):
