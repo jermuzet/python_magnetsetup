@@ -31,6 +31,7 @@ import re
 import json
 import yaml
 import itertools
+import math
 
 from python_magnetgeo.Insert import Insert
 from python_magnetgeo.MSite import MSite
@@ -130,16 +131,26 @@ def magnet_setup(
     mmodels = {}
     mpost = {}
 
+    yamlfile = confdata["geom"]
+    if debug:
+        print(f"magnet_setup: yamfile: {yamlfile}")
+
+    # Download or Load yaml file from data repository??
+    cad = None
+    with MyOpen(yamlfile, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
+        cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
+    innerbore = cad.innerbore
+    outerbore = cad.outerbore
+    print(
+        f"Load magnet: mname={mname}, cad={cad.name}, innerbore={innerbore}, outerbore={outerbore}"
+    )
+
+    prefix = ""
+    if mname:
+        prefix = f"{mname}_"
+
     if "Helix" in confdata:
         print(f"Load an insert: mname={mname}")
-        yamlfile = confdata["geom"]
-        if debug:
-            print(f"magnet_setup: yamfile: {yamlfile}")
-
-        # Download or Load yaml file from data repository??
-        cad = None
-        with MyOpen(yamlfile, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
-            cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
         # if isinstance(cad, Insert):
         (mdict, mmat, mmodels, mpost) = Insert_setup(
             MyEnv, mname, confdata, cad, method_data, templates, current, debug
@@ -151,7 +162,7 @@ def magnet_setup(
             print(f"confdata[{mtype}]={confdata[mtype]}")
 
             # loop on mtype
-            for obj in confdata[mtype]:
+            for i, obj in enumerate(confdata[mtype]):
                 if debug:
                     print(f"obj: {obj}")
                 yamlfile = obj["geom"]
@@ -160,12 +171,252 @@ def magnet_setup(
                     yamlfile, "r", paths=search_paths(MyEnv, "geom")
                 ) as cfgdata:
                     cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
-                print(f"magnetsetup:magnet_setup: load a {mtype} insert: {cad.name}")
+                print(f"magnetsetup:magnet_setup: load a {mtype}: {cad.name}")
 
                 if isinstance(cad, Bitter):
                     (tdict, tmat, tmodels, tpost) = Bitter_setup(
                         MyEnv, mname, obj, cad, method_data, templates, current, debug
                     )
+
+                    # add Slit0 and update params for i == 0
+                    if i == 0:
+                        Sh = math.pi * (cad.r[0] - innerbore) * (innerbore + cad.r[0])
+                        Dh = 4 * Sh / (2 * math.pi * (innerbore + cad.r[0]))
+
+                        parameters = tdict["Parameters"]
+                        pdict = {"name": f"{prefix}{cad.name}_Slit0_Dh", "value": Dh}
+
+                        parameters.append(pdict)
+                        pdict = {"name": f"{prefix}{cad.name}_Slit0_Sh", "value": Sh}
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit0_hw",
+                            "value": 58222.1,
+                        }
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit0_Tw",
+                            "value": 290.671,
+                        }
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit0_dTw",
+                            "value": 12.74,
+                        }
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit0_Zmin",
+                            "value": cad.z[0],
+                        }
+                        parameters.append(pdict)
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit0_Zmax",
+                            "value": cad.z[1],
+                        }
+                        parameters.append(pdict)
+
+                        # update bcs (index for slits) for i == 0
+                        bcname = f"{prefix}{cad.name}_Slit0"
+                        fcooling = templates["cooling"]
+
+                        from .jsonmodel import entry
+
+                        mdata = entry(
+                            fcooling,
+                            {
+                                "name": f"{bcname}",
+                                "markers": [bcname],
+                                "hw": f"{bcname}_hw",
+                                "Tw": f"{bcname}_Tw",
+                                "dTw": f"{bcname}_dTw",
+                            },
+                            debug,
+                        )
+
+                        from .utils import Merge
+
+                        bcs = tdict["boundary_Therm_Robin"]
+                        bcs.append(Merge({"name": bcname}, mdata[bcname]))
+
+                        # print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
+                        # exit(1)
+
+                    # add and update params for Slit(N+1) for
+                    if i != len(confdata[mtype]) - 1:
+                        print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
+                        nobj = confdata[mtype][i + 1]
+                        nyamlfile = nobj["geom"]
+                        ncad = None
+                        with MyOpen(
+                            nyamlfile, "r", paths=search_paths(MyEnv, "geom")
+                        ) as cfgdata:
+                            ncad = yaml.load(cfgdata, Loader=yaml.FullLoader)
+                        print(
+                            f"magnetsetup:magnet_setup: load next {mtype}: {ncad.name}"
+                        )
+                        Sh = math.pi * (ncad.r[0] - cad.r[1]) * (ncad.r[0] + cad.r[1])
+                        Dh = 4 * Sh / (2 * math.pi * (ncad.r[0] + cad.r[1]))
+
+                        # for better grad Tw model
+                        # get Zh from cad and ncad
+                        # concat 2 lists
+                        # sort
+                        # remove duplicates see python_magnetgeo/Insert.py def filter
+
+                        Nslits = len(cad.coolingslits)
+                        parameters = tdict["Parameters"]
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Dh",
+                            "value": Dh,
+                        }
+
+                        parameters.append(pdict)
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Sh",
+                            "value": Sh,
+                        }
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
+                            "value": 58222.1,
+                        }
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
+                            "value": 290.671,
+                        }
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
+                            "value": 12.74,
+                        }
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
+                            "value": min(cad.z[0], ncad.z[0]),
+                        }
+                        parameters.append(pdict)
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
+                            "value": max(cad.z[1], ncad.z[1]),
+                        }
+                        parameters.append(pdict)
+
+                        # update bcs (index for slits) for i == 0
+                        bcname = f"{prefix}{cad.name}_Slit{Nslits+1}"
+                        fcooling = templates["cooling"]
+
+                        from .jsonmodel import entry
+
+                        mdata = entry(
+                            fcooling,
+                            {
+                                "name": f"{bcname}",
+                                "markers": [bcname],
+                                "hw": f"{bcname}_hw",
+                                "Tw": f"{bcname}_Tw",
+                                "dTw": f"{bcname}_dTw",
+                            },
+                            debug,
+                        )
+
+                        from .utils import Merge
+
+                        bcs = tdict["boundary_Therm_Robin"]
+                        bcs.append(Merge({"name": bcname}, mdata[bcname]))
+
+                        # update post (index for slits) for i == 0
+                        fpost = tpost["Flux"][0]["index_h"]
+                        if i == 0:
+                            fpost = f"0:{str(Nslits+2)}"
+                        else:
+                            fpost = f"1:{str(Nslits+2)}"
+                        print(f"tpost={tpost}")
+
+                    # add and update Params for Slit(N+1) for i == len(confdata[mtype])-1
+                    else:
+                        print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
+                        Sh = math.pi * (outerbore - cad.r[0]) * (outerbore + cad.r[0])
+                        Dh = 4 * Sh / (2 * math.pi * (outerbore + cad.r[0]))
+                        Nslits = len(cad.coolingslits)
+                        parameters = tdict["Parameters"]
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Dh",
+                            "value": Dh,
+                        }
+
+                        parameters.append(pdict)
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Sh",
+                            "value": Sh,
+                        }
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
+                            "value": 58222.1,
+                        }
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
+                            "value": 290.671,
+                        }
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
+                            "value": 12.74,
+                        }
+                        parameters.append(pdict)
+
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
+                            "value": cad.z[0],
+                        }
+                        parameters.append(pdict)
+                        pdict = {
+                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
+                            "value": cad.z[1],
+                        }
+                        parameters.append(pdict)
+
+                        # update bcs (index for slits) for i == 0
+                        bcname = f"{prefix}{cad.name}_Slit{Nslits+1}"
+                        fcooling = templates["cooling"]
+
+                        from .jsonmodel import entry
+
+                        mdata = entry(
+                            fcooling,
+                            {
+                                "name": f"{bcname}",
+                                "markers": [bcname],
+                                "hw": f"{bcname}_hw",
+                                "Tw": f"{bcname}_Tw",
+                                "dTw": f"{bcname}_dTw",
+                            },
+                            debug,
+                        )
+
+                        from .utils import Merge
+
+                        bcs = tdict["boundary_Therm_Robin"]
+                        bcs.append(Merge({"name": bcname}, mdata[bcname]))
+
+                        # update post (index for slits) for i == 0
+                        fpost = tpost["Flux"][0]["index_h"]
+                        fpost = f"1:{str(Nslits+2)}"
+                        print(f"tpost={tpost}")
+
                 elif isinstance(cad, Supra):
                     (tdict, tmat, tmodels, tpost) = Supra_setup(
                         MyEnv, mname, obj, cad, method_data, templates, current, debug
@@ -701,6 +952,10 @@ def setup_cmds(
 
         # let xao decide mesh caracteristic length ??:
         meshcmd = f"python3 -m python_magnetgmsh.xao2msh {xaofile} --wd data/geometries --geo {yamlfile} mesh --group CoolingChannels"
+
+        # or use gmsh api (do not support Supra with details)
+        # meshcmd = f"python3 -m python_magnetgmsh.cli {yamlfile} --wd data/geometries --tickslit --mesh --group CoolingChannels"
+
     else:
         gmshfile = meshfile.replace(".med", ".msh")
         meshconvert = f"gmsh -0 {meshfile} -bin -o {gmshfile}"
@@ -719,16 +974,11 @@ def setup_cmds(
         "CAD": f"singularity exec {simage_path}/{salome} {geocmd}",
     }
 
-    # TODO add mount point for MeshGems if 3D otherwise use gmsh for Axi
-    # to be changed in the future by using an entry from magnetsetup.conf MeshGems or gmsh
-    # MeshGems_licdir = f"-B {node_spec.mgkeydir}:/opt/DISTENE/license:ro" if node_spec.mgkeydir is not None else ""
-    # cmds["Mesh"] = f"singularity exec {MeshGems_licdir} {simage_path}/{salome} {meshcmd}"
+    # TODO add mount specific point for selected node
     if args.geom == "Axi":
         cmds["Mesh"] = f"singularity exec {simage_path}/{gmsh} {meshcmd}"
     else:
         cmds["Mesh"] = f"singularity exec {simage_path}/{salome} {meshcmd}"
-    # if gmsh:
-    #    cmds["Mesh"] = f"singularity exec -B /opt/MeshGems:/opt/DISTENE/license:ro {simage_path}/{salome} {meshcmd}"
 
     if meshconvert:
         cmds["Convert"] = f"singularity exec {simage_path}/{salome} {meshconvert}"

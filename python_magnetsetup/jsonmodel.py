@@ -61,6 +61,8 @@ def create_params_bitter(
 ):
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
+
+    method_data:
     """
     print(f"create_params_bitter for mname={mname} gdata[0]={gdata[0]}")
 
@@ -100,35 +102,27 @@ def create_params_bitter(
         Sh = convert_data(units, Sh, "Area")
 
     # depending on method_data[4] (aka args.cooling)
-    params_data["Parameters"].append(
-        {"name": f"{name}_hw", "value": convert_data(units, 58222.1, "h")}
-    )
-    params_data["Parameters"].append({"name": f"{name}_Tw", "value": 290.671})
-    params_data["Parameters"].append({"name": f"{name}_dTw", "value": 12.74})
-    params_data["Parameters"].append({"name": f"{name}_Zmin", "value": Zmin})
-    params_data["Parameters"].append({"name": f"{name}_Zmax", "value": Zmax})
-
-    for thbc in ["rInt", "rExt"]:
-        bcname = f"{name}_{thbc}"
+    if not "H" in method_data[4]:
         params_data["Parameters"].append(
-            {"name": f"{bcname}_hw", "value": convert_data(units, 58222.1, "h")}
+            {"name": f"{name}_hw", "value": convert_data(units, 58222.1, "h")}
         )
-        params_data["Parameters"].append({"name": f"{bcname}_Tw", "value": 290.671})
-        params_data["Parameters"].append({"name": f"{bcname}_dTw", "value": 12.74})
-        params_data["Parameters"].append({"name": f"{bcname}_Zmin", "value": Zmin})
-        params_data["Parameters"].append({"name": f"{bcname}_Zmax", "value": Zmax})
+        params_data["Parameters"].append({"name": f"{name}_Tw", "value": 290.671})
+        params_data["Parameters"].append({"name": f"{name}_dTw", "value": 12.74})
+        params_data["Parameters"].append({"name": f"{name}_Zmin", "value": Zmin})
+        params_data["Parameters"].append({"name": f"{name}_Zmax", "value": Zmax})
 
-    for i in range(NCoolingSlits):
-        bcname = f"{name}_Slit{i+1}"
-        params_data["Parameters"].append(
-            {"name": f"{bcname}_hw", "value": convert_data(units, 58222.1, "h")}
-        )
-        params_data["Parameters"].append({"name": f"{bcname}_Tw", "value": 290.671})
-        params_data["Parameters"].append({"name": f"{bcname}_dTw", "value": 12.74})
-        params_data["Parameters"].append({"name": f"{bcname}_Sh", "value": Sh[i]})
-        params_data["Parameters"].append({"name": f"{bcname}_Dh", "value": Dh[i]})
-        params_data["Parameters"].append({"name": f"{bcname}_Zmin", "value": Zmin})
-        params_data["Parameters"].append({"name": f"{bcname}_Zmax", "value": Zmax})
+    else:
+        for i in range(NCoolingSlits):
+            bcname = f"{name}_Slit{i+1}"
+            params_data["Parameters"].append(
+                {"name": f"{bcname}_hw", "value": convert_data(units, 58222.1, "h")}
+            )
+            params_data["Parameters"].append({"name": f"{bcname}_Tw", "value": 290.671})
+            params_data["Parameters"].append({"name": f"{bcname}_dTw", "value": 12.74})
+            params_data["Parameters"].append({"name": f"{bcname}_Sh", "value": Sh[i]})
+            params_data["Parameters"].append({"name": f"{bcname}_Dh", "value": Dh[i]})
+            params_data["Parameters"].append({"name": f"{bcname}_Zmin", "value": Zmin})
+            params_data["Parameters"].append({"name": f"{bcname}_Zmax", "value": Zmax})
 
     # init values for U (Axi specific)
     print(f"create_params_bitter/nturns: {nturns}")
@@ -225,29 +219,39 @@ def create_params_insert(
         prefix = f"{mname}_"
 
     params_data["Parameters"].append({"name": f"{prefix}Tinit", "value": 293})
+
     # get value from coolingmethod and Flow(I) value
-    params_data["Parameters"].append(
-        {"name": f"{prefix}hw", "value": convert_data(units, 58222.1, "h")}
-    )
-    params_data["Parameters"].append({"name": f"{prefix}Tw", "value": 290.671})
-    params_data["Parameters"].append({"name": f"{prefix}dTw", "value": 12.74})
-    params_data["Parameters"].append({"name": f"{prefix}Zmin", "value": min(Zmin)})
-    params_data["Parameters"].append({"name": f"{prefix}Zmax", "value": max(Zmax)})
+    if not "H" in method_data[4]:
+        params_data["Parameters"].append(
+            {"name": f"{prefix}hw", "value": convert_data(units, 58222.1, "h")}
+        )
+        params_data["Parameters"].append({"name": f"{prefix}Tw", "value": 290.671})
+        params_data["Parameters"].append({"name": f"{prefix}dTw", "value": 12.74})
+        params_data["Parameters"].append({"name": f"{prefix}Zmin", "value": min(Zmin)})
+        params_data["Parameters"].append({"name": f"{prefix}Zmax", "value": max(Zmax)})
 
     # params per cooling channels
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
-
-    for i in range(NHelices + 1):
-        # get value from coolingmethod and Flow(I) value
-        params_data["Parameters"].append(
-            {"name": f"{prefix}h{i}", "value": convert_data(units, 58222.1, "h")}
-        )
-        params_data["Parameters"].append({"name": f"{prefix}Tw{i}", "value": 290.671})
-        params_data["Parameters"].append({"name": f"{prefix}dTw{i}", "value": 12.74})
-        params_data["Parameters"].append({"name": f"{prefix}Zmin{i}", "value": Zmin[i]})
-        params_data["Parameters"].append({"name": f"{prefix}Zmax{i}", "value": Zmax[i]})
-        params_data["Parameters"].append({"name": f"{prefix}Sh{i}", "value": Sh[i]})
-        params_data["Parameters"].append({"name": f"{prefix}Dh{i}", "value": Dh[i]})
+    else:
+        for i in range(NHelices + 1):
+            # get value from coolingmethod and Flow(I) value
+            params_data["Parameters"].append(
+                {"name": f"{prefix}h{i}", "value": convert_data(units, 58222.1, "h")}
+            )
+            params_data["Parameters"].append(
+                {"name": f"{prefix}Tw{i}", "value": 290.671}
+            )
+            params_data["Parameters"].append(
+                {"name": f"{prefix}dTw{i}", "value": 12.74}
+            )
+            params_data["Parameters"].append(
+                {"name": f"{prefix}Zmin{i}", "value": Zmin[i]}
+            )
+            params_data["Parameters"].append(
+                {"name": f"{prefix}Zmax{i}", "value": Zmax[i]}
+            )
+            params_data["Parameters"].append({"name": f"{prefix}Sh{i}", "value": Sh[i]})
+            params_data["Parameters"].append({"name": f"{prefix}Dh{i}", "value": Dh[i]})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
@@ -746,7 +750,6 @@ def create_bcs_bitter(
     method_data: List[str],
     debug: bool = False,
 ) -> dict:
-
     (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
     print(f"create_bcs_bitter from templates for {name}")
     # print("snames=", snames)
@@ -767,6 +770,7 @@ def create_bcs_bitter(
     if "th" in method_data[3]:
         fcooling = templates["cooling"]
 
+        """
         # TODO make only one Bc for rInt and on for RExt
         for thbc in ["rInt", "rExt"]:
             bcname = name
@@ -787,6 +791,7 @@ def create_bcs_bitter(
             thermic_bcs_rob["boundary_Therm_Robin"].append(
                 Merge({"name": f"{name}_{thbc}"}, mdata[f"{name}_{thbc}"])
             )
+        """
 
         for i in range(NCoolingSlits):
             bcname = name
