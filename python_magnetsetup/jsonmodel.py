@@ -101,6 +101,8 @@ def create_params_bitter(
         Dh = convert_data(units, Dh, "Length")
         Sh = convert_data(units, Sh, "Area")
 
+    
+
     # depending on method_data[4] (aka args.cooling)
     if not "H" in method_data[4]:
         params_data["Parameters"].append(
@@ -108,6 +110,9 @@ def create_params_bitter(
         )
         params_data["Parameters"].append({"name": f"{name}_Tw", "value": 290.671})
         params_data["Parameters"].append({"name": f"{name}_dTw", "value": 12.74})
+        for i in range(NCoolingSlits):
+            params_data["Parameters"].append({"name": f"{bcname}_Sh", "value": Sh[i]})
+            params_data["Parameters"].append({"name": f"{bcname}_Dh", "value": Dh[i]})
         params_data["Parameters"].append({"name": f"{name}_Zmin", "value": Zmin})
         params_data["Parameters"].append({"name": f"{name}_Zmax", "value": Zmax})
 
@@ -227,6 +232,9 @@ def create_params_insert(
         )
         params_data["Parameters"].append({"name": f"{prefix}Tw", "value": 290.671})
         params_data["Parameters"].append({"name": f"{prefix}dTw", "value": 12.74})
+        for i in range(NHelices + 1):
+            params_data["Parameters"].append({"name": f"{prefix}Sh{i}", "value": Sh[i]})
+            params_data["Parameters"].append({"name": f"{prefix}Dh{i}", "value": Dh[i]})
         params_data["Parameters"].append({"name": f"{prefix}Zmin", "value": min(Zmin)})
         params_data["Parameters"].append({"name": f"{prefix}Zmax", "value": max(Zmax)})
 
