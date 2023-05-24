@@ -90,11 +90,9 @@ def Bitter_setup(
             ignore_index.append(len(snames) - 1)
         start = int(snames[0].replace(f"{name}_B", ""))
         end=len(snames)
-        print(f"snames : {snames} len(snames) : {len(snames)}")
         if end==start : 
             end=end+1 
         index_ABitters = f"{start}:{end}"
-        print("index_ABitters : ",index_ABitters)
         index_Bitters = f"{1}:{NSections+1}"
 
         part_conductors.append(f"Conductor_{name}")
