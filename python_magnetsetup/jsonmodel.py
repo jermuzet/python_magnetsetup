@@ -102,7 +102,7 @@ def create_params_bitter(
         Sh = convert_data(units, Sh, "Area")
 
     # depending on method_data[4] (aka args.cooling)
-    if not "H" in method_data[""]:
+    if not "H" in method_data[4]:
         params_data["Parameters"].append(
             {"name": f"{name}_hw", "value": convert_data(units, 58222.1, "h")}
         )
