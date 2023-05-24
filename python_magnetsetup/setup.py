@@ -51,6 +51,7 @@ from .bitter import Bitter_setup, Bitter_simfile
 from .supra import Supra_setup, Supra_simfile
 
 from .file_utils import MyOpen, findfile, search_paths
+from .units import load_units, convert_data
 
 
 def magnet_simfile(
@@ -178,10 +179,20 @@ def magnet_setup(
                         MyEnv, mname, obj, cad, method_data, templates, current, debug
                     )
 
+                    unit_Length = method_data[5]  # "meter"
+                    units = load_units(unit_Length)
+
                     # add Slit0 and update params for i == 0
                     if i == 0:
                         Sh = math.pi * (cad.r[0] - innerbore) * (innerbore + cad.r[0])
                         Dh = 4 * Sh / (2 * math.pi * (innerbore + cad.r[0]))
+                        Zmin = cad.z[0]
+                        Zmax = cad.z[1]
+                        if unit_Length == "meter":
+                            Zmin = convert_data(units, Zmin, "Length")
+                            Zmax = convert_data(units, Zmax, "Length")
+                            Dh = convert_data(units, Dh, "Length")
+                            Sh = convert_data(units, Sh, "Area")
 
                         parameters = tdict["Parameters"]
                         pdict = {"name": f"{prefix}{cad.name}_Slit0_Dh", "value": Dh}
@@ -192,7 +203,7 @@ def magnet_setup(
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit0_hw",
-                            "value": 58222.1,
+                            "value": convert_data(units, 58222.1, "h"),
                         }
                         parameters.append(pdict)
 
@@ -210,12 +221,12 @@ def magnet_setup(
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit0_Zmin",
-                            "value": cad.z[0],
+                            "value": Zmin,
                         }
                         parameters.append(pdict)
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit0_Zmax",
-                            "value": cad.z[1],
+                            "value": Zmax,
                         }
                         parameters.append(pdict)
 
@@ -260,6 +271,13 @@ def magnet_setup(
                         )
                         Sh = math.pi * (ncad.r[0] - cad.r[1]) * (ncad.r[0] + cad.r[1])
                         Dh = 4 * Sh / (2 * math.pi * (ncad.r[0] + cad.r[1]))
+                        Zmin = min(cad.z[0], ncad.z[0])
+                        Zmax = max(cad.z[1], ncad.z[1])
+                        if unit_Length == "meter":
+                            Zmin = convert_data(units, Zmin, "Length")
+                            Zmax = convert_data(units, Zmax, "Length")
+                            Dh = convert_data(units, Dh, "Length")
+                            Sh = convert_data(units, Sh, "Area")
 
                         # for better grad Tw model
                         # get Zh from cad and ncad
@@ -283,7 +301,7 @@ def magnet_setup(
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
-                            "value": 58222.1,
+                            "value": convert_data(units, 58222.1, "h"),
                         }
                         parameters.append(pdict)
 
@@ -301,12 +319,12 @@ def magnet_setup(
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
-                            "value": min(cad.z[0], ncad.z[0]),
+                            "value": Zmin,
                         }
                         parameters.append(pdict)
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
-                            "value": max(cad.z[1], ncad.z[1]),
+                            "value": Zmax,
                         }
                         parameters.append(pdict)
 
@@ -346,6 +364,14 @@ def magnet_setup(
                         print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
                         Sh = math.pi * (outerbore - cad.r[0]) * (outerbore + cad.r[0])
                         Dh = 4 * Sh / (2 * math.pi * (outerbore + cad.r[0]))
+                        Zmin = cad.z[0]
+                        Zmax = cad.z[1]
+                        if unit_Length == "meter":
+                            Zmin = convert_data(units, Zmin, "Length")
+                            Zmax = convert_data(units, Zmax, "Length")
+                            Dh = convert_data(units, Dh, "Length")
+                            Sh = convert_data(units, Sh, "Area")
+
                         Nslits = 0
                         if cad.coolingslits :
                             Nslits = len(cad.coolingslits)
@@ -364,7 +390,7 @@ def magnet_setup(
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
-                            "value": 58222.1,
+                            "value": convert_data(units, 58222.1, "h"),
                         }
                         parameters.append(pdict)
 
@@ -382,12 +408,12 @@ def magnet_setup(
 
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
-                            "value": cad.z[0],
+                            "value": Zmin,
                         }
                         parameters.append(pdict)
                         pdict = {
                             "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
-                            "value": cad.z[1],
+                            "value": Zmax,
                         }
                         parameters.append(pdict)
 
