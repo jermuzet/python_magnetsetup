@@ -199,17 +199,17 @@
 				"Statistics":
 				{
 					{{#power_magnet}}
-					"Power_{{name}}":
+					"PowerM_{{name}}":
 					{
         				"type": "integrate",
-        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi+magnetic_dphi_dt)*(materials_U/2/pi+magnetic_dphi_dt)/x:magnetic_dphi_dt:materials_sigma:materials_U:x",
         				"markers": {{magnet_parts}}
 					},
 					{{/power_magnet}}
 		    		"Power":
 				    {
         				"type": "integrate",
-        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+        				"expr": "2*pi*materials_sigma*(materials_U/2/pi+magnetic_dphi_dt)*(materials_U/2/pi+magnetic_dphi_dt)/x:magnetic_dphi_dt:materials_sigma:materials_U:x",
         				"markers": {{part_electric}}
     				},
 					"Stat_T": 

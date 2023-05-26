@@ -5,11 +5,10 @@
     "Intensity_%1%": 
     {
         "type": "integrate",
-        "expr": "-materials_sigma*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+        "expr": "-materials_sigma*(materials_U/2/pi)/x/N_%1%:materials_sigma:materials_U:x:N_%1%",
         "markers": "%1%",
         "index1": {{part_electric}}
     },
     {{/Stats_Current}}
     }
 }
-                    
