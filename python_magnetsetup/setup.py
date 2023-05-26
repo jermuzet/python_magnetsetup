@@ -174,7 +174,7 @@ def magnet_setup(
                     cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
                 print(f"magnetsetup:magnet_setup: load a {mtype}: {cad.name}")
 
-                if isinstance(cad, Bitter):
+                if isinstance(cad, Bitter) :
                     (tdict, tmat, tmodels, tpost) = Bitter_setup(
                         MyEnv, mname, obj, cad, method_data, templates, current, debug
                     )
@@ -182,8 +182,10 @@ def magnet_setup(
                     unit_Length = method_data[5]  # "meter"
                     units = load_units(unit_Length)
 
+                
                     # add Slit0 and update params for i == 0
                     if i == 0:
+                        print(f"cad.r {cad.r}   innerbore {innerbore}")
                         Sh = math.pi * (cad.r[0] - innerbore) * (innerbore + cad.r[0])
                         Dh = 4 * Sh / (2 * math.pi * (innerbore + cad.r[0]))
                         Zmin = cad.z[0]
@@ -362,8 +364,8 @@ def magnet_setup(
                     # add and update Params for Slit(N+1) for i == len(confdata[mtype])-1
                     else:
                         print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
-                        Sh = math.pi * (outerbore - cad.r[0]) * (outerbore + cad.r[0])
-                        Dh = 4 * Sh / (2 * math.pi * (outerbore + cad.r[0]))
+                        Sh = math.pi * (outerbore - cad.r[1]) * (outerbore + cad.r[1])
+                        Dh = 4 * Sh / (2 * math.pi * (outerbore + cad.r[1]))
                         Zmin = cad.z[0]
                         Zmax = cad.z[1]
                         if unit_Length == "meter":
@@ -500,16 +502,18 @@ def magnet_setup(
                 print(f"magnet_setup: {mtype}, mname={mname}, tpost={tpost}")
                 print(f"magnet_setup: {mtype}, mname={mname}, mpost={mpost}")
 
-                list_current = []
-                for item in mpost["Current"]:
-                    if isinstance(item, dict) and "part_electric" in item:
-                        list_current = list(set(list_current + item["part_electric"]))
-                if list_current:
-                    mpost["Current"] = [{"part_electric": list_current}]
-                    if debug:
-                        print(
-                            f"magnet_setup {mname}: force mpost[Current]={mpost['Current']}"
-                        )
+                
+                for key in ["Current","Power"] :
+                    list_current = []
+                    for item in mpost[key]:
+                        if isinstance(item, dict) and "part_electric" in item:
+                            list_current = list(set(list_current + item["part_electric"]))
+                    if list_current:
+                        mpost[key] = [{"part_electric": list_current}]
+                        if debug:
+                            print(
+                                f"magnet_setup {mname}: force mpost[{key}]={mpost[key]}"
+                            )
 
                 tdict.clear()
                 tmat.clear()
@@ -665,15 +669,16 @@ def msite_setup(
         tmodels.clear()
         tpost.clear()
 
-        list_current = []
-        for item in mpost["Current"]:
-            if isinstance(item, dict) and "part_electric" in item:
-                list_current = list(set(list_current + item["part_electric"]))
+        for key in ["Current","Power"] :
+            list_current = []
+            for item in mpost[key]:
+                if isinstance(item, dict) and "part_electric" in item:
+                    list_current = list(set(list_current + item["part_electric"]))
             if list_current:
-                mpost["Current"] = [{"part_electric": list_current}]
+                mpost[key] = [{"part_electric": list_current}]
                 if debug:
                     print(
-                        f"msite_setup: magnet_setup[{mname}]: force mpost[Current]={mpost['Current']}"
+                        f"msite_setup {mname}: force mpost[{key}]={mpost[key]}"
                     )
         if debug:
             print("NewMerge:", mpost)
