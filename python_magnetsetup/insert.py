@@ -480,7 +480,8 @@ def Insert_setup(
         suffix = "%1%"
 
     mpost = {
-        "Power": powerH_data,
+        "Power": currentH_data,
+        "PowerH": powerH_data,
         "Current": currentH_data,
         "Flux": [
             {
