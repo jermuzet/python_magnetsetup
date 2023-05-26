@@ -245,7 +245,7 @@ def create_params_insert(
         for i in range(NHelices + 1):
             # get value from coolingmethod and Flow(I) value
             params_data["Parameters"].append(
-                {"name": f"{prefix}h{i}", "value": convert_data(units, 58222.1, "h")}
+                {"name": f"{prefix}hw{i}", "value": convert_data(units, 58222.1, "h")}
             )
             params_data["Parameters"].append(
                 {"name": f"{prefix}Tw{i}", "value": 290.671}
