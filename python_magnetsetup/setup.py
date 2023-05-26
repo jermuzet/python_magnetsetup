@@ -182,273 +182,272 @@ def magnet_setup(
                     unit_Length = method_data[5]  # "meter"
                     units = load_units(unit_Length)
 
-                
-                    # add Slit0 and update params for i == 0
-                    if i == 0:
-                        print(f"cad.r {cad.r}   innerbore {innerbore}")
-                        Sh = math.pi * (cad.r[0] - innerbore) * (innerbore + cad.r[0])
-                        Dh = 4 * Sh / (2 * math.pi * (innerbore + cad.r[0]))
-                        Zmin = cad.z[0]
-                        Zmax = cad.z[1]
-                        if unit_Length == "meter":
-                            Zmin = convert_data(units, Zmin, "Length")
-                            Zmax = convert_data(units, Zmax, "Length")
-                            Dh = convert_data(units, Dh, "Length")
-                            Sh = convert_data(units, Sh, "Area")
-
-                        parameters = tdict["Parameters"]
-                        pdict = {"name": f"{prefix}{cad.name}_Slit0_Dh", "value": Dh}
-
-                        parameters.append(pdict)
-                        pdict = {"name": f"{prefix}{cad.name}_Slit0_Sh", "value": Sh}
-                        parameters.append(pdict)
-
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit0_hw",
-                            "value": convert_data(units, 58222.1, "h"),
-                        }
-                        parameters.append(pdict)
-
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit0_Tw",
-                            "value": 290.671,
-                        }
-                        parameters.append(pdict)
-
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit0_dTw",
-                            "value": 12.74,
-                        }
-                        parameters.append(pdict)
-
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit0_Zmin",
-                            "value": Zmin,
-                        }
-                        parameters.append(pdict)
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit0_Zmax",
-                            "value": Zmax,
-                        }
-                        parameters.append(pdict)
-
-                        # update bcs (index for slits) for i == 0
-                        bcname = f"{prefix}{cad.name}_Slit0"
-                        fcooling = templates["cooling"]
-
-                        from .jsonmodel import entry
-
-                        mdata = entry(
-                            fcooling,
-                            {
-                                "name": f"{bcname}",
-                                "markers": [bcname],
-                                "hw": f"{bcname}_hw",
-                                "Tw": f"{bcname}_Tw",
-                                "dTw": f"{bcname}_dTw",
-                            },
-                            debug,
-                        )
-
-                        from .utils import Merge
-
-                        bcs = tdict["boundary_Therm_Robin"]
-                        bcs.append(Merge({"name": bcname}, mdata[bcname]))
-
-                        # print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
-                        # exit(1)
-
-                    # add and update params for Slit(N+1) for
-                    if i != len(confdata[mtype]) - 1:
-                        print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
-                        nobj = confdata[mtype][i + 1]
-                        nyamlfile = nobj["geom"]
-                        ncad = None
-                        with MyOpen(
-                            nyamlfile, "r", paths=search_paths(MyEnv, "geom")
-                        ) as cfgdata:
-                            ncad = yaml.load(cfgdata, Loader=yaml.FullLoader)
-                        print(
-                            f"magnetsetup:magnet_setup: load next {mtype}: {ncad.name}"
-                        )
-                        Sh = math.pi * (ncad.r[0] - cad.r[1]) * (ncad.r[0] + cad.r[1])
-                        Dh = 4 * Sh / (2 * math.pi * (ncad.r[0] + cad.r[1]))
-                        Zmin = min(cad.z[0], ncad.z[0])
-                        Zmax = max(cad.z[1], ncad.z[1])
-                        if unit_Length == "meter":
-                            Zmin = convert_data(units, Zmin, "Length")
-                            Zmax = convert_data(units, Zmax, "Length")
-                            Dh = convert_data(units, Dh, "Length")
-                            Sh = convert_data(units, Sh, "Area")
-
-                        # for better grad Tw model
-                        # get Zh from cad and ncad
-                        # concat 2 lists
-                        # sort
-                        # remove duplicates see python_magnetgeo/Insert.py def filter
-
-                        Nslits = len(cad.coolingslits)
-                        parameters = tdict["Parameters"]
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Dh",
-                            "value": Dh,
-                        }
-
-                        parameters.append(pdict)
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Sh",
-                            "value": Sh,
-                        }
-                        parameters.append(pdict)
-
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
-                            "value": convert_data(units, 58222.1, "h"),
-                        }
-                        parameters.append(pdict)
-
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
-                            "value": 290.671,
-                        }
-                        parameters.append(pdict)
-
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
-                            "value": 12.74,
-                        }
-                        parameters.append(pdict)
-
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
-                            "value": Zmin,
-                        }
-                        parameters.append(pdict)
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
-                            "value": Zmax,
-                        }
-                        parameters.append(pdict)
-
-                        # update bcs (index for slits) for i == 0
-                        bcname = f"{prefix}{cad.name}_Slit{Nslits+1}"
-                        fcooling = templates["cooling"]
-
-                        from .jsonmodel import entry
-
-                        mdata = entry(
-                            fcooling,
-                            {
-                                "name": f"{bcname}",
-                                "markers": [bcname],
-                                "hw": f"{bcname}_hw",
-                                "Tw": f"{bcname}_Tw",
-                                "dTw": f"{bcname}_dTw",
-                            },
-                            debug,
-                        )
-
-                        from .utils import Merge
-
-                        bcs = tdict["boundary_Therm_Robin"]
-                        bcs.append(Merge({"name": bcname}, mdata[bcname]))
-
-                        # update post (index for slits) for i == 0
-                        fpost = tpost["Flux"][0]["index_h"]
-                        fpost = f"1:{str(Nslits+2)}"
+                    if "th" in method_data[3]:
+                        # add Slit0 and update params for i == 0
                         if i == 0:
-                            fpost = f"0:{str(Nslits+2)}"
-                        tpost["Flux"][0]["index_h"] = fpost
-                        print(f"tpost={tpost}")
+                            Sh = math.pi * (cad.r[0] - innerbore) * (innerbore + cad.r[0])
+                            Dh = 4 * Sh / (2 * math.pi * (innerbore + cad.r[0]))
+                            Zmin = cad.z[0]
+                            Zmax = cad.z[1]
+                            if unit_Length == "meter":
+                                Zmin = convert_data(units, Zmin, "Length")
+                                Zmax = convert_data(units, Zmax, "Length")
+                                Dh = convert_data(units, Dh, "Length")
+                                Sh = convert_data(units, Sh, "Area")
 
-                    # add and update Params for Slit(N+1) for i == len(confdata[mtype])-1
-                    else:
-                        print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
-                        Sh = math.pi * (outerbore - cad.r[1]) * (outerbore + cad.r[1])
-                        Dh = 4 * Sh / (2 * math.pi * (outerbore + cad.r[1]))
-                        Zmin = cad.z[0]
-                        Zmax = cad.z[1]
-                        if unit_Length == "meter":
-                            Zmin = convert_data(units, Zmin, "Length")
-                            Zmax = convert_data(units, Zmax, "Length")
-                            Dh = convert_data(units, Dh, "Length")
-                            Sh = convert_data(units, Sh, "Area")
+                            parameters = tdict["Parameters"]
+                            pdict = {"name": f"{prefix}{cad.name}_Slit0_Dh", "value": Dh}
 
-                        Nslits = 0
-                        if cad.coolingslits :
+                            parameters.append(pdict)
+                            pdict = {"name": f"{prefix}{cad.name}_Slit0_Sh", "value": Sh}
+                            parameters.append(pdict)
+
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit0_hw",
+                                "value": convert_data(units, 58222.1, "h"),
+                            }
+                            parameters.append(pdict)
+
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit0_Tw",
+                                "value": 290.671,
+                            }
+                            parameters.append(pdict)
+
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit0_dTw",
+                                "value": 12.74,
+                            }
+                            parameters.append(pdict)
+
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit0_Zmin",
+                                "value": Zmin,
+                            }
+                            parameters.append(pdict)
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit0_Zmax",
+                                "value": Zmax,
+                            }
+                            parameters.append(pdict)
+
+                            # update bcs (index for slits) for i == 0
+                            bcname = f"{prefix}{cad.name}_Slit0"
+                            fcooling = templates["cooling"]
+
+                            from .jsonmodel import entry
+
+                            mdata = entry(
+                                fcooling,
+                                {
+                                    "name": f"{bcname}",
+                                    "markers": [bcname],
+                                    "hw": f"{bcname}_hw",
+                                    "Tw": f"{bcname}_Tw",
+                                    "dTw": f"{bcname}_dTw",
+                                },
+                                debug,
+                            )
+
+                            from .utils import Merge
+
+                            bcs = tdict["boundary_Therm_Robin"]
+                            bcs.append(Merge({"name": bcname}, mdata[bcname]))
+
+                            # print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
+                            # exit(1)
+
+                        # add and update params for Slit(N+1) for
+                        if i != len(confdata[mtype]) - 1:
+                            print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
+                            nobj = confdata[mtype][i + 1]
+                            nyamlfile = nobj["geom"]
+                            ncad = None
+                            with MyOpen(
+                                nyamlfile, "r", paths=search_paths(MyEnv, "geom")
+                            ) as cfgdata:
+                                ncad = yaml.load(cfgdata, Loader=yaml.FullLoader)
+                            print(
+                                f"magnetsetup:magnet_setup: load next {mtype}: {ncad.name}"
+                            )
+                            Sh = math.pi * (ncad.r[0] - cad.r[1]) * (ncad.r[0] + cad.r[1])
+                            Dh = 4 * Sh / (2 * math.pi * (ncad.r[0] + cad.r[1]))
+                            Zmin = min(cad.z[0], ncad.z[0])
+                            Zmax = max(cad.z[1], ncad.z[1])
+                            if unit_Length == "meter":
+                                Zmin = convert_data(units, Zmin, "Length")
+                                Zmax = convert_data(units, Zmax, "Length")
+                                Dh = convert_data(units, Dh, "Length")
+                                Sh = convert_data(units, Sh, "Area")
+
+                            # for better grad Tw model
+                            # get Zh from cad and ncad
+                            # concat 2 lists
+                            # sort
+                            # remove duplicates see python_magnetgeo/Insert.py def filter
+
                             Nslits = len(cad.coolingslits)
-                        parameters = tdict["Parameters"]
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Dh",
-                            "value": Dh,
-                        }
+                            parameters = tdict["Parameters"]
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Dh",
+                                "value": Dh,
+                            }
 
-                        parameters.append(pdict)
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Sh",
-                            "value": Sh,
-                        }
-                        parameters.append(pdict)
+                            parameters.append(pdict)
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Sh",
+                                "value": Sh,
+                            }
+                            parameters.append(pdict)
 
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
-                            "value": convert_data(units, 58222.1, "h"),
-                        }
-                        parameters.append(pdict)
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
+                                "value": convert_data(units, 58222.1, "h"),
+                            }
+                            parameters.append(pdict)
 
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
-                            "value": 290.671,
-                        }
-                        parameters.append(pdict)
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
+                                "value": 290.671,
+                            }
+                            parameters.append(pdict)
 
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
-                            "value": 12.74,
-                        }
-                        parameters.append(pdict)
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
+                                "value": 12.74,
+                            }
+                            parameters.append(pdict)
 
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
-                            "value": Zmin,
-                        }
-                        parameters.append(pdict)
-                        pdict = {
-                            "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
-                            "value": Zmax,
-                        }
-                        parameters.append(pdict)
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
+                                "value": Zmin,
+                            }
+                            parameters.append(pdict)
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
+                                "value": Zmax,
+                            }
+                            parameters.append(pdict)
 
-                        # update bcs (index for slits) for i == 0
-                        bcname = f"{prefix}{cad.name}_Slit{Nslits+1}"
-                        fcooling = templates["cooling"]
+                            # update bcs (index for slits) for i == 0
+                            bcname = f"{prefix}{cad.name}_Slit{Nslits+1}"
+                            fcooling = templates["cooling"]
 
-                        from .jsonmodel import entry
+                            from .jsonmodel import entry
 
-                        mdata = entry(
-                            fcooling,
-                            {
-                                "name": f"{bcname}",
-                                "markers": [bcname],
-                                "hw": f"{bcname}_hw",
-                                "Tw": f"{bcname}_Tw",
-                                "dTw": f"{bcname}_dTw",
-                            },
-                            debug,
-                        )
+                            mdata = entry(
+                                fcooling,
+                                {
+                                    "name": f"{bcname}",
+                                    "markers": [bcname],
+                                    "hw": f"{bcname}_hw",
+                                    "Tw": f"{bcname}_Tw",
+                                    "dTw": f"{bcname}_dTw",
+                                },
+                                debug,
+                            )
 
-                        from .utils import Merge
+                            from .utils import Merge
 
-                        bcs = tdict["boundary_Therm_Robin"]
-                        bcs.append(Merge({"name": bcname}, mdata[bcname]))
+                            bcs = tdict["boundary_Therm_Robin"]
+                            bcs.append(Merge({"name": bcname}, mdata[bcname]))
 
-                        # update post (index for slits) for i == 0
-                        fpost = tpost["Flux"][0]["index_h"]
-                        fpost = f"1:{str(Nslits+2)}"
-                        if i == 0:
-                            fpost = f"0:{str(Nslits+2)}"
-                        tpost["Flux"][0]["index_h"] = fpost
-                        print(f"tpost={tpost}")
+                            # update post (index for slits) for i == 0
+                            fpost = tpost["Flux"][0]["index_h"]
+                            fpost = f"1:{str(Nslits+2)}"
+                            if i == 0:
+                                fpost = f"0:{str(Nslits+2)}"
+                            tpost["Flux"][0]["index_h"] = fpost
+                            print(f"tpost={tpost}")
+
+                        # add and update Params for Slit(N+1) for i == len(confdata[mtype])-1
+                        else:
+                            print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
+                            Sh = math.pi * (outerbore - cad.r[1]) * (outerbore + cad.r[1])
+                            Dh = 4 * Sh / (2 * math.pi * (outerbore + cad.r[1]))
+                            Zmin = cad.z[0]
+                            Zmax = cad.z[1]
+                            if unit_Length == "meter":
+                                Zmin = convert_data(units, Zmin, "Length")
+                                Zmax = convert_data(units, Zmax, "Length")
+                                Dh = convert_data(units, Dh, "Length")
+                                Sh = convert_data(units, Sh, "Area")
+
+                            Nslits = 0
+                            if cad.coolingslits :
+                                Nslits = len(cad.coolingslits)
+                            parameters = tdict["Parameters"]
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Dh",
+                                "value": Dh,
+                            }
+
+                            parameters.append(pdict)
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Sh",
+                                "value": Sh,
+                            }
+                            parameters.append(pdict)
+
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
+                                "value": convert_data(units, 58222.1, "h"),
+                            }
+                            parameters.append(pdict)
+
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
+                                "value": 290.671,
+                            }
+                            parameters.append(pdict)
+
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
+                                "value": 12.74,
+                            }
+                            parameters.append(pdict)
+
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
+                                "value": Zmin,
+                            }
+                            parameters.append(pdict)
+                            pdict = {
+                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
+                                "value": Zmax,
+                            }
+                            parameters.append(pdict)
+
+                            # update bcs (index for slits) for i == 0
+                            bcname = f"{prefix}{cad.name}_Slit{Nslits+1}"
+                            fcooling = templates["cooling"]
+
+                            from .jsonmodel import entry
+
+                            mdata = entry(
+                                fcooling,
+                                {
+                                    "name": f"{bcname}",
+                                    "markers": [bcname],
+                                    "hw": f"{bcname}_hw",
+                                    "Tw": f"{bcname}_Tw",
+                                    "dTw": f"{bcname}_dTw",
+                                },
+                                debug,
+                            )
+
+                            from .utils import Merge
+
+                            bcs = tdict["boundary_Therm_Robin"]
+                            bcs.append(Merge({"name": bcname}, mdata[bcname]))
+
+                            # update post (index for slits) for i == 0
+                            fpost = tpost["Flux"][0]["index_h"]
+                            fpost = f"1:{str(Nslits+2)}"
+                            if i == 0:
+                                fpost = f"0:{str(Nslits+2)}"
+                            tpost["Flux"][0]["index_h"] = fpost
+                            print(f"tpost={tpost}")
 
                 elif isinstance(cad, Supra):
                     (tdict, tmat, tmodels, tpost) = Supra_setup(
