@@ -65,6 +65,14 @@
 							"template": "stats_Power.mustache",
 							"physic": "heat",
 							"data": {
+								"power_": ""
+							}
+						},
+						"PowerH": {
+							"name": "Stats_PowerH",
+							"template": "stats_PowerH.mustache",
+							"physic": "heat",
+							"data": {
 								"power_H": ""
 							}
 						},
@@ -106,6 +114,40 @@
 						"conductor": "conductor-static.json",
 						"insulator": "insulator-static.json"
 					},
+					"stats": {
+						"T": {
+							"name": "Stats_T",
+							"template": "stats_T.mustache",
+							"physic": "heat",
+							"data": {
+								"T_H": ""
+							}
+						},
+						"Power": {
+							"name": "Stats_Power",
+							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {
+								"power_": ""
+							}
+						},
+						"PowerH": {
+							"name": "Stats_PowerH",
+							"template": "stats_PowerH.mustache",
+							"physic": "heat",
+							"data": {
+								"power_H": ""
+							}
+						},
+						"Current": {
+							"name": "Stats_Currents",
+							"template": "stats_Current.mustache",
+							"physic": "heat",
+							"data": {
+								"Current_H": ""
+							}
+						}
+					},
 					"plots": {
 						"B": "plot_B.mustache"
 					}
@@ -139,6 +181,14 @@
 						"Power": {
 							"name": "Stats_Power",
 							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {
+								"power_": ""
+							}
+						},
+						"PowerH": {
+							"name": "Stats_PowerH",
+							"template": "stats_PowerH.mustache",
 							"physic": "heat",
 							"data": {
 								"power_H": ""
@@ -202,6 +252,14 @@
 						"Power": {
 							"name": "Stats_Power",
 							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {
+								"power_": ""
+							}
+						},
+						"PowerH": {
+							"name": "Stats_PowerH",
+							"template": "stats_PowerH.mustache",
 							"physic": "heat",
 							"data": {
 								"power_H": ""
@@ -273,6 +331,14 @@
 						"Power": {
 							"name": "Stats_Power",
 							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {
+								"power_": ""
+							}
+						},
+						"PowerH": {
+							"name": "Stats_PowerH",
+							"template": "stats_PowerH.mustache",
 							"physic": "heat",
 							"data": {
 								"power_H": ""
@@ -347,6 +413,14 @@
 						"Power": {
 							"name": "Stats_Power",
 							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {
+								"power_": ""
+							}
+						},
+						"PowerH": {
+							"name": "Stats_PowerH",
+							"template": "stats_PowerH.mustache",
 							"physic": "heat",
 							"data": {
 								"power_H": ""
@@ -437,6 +511,14 @@
 						"Power": {
 							"name": "Stats_Power",
 							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {
+								"power_": ""
+							}
+						},
+						"PowerH": {
+							"name": "Stats_PowerH",
+							"template": "stats_PowerH.mustache",
 							"physic": "heat",
 							"data": {
 								"power_H": ""
@@ -648,6 +730,14 @@
 							"template": "stats_Power.mustache",
 							"physic": "heat",
 							"data": {
+								"power_": ""
+							}
+						},
+						"PowerH": {
+							"name": "Stats_PowerH",
+							"template": "stats_PowerH.mustache",
+							"physic": "heat",
+							"data": {
 								"power_H": ""
 							}
 						},
@@ -721,6 +811,14 @@
 						"Power": {
 							"name": "Stats_Power",
 							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {
+								"power_": ""
+							}
+						},
+						"PowerH": {
+							"name": "Stats_PowerH",
+							"template": "stats_PowerH.mustache",
 							"physic": "heat",
 							"data": {
 								"power_H": ""
@@ -804,6 +902,14 @@
 						"Power": {
 							"name": "Stats_Power",
 							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {
+								"power_": ""
+							}
+						},
+						"PowerH": {
+							"name": "Stats_PowerH",
+							"template": "stats_PowerH.mustache",
 							"physic": "heat",
 							"data": {
 								"power_H": ""
@@ -903,6 +1009,14 @@
 						"Power": {
 							"name": "Stats_Power",
 							"template": "stats_Power.mustache",
+							"physic": "heat",
+							"data": {
+								"power_": ""
+							}
+						},
+						"PowerH": {
+							"name": "Stats_PowerH",
+							"template": "stats_PowerH.mustache",
 							"physic": "heat",
 							"data": {
 								"power_H": ""
