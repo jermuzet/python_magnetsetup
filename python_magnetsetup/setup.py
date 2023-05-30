@@ -782,8 +782,9 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
                     mconfdata = magnet[mname]
                     if args.debug:
                         print(f"magnet[{mname}]: {mconfdata}")
-                    if "Helix" in mconfdata:
-                        todict[mname] = mconfdata["geom"].replace(".yaml", "")
+                    #if "Helix" in mconfdata:
+                    todict[mname] = mconfdata["geom"].replace(".yaml", "")
+                    """
                     else:
                         todict[mname] = []
                         if "Bitter" in mconfdata:
@@ -792,6 +793,7 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
                         if "Supra" in mconfdata:
                             for obj in mconfdata["Supra"]:
                                 todict[mname].append(obj["geom"].replace(".yaml", ""))
+                    """
             else:
                 raise Exception(f"setup: no magnet in site {confdata['name']}")
 
