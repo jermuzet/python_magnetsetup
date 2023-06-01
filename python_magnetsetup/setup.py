@@ -521,7 +521,7 @@ def magnet_setup(
 
                 # fix init_temp and power_magnet entries in mdict
                 print(f"mdict: key={mdict.keys()}")
-                for key in ["init_temp", "power_magnet"]:
+                for key in ["init_temp", "power_magnet","T_magnet"]:
                     if len(mdict[key]) > 1:
                         # print(f"setup/magnet_setup mname={mname}: mdict[{key}]={mdict[key]}")
                         _key = [item["name"] for item in mdict[key]]

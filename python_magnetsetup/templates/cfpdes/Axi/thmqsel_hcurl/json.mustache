@@ -290,7 +290,15 @@
         				"expr": "2*pi*materials_sigma*(materials_U/2/pi+magnetic_dAtheta_dt*x)*(materials_U/2/pi+magnetic_dAtheta_dt*x)/x:magnetic_dAtheta_dt:materials_sigma:materials_U:x",
         				"markers": {{part_electric}}
     				},
-				"Stat_T": 
+					{{#T_magnet}}
+					"Stat_T_{{name}}":
+					{
+        				"type":["min","max","mean"], 
+						"field":"temperature",
+        				"markers": {{magnet_parts}}
+					},
+					{{/T_magnet}}
+					"Stat_T": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 

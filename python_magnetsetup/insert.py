@@ -313,6 +313,15 @@ def Insert_setup(
     NMerge(power_dict, mdict, debug, "insert_setup mdict")
     # print(f'power_data({mname}): {power_data}')
 
+    # add T per magnet data: mdict = NMerge( mdict, {'T_magnet': T_data}, debug, "bitter_setup mdict")
+    T_data = []
+    T_data.append(
+        {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
+    )
+    T_dict = {"T_magnet": T_data}
+    NMerge(T_dict, mdict, debug, "insert_setup mdict")
+    # print(f'T_data({mname}): {T_data}')
+
     main_data = {
         "part_thermic": part_thermic,
         "part_electric": part_electric,
@@ -341,11 +350,6 @@ def Insert_setup(
         "Rinf": convert_data(units, R2[-1], "Length"),
         "Zinf": convert_data(units, Zmax[-1], "Length"),
     }
-
-    if prefix:
-        meanT_data.append(
-            {"header": f"T_{prefix}", "markers": copy.deepcopy(part_thermic)}
-        )
 
     # if method_data[3] != 'mag' and method_data[3] != 'mag_hcurl':
     if method_data[2] == "Axi":
