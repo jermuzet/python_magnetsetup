@@ -171,6 +171,16 @@ def Bitter_setup(
     NMerge(power_dict, mdict, debug, "bitter_setup power")
     # print(f'power_data({mname}): {power_data}')
 
+    # add T per magnet data: mdict = NMerge( mdict, {'T_magnet': T_data}, debug, "bitter_setup mdict")
+    print("bitter_setup: add T_magnet")
+    T_data = []
+    T_data.append(
+        {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
+    )
+    T_dict = {"T_magnet": T_data}
+    NMerge(T_dict, mdict, debug, "bitter_setup T")
+    # print(f'T_data({mname}): {T_data}')
+
     # print(f"mdict[init_temp]={mdict['init_temp']}")
     # print(f"mdict[power_magnet]={mdict['power_magnet']}")
 
