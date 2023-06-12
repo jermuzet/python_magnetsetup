@@ -154,6 +154,14 @@ def Supra_setup(
     power_dict = {"power_magnet": power_data}
     NMerge(power_dict, mdict, debug, "supra_setup power")
 
+    # add T per magnet data: mdict = NMerge( mdict, {'T_magnet': T_data}, debug, "bitter_setup mdict")
+    T_data = []
+    T_data.append(
+        {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
+    )
+    T_dict = {"T_magnet": T_data}
+    NMerge(T_dict, mdict, debug, "insert_setup mdict")
+
     main_data = {
         "part_thermic": part_thermic,
         "part_electric": part_electric,
@@ -186,6 +194,7 @@ def Supra_setup(
         VonMises_data.append({"header": f"VonMises_{name}", "markers": part_electric})
 
     mpost = {
+        "Power": currentH_data,
         "Current": currentH_data,
         "Stress": Stress_data,
         "VonMises": VonMises_data,
