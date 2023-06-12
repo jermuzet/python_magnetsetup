@@ -245,6 +245,8 @@ def magnet_setup(
                                     "hw": f"{bcname}_hw",
                                     "Tw": f"{bcname}_Tw",
                                     "dTw": f"{bcname}_dTw",
+                                    "Zmin": f"{bcname}_Zmin",
+                                    "Zmax": f"{bcname}_Zmax",
                                 },
                                 debug,
                             )
@@ -343,6 +345,8 @@ def magnet_setup(
                                     "hw": f"{bcname}_hw",
                                     "Tw": f"{bcname}_Tw",
                                     "dTw": f"{bcname}_dTw",
+                                    "Zmin": f"{bcname}_Zmin",
+                                    "Zmax": f"{bcname}_Zmax",
                                 },
                                 debug,
                             )
@@ -432,6 +436,8 @@ def magnet_setup(
                                     "hw": f"{bcname}_hw",
                                     "Tw": f"{bcname}_Tw",
                                     "dTw": f"{bcname}_dTw",
+                                    "Zmin": f"{bcname}_Zmin",
+                                    "Zmax": f"{bcname}_Zmax",
                                 },
                                 debug,
                             )
