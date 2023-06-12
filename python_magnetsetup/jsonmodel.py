@@ -814,6 +814,8 @@ def create_bcs_bitter(
                     "hw": f"{bcname}_hw",
                     "Tw": f"{bcname}_Tw",
                     "dTw": f"{bcname}_dTw",
+                    "Zmin": f"{bcname}_Zmin",
+                    "Zmax": f"{bcname}_Zmax",
                 },
                 debug,
             )
@@ -897,6 +899,9 @@ def create_bcs_insert(
                         "hw": f"{prefix}hw{i}",
                         "Tw": f"{prefix}Tw{i}",
                         "dTw": f"{prefix}dTw{i}",
+                        "Zmin": f"{prefix}Zmin{i}",
+                        "Zmax": f"{prefix}Zmax{i}",
+                        
                     },
                     debug,
                 )
@@ -913,6 +918,8 @@ def create_bcs_insert(
                         "hw": f"{prefix}hw",
                         "Tw": f"{prefix}Tw",
                         "dTw": f"{prefix}dTw",
+                        "Zmin": f"{prefix}Zmin",
+                        "Zmax": f"{prefix}Zmax",
                     },
                     debug,
                 )
