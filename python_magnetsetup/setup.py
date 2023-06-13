@@ -202,34 +202,35 @@ def magnet_setup(
                             pdict = {"name": f"{prefix}{cad.name}_Slit0_Sh", "value": Sh}
                             parameters.append(pdict)
 
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit0_hw",
-                                "value": convert_data(units, 58222.1, "h"),
-                            }
-                            parameters.append(pdict)
+                            if "H" in method_data[4]:
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit0_hw",
+                                    "value": convert_data(units, 58222.1, "h"),
+                                }
+                                parameters.append(pdict)
 
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit0_Tw",
-                                "value": 290.671,
-                            }
-                            parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit0_Tw",
+                                    "value": 290.671,
+                                }
+                                parameters.append(pdict)
 
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit0_dTw",
-                                "value": 12.74,
-                            }
-                            parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit0_dTw",
+                                    "value": 12.74,
+                                }
+                                parameters.append(pdict)
 
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit0_Zmin",
-                                "value": Zmin,
-                            }
-                            parameters.append(pdict)
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit0_Zmax",
-                                "value": Zmax,
-                            }
-                            parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit0_Zmin",
+                                    "value": Zmin,
+                                }
+                                parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit0_Zmax",
+                                    "value": Zmax,
+                                }
+                                parameters.append(pdict)
 
                             # update bcs (index for slits) for i == 0
                             bcname = f"{prefix}{cad.name}"
@@ -303,35 +304,36 @@ def magnet_setup(
                                 "value": Sh,
                             }
                             parameters.append(pdict)
+                            
+                            if "H" in method_data[4]:
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
+                                    "value": convert_data(units, 58222.1, "h"),
+                                }
+                                parameters.append(pdict)
 
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
-                                "value": convert_data(units, 58222.1, "h"),
-                            }
-                            parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
+                                    "value": 290.671,
+                                }
+                                parameters.append(pdict)
 
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
-                                "value": 290.671,
-                            }
-                            parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
+                                    "value": 12.74,
+                                }
+                                parameters.append(pdict)
 
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
-                                "value": 12.74,
-                            }
-                            parameters.append(pdict)
-
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
-                                "value": Zmin,
-                            }
-                            parameters.append(pdict)
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
-                                "value": Zmax,
-                            }
-                            parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
+                                    "value": Zmin,
+                                }
+                                parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
+                                    "value": Zmax,
+                                }
+                                parameters.append(pdict)
 
                             # update bcs (index for slits) for i == 0
                             bcname = f"{prefix}{cad.name}"
@@ -397,34 +399,36 @@ def magnet_setup(
                             }
                             parameters.append(pdict)
                             
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
-                                "value": convert_data(units, 58222.1, "h"),
-                            }
-                            parameters.append(pdict)
+                            
+                            if "H" in method_data[4]:
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
+                                    "value": convert_data(units, 58222.1, "h"),
+                                }
+                                parameters.append(pdict)
 
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
-                                "value": 290.671,
-                            }
-                            parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Tw",
+                                    "value": 290.671,
+                                }
+                                parameters.append(pdict)
 
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
-                                "value": 12.74,
-                            }
-                            parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}_dTw",
+                                    "value": 12.74,
+                                }
+                                parameters.append(pdict)
 
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
-                                "value": Zmin,
-                            }
-                            parameters.append(pdict)
-                            pdict = {
-                                "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
-                                "value": Zmax,
-                            }
-                            parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmin",
+                                    "value": Zmin,
+                                }
+                                parameters.append(pdict)
+                                pdict = {
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}_Zmax",
+                                    "value": Zmax,
+                                }
+                                parameters.append(pdict)
 
                             # update bcs (index for slits) for i == 0
                             bcname = f"{prefix}{cad.name}"
