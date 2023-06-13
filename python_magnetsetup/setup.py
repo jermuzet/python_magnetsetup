@@ -232,7 +232,9 @@ def magnet_setup(
                             parameters.append(pdict)
 
                             # update bcs (index for slits) for i == 0
-                            bcname = f"{prefix}{cad.name}_Slit0"
+                            bcname = f"{prefix}{cad.name}"
+                            if "H" in method_data[4]:
+                                bcname = f"{prefix}{cad.name}_Slit0"
                             fcooling = templates["cooling"]
 
                             from .jsonmodel import entry
@@ -240,8 +242,8 @@ def magnet_setup(
                             mdata = entry(
                                 fcooling,
                                 {
-                                    "name": f"{bcname}",
-                                    "markers": [bcname],
+                                    "name": f"{prefix}{cad.name}_Slit0",
+                                    "markers": [f"{prefix}{cad.name}_Slit0"],
                                     "hw": f"{bcname}_hw",
                                     "Tw": f"{bcname}_Tw",
                                     "dTw": f"{bcname}_dTw",
@@ -254,7 +256,7 @@ def magnet_setup(
                             from .utils import Merge
 
                             bcs = tdict["boundary_Therm_Robin"]
-                            bcs.append(Merge({"name": bcname}, mdata[bcname]))
+                            bcs.append(Merge({"name": f"{prefix}{cad.name}_Slit0"}, mdata[f"{prefix}{cad.name}_Slit0"]))
 
                             # print(f"Bitter_setup: object={cad.name}, tdict={tdict}")
                             # exit(1)
@@ -332,7 +334,9 @@ def magnet_setup(
                             parameters.append(pdict)
 
                             # update bcs (index for slits) for i == 0
-                            bcname = f"{prefix}{cad.name}_Slit{Nslits+1}"
+                            bcname = f"{prefix}{cad.name}"
+                            if "H" in method_data[4]:
+                                bcname = f"{prefix}{cad.name}_Slit{Nslits+1}"
                             fcooling = templates["cooling"]
 
                             from .jsonmodel import entry
@@ -340,8 +344,8 @@ def magnet_setup(
                             mdata = entry(
                                 fcooling,
                                 {
-                                    "name": f"{bcname}",
-                                    "markers": [bcname],
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}",
+                                    "markers": [f"{prefix}{cad.name}_Slit{Nslits+1}"],
                                     "hw": f"{bcname}_hw",
                                     "Tw": f"{bcname}_Tw",
                                     "dTw": f"{bcname}_dTw",
@@ -354,7 +358,7 @@ def magnet_setup(
                             from .utils import Merge
 
                             bcs = tdict["boundary_Therm_Robin"]
-                            bcs.append(Merge({"name": bcname}, mdata[bcname]))
+                            bcs.append(Merge({"name": f"{prefix}{cad.name}_Slit{Nslits+1}"}, mdata[f"{prefix}{cad.name}_Slit{Nslits+1}"]))
 
                             # update post (index for slits) for i == 0
                             fpost = tpost["Flux"][0]["index_h"]
@@ -392,7 +396,7 @@ def magnet_setup(
                                 "value": Sh,
                             }
                             parameters.append(pdict)
-
+                            
                             pdict = {
                                 "name": f"{prefix}{cad.name}_Slit{Nslits+1}_hw",
                                 "value": convert_data(units, 58222.1, "h"),
@@ -423,7 +427,9 @@ def magnet_setup(
                             parameters.append(pdict)
 
                             # update bcs (index for slits) for i == 0
-                            bcname = f"{prefix}{cad.name}_Slit{Nslits+1}"
+                            bcname = f"{prefix}{cad.name}"
+                            if "H" in method_data[4]:
+                                bcname = f"{prefix}{cad.name}_Slit{Nslits+1}"
                             fcooling = templates["cooling"]
 
                             from .jsonmodel import entry
@@ -431,8 +437,8 @@ def magnet_setup(
                             mdata = entry(
                                 fcooling,
                                 {
-                                    "name": f"{bcname}",
-                                    "markers": [bcname],
+                                    "name": f"{prefix}{cad.name}_Slit{Nslits+1}",
+                                    "markers": [f"{prefix}{cad.name}_Slit{Nslits+1}"],
                                     "hw": f"{bcname}_hw",
                                     "Tw": f"{bcname}_Tw",
                                     "dTw": f"{bcname}_dTw",
@@ -445,7 +451,7 @@ def magnet_setup(
                             from .utils import Merge
 
                             bcs = tdict["boundary_Therm_Robin"]
-                            bcs.append(Merge({"name": bcname}, mdata[bcname]))
+                            bcs.append(Merge({"name": f"{prefix}{cad.name}_Slit{Nslits+1}"}, mdata[f"{prefix}{cad.name}_Slit{Nslits+1}"]))
 
                             # update post (index for slits) for i == 0
                             fpost = tpost["Flux"][0]["index_h"]
