@@ -259,7 +259,7 @@ def Bitter_setup(
                 "Tw": f"{bcname}_Tw",
                 "dTw": f"{bcname}_dTw",
                 "Zmin": f"{bcname}_Zmin",
-                "Zmax": f"{bcname}_dZmax",
+                "Zmax": f"{bcname}_Zmax",
                 "index_h": f"1:{str(NCoolingSlits+1)}",
             }
         ],
