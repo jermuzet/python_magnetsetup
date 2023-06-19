@@ -490,11 +490,11 @@ def Insert_setup(
         "Flux": [
             {
                 "prefix": f"{prefix}Channel",
-                "hw": f"{prefix}Channel{suffix}_hw",
-                "Tw": f"{prefix}Channel{suffix}_Tw",
-                "dTw": f"{prefix}Channel{suffix}_dTw",
-                "Zmin": f"{prefix}Channel{suffix}_Zmin",
-                "Zmax": f"{prefix}Channel{suffix}_Zmax",
+                "hw": f"hw_{prefix}Channel{suffix}",
+                "Tw": f"Tw_{prefix}Channel{suffix}",
+                "dTw": f"dTw_{prefix}Channel{suffix}",
+                "Zmin": f"Zmin_{prefix}Channel{suffix}",
+                "Zmax": f"Zmax_{prefix}Channel{suffix}",
                 "index_h": f"0:{str(NChannels)}",
             }
         ],

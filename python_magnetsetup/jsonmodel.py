@@ -106,29 +106,29 @@ def create_params_bitter(
     # depending on method_data[4] (aka args.cooling)
     if not "H" in method_data[4]:
         params_data["Parameters"].append(
-            {"name": f"{name}_hw", "value": convert_data(units, 58222.1, "h")}
+            {"name": f"hw_{name}", "value": convert_data(units, 58222.1, "h")}
         )
-        params_data["Parameters"].append({"name": f"{name}_Tw", "value": 290.671})
-        params_data["Parameters"].append({"name": f"{name}_dTw", "value": 12.74})
+        params_data["Parameters"].append({"name": f"Tw_{name}", "value": 290.671})
+        params_data["Parameters"].append({"name": f"dTw_{name}", "value": 12.74})
         for i in range(NCoolingSlits):
             bcname = f"{name}_Slit{i+1}"
-            params_data["Parameters"].append({"name": f"{bcname}_Sh", "value": Sh[i]})
-            params_data["Parameters"].append({"name": f"{bcname}_Dh", "value": Dh[i]})
-        params_data["Parameters"].append({"name": f"{name}_Zmin", "value": Zmin})
-        params_data["Parameters"].append({"name": f"{name}_Zmax", "value": Zmax})
+            params_data["Parameters"].append({"name": f"Sh_{bcname}", "value": Sh[i]})
+            params_data["Parameters"].append({"name": f"Dh_{bcname}", "value": Dh[i]})
+        params_data["Parameters"].append({"name": f"Zmin_{name}", "value": Zmin})
+        params_data["Parameters"].append({"name": f"Zmax_{name}", "value": Zmax})
 
     else:
         for i in range(NCoolingSlits):
             bcname = f"{name}_Slit{i+1}"
             params_data["Parameters"].append(
-                {"name": f"{bcname}_hw", "value": convert_data(units, 58222.1, "h")}
+                {"name": f"hw_{bcname}", "value": convert_data(units, 58222.1, "h")}
             )
-            params_data["Parameters"].append({"name": f"{bcname}_Tw", "value": 290.671})
-            params_data["Parameters"].append({"name": f"{bcname}_dTw", "value": 12.74})
-            params_data["Parameters"].append({"name": f"{bcname}_Sh", "value": Sh[i]})
-            params_data["Parameters"].append({"name": f"{bcname}_Dh", "value": Dh[i]})
-            params_data["Parameters"].append({"name": f"{bcname}_Zmin", "value": Zmin})
-            params_data["Parameters"].append({"name": f"{bcname}_Zmax", "value": Zmax})
+            params_data["Parameters"].append({"name": f"Tw_{bcname}", "value": 290.671})
+            params_data["Parameters"].append({"name": f"dTw_{bcname}", "value": 12.74})
+            params_data["Parameters"].append({"name": f"Sh_{bcname}", "value": Sh[i]})
+            params_data["Parameters"].append({"name": f"Dh_{bcname}", "value": Dh[i]})
+            params_data["Parameters"].append({"name": f"Zmin_{bcname}", "value": Zmin})
+            params_data["Parameters"].append({"name": f"Zmax_{bcname}", "value": Zmax})
 
     # init values for U (Axi specific)
     print(f"create_params_bitter/nturns: {nturns}")
@@ -229,15 +229,15 @@ def create_params_insert(
     # get value from coolingmethod and Flow(I) value
     if not "H" in method_data[4]:
         params_data["Parameters"].append(
-            {"name": f"{prefix}Channel_hw", "value": convert_data(units, 58222.1, "h")}
+            {"name": f"hw_{prefix}Channel", "value": convert_data(units, 58222.1, "h")}
         )
-        params_data["Parameters"].append({"name": f"{prefix}Channel_Tw", "value": 290.671})
-        params_data["Parameters"].append({"name": f"{prefix}Channel_dTw", "value": 12.74})
+        params_data["Parameters"].append({"name": f"Tw_{prefix}Channel", "value": 290.671})
+        params_data["Parameters"].append({"name": f"dTw_{prefix}Channel", "value": 12.74})
         for i in range(NHelices + 1):
-            params_data["Parameters"].append({"name": f"{prefix}Channel{i}_Sh", "value": Sh[i]})
-            params_data["Parameters"].append({"name": f"{prefix}Channel{i}_Dh", "value": Dh[i]})
-        params_data["Parameters"].append({"name": f"{prefix}Channel_Zmin", "value": min(Zmin)})
-        params_data["Parameters"].append({"name": f"{prefix}Channel_Zmax", "value": max(Zmax)})
+            params_data["Parameters"].append({"name": f"Sh_{prefix}Channel{i}", "value": Sh[i]})
+            params_data["Parameters"].append({"name": f"Dh_{prefix}Channel{i}", "value": Dh[i]})
+        params_data["Parameters"].append({"name": f"Zmin_{prefix}Channel", "value": min(Zmin)})
+        params_data["Parameters"].append({"name": f"Zmax_{prefix}Channel", "value": max(Zmax)})
 
     # params per cooling channels
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
@@ -245,22 +245,22 @@ def create_params_insert(
         for i in range(NHelices + 1):
             # get value from coolingmethod and Flow(I) value
             params_data["Parameters"].append(
-                {"name": f"{prefix}Channel{i}_hw", "value": convert_data(units, 58222.1, "h")}
+                {"name": f"hw_{prefix}Channel{i}", "value": convert_data(units, 58222.1, "h")}
             )
             params_data["Parameters"].append(
-                {"name": f"{prefix}Channel{i}_Tw", "value": 290.671}
+                {"name": f"Tw_{prefix}Channel{i}", "value": 290.671}
             )
             params_data["Parameters"].append(
-                {"name": f"{prefix}Channel{i}_dTw", "value": 12.74}
+                {"name": f"dTw_{prefix}Channel{i}", "value": 12.74}
             )
             params_data["Parameters"].append(
-                {"name": f"{prefix}Channel{i}_Zmin", "value": Zmin[i]}
+                {"name": f"Zmin_{prefix}Channel{i}", "value": Zmin[i]}
             )
             params_data["Parameters"].append(
-                {"name": f"{prefix}Channel{i}_Zmax", "value": Zmax[i]}
+                {"name": f"Zmax_{prefix}Channel{i}", "value": Zmax[i]}
             )
-            params_data["Parameters"].append({"name": f"{prefix}Channel{i}_Sh", "value": Sh[i]})
-            params_data["Parameters"].append({"name": f"{prefix}Channel{i}_Dh", "value": Dh[i]})
+            params_data["Parameters"].append({"name": f"Sh_{prefix}Channel{i}", "value": Sh[i]})
+            params_data["Parameters"].append({"name": f"Dh_{prefix}Channel{i}", "value": Dh[i]})
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
@@ -811,11 +811,11 @@ def create_bcs_bitter(
                 {
                     "name": f"{name}_Slit{i+1}",
                     "markers": snames,
-                    "hw": f"{bcname}_hw",
-                    "Tw": f"{bcname}_Tw",
-                    "dTw": f"{bcname}_dTw",
-                    "Zmin": f"{bcname}_Zmin",
-                    "Zmax": f"{bcname}_Zmax",
+                    "hw": f"hw_{bcname}",
+                    "Tw": f"Tw_{bcname}",
+                    "dTw": f"dTw_{bcname}",
+                    "Zmin": f"Zmin_{bcname}",
+                    "Zmax": f"Zmax_{bcname}",
                 },
                 debug,
             )
@@ -896,11 +896,11 @@ def create_bcs_insert(
                     fcooling,
                     {
                         "name": f"{prefix}Channel{i}",
-                        "hw": f"{prefix}Channel{i}_hw",
-                        "Tw": f"{prefix}Channel{i}_Tw",
-                        "dTw": f"{prefix}Channel{i}_dTw",
-                        "Zmin": f"{prefix}Channel{i}_Zmin",
-                        "Zmax": f"{prefix}Channel{i}_Zmax",
+                        "hw": f"hw_{prefix}Channel{i}",
+                        "Tw": f"Tw_{prefix}Channel{i}",
+                        "dTw": f"dTw_{prefix}Channel{i}",
+                        "Zmin": f"Zmin_{prefix}Channel{i}",
+                        "Zmax": f"Zmax_{prefix}Channel{i}",
                         
                     },
                     debug,
@@ -915,11 +915,11 @@ def create_bcs_insert(
                     fcooling,
                     {
                         "name": f"{prefix}Channel{i}",
-                        "hw": f"{prefix}Channel_hw",
-                        "Tw": f"{prefix}Channel_Tw",
-                        "dTw": f"{prefix}Channel_dTw",
-                        "Zmin": f"{prefix}Channel_Zmin",
-                        "Zmax": f"{prefix}Channel_Zmax",
+                        "hw": f"hw_{prefix}Channel",
+                        "Tw": f"Tw_{prefix}Channel",
+                        "dTw": f"dTw_{prefix}Channel",
+                        "Zmin": f"Zmin_{prefix}Channel",
+                        "Zmax": f"Zmax_{prefix}Channel",
                     },
                     debug,
                 )

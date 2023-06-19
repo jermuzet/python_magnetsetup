@@ -255,11 +255,11 @@ def Bitter_setup(
         "Flux": [
             {
                 "prefix": f"{name}_Slit",
-                "hw": f"{bcname}_hw",
-                "Tw": f"{bcname}_Tw",
-                "dTw": f"{bcname}_dTw",
-                "Zmin": f"{bcname}_Zmin",
-                "Zmax": f"{bcname}_Zmax",
+                "hw": f"hw_{bcname}",
+                "Tw": f"Tw_{bcname}",
+                "dTw": f"dTw_{bcname}",
+                "Zmin": f"Zmin_{bcname}",
+                "Zmax": f"Zmax_{bcname}",
                 "index_h": f"1:{str(NCoolingSlits+1)}",
             }
         ],
