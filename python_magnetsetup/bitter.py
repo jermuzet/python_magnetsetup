@@ -89,9 +89,9 @@ def Bitter_setup(
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames) - 1)
         start = int(snames[0].replace(f"{name}_B", ""))
-        end=len(snames)
-        if end==start : 
-            end=end+1 
+        end = len(snames)
+        if end == start:
+            end = end + 1
         index_ABitters = f"{start}:{end}"
         index_Bitters = f"{1}:{NSections+1}"
 
@@ -104,6 +104,7 @@ def Bitter_setup(
         part_electric.append(cad.name)
         if "th" in method_data[3]:
             part_thermic.append(cad.name)
+
     gdata = (name, snames, cad.axi.turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index)
 
     if debug:
@@ -174,9 +175,7 @@ def Bitter_setup(
     # add T per magnet data: mdict = NMerge( mdict, {'T_magnet': T_data}, debug, "bitter_setup mdict")
     print("bitter_setup: add T_magnet")
     T_data = []
-    T_data.append(
-        {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
-    )
+    T_data.append({"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)})
     T_dict = {"T_magnet": T_data}
     NMerge(T_dict, mdict, debug, "bitter_setup T")
     # print(f'T_data({mname}): {T_data}')
@@ -260,7 +259,7 @@ def Bitter_setup(
                 "dTw": f"dTw_{bcname}",
                 "Zmin": f"Zmin_{bcname}",
                 "Zmax": f"Zmax_{bcname}",
-                "index_h": f"1:{str(NCoolingSlits+1)}",
+                "index_h": f"0:{str(NCoolingSlits+2)}",
             }
         ],
         "T": meanT_data,
