@@ -110,16 +110,14 @@ def create_params_bitter(
         )
         params_data["Parameters"].append({"name": f"Tw_{name}", "value": 290.671})
         params_data["Parameters"].append({"name": f"dTw_{name}", "value": 12.74})
-        for i in range(NCoolingSlits):
-            bcname = f"{name}_Slit{i+1}"
-            params_data["Parameters"].append({"name": f"Sh_{bcname}", "value": Sh[i]})
-            params_data["Parameters"].append({"name": f"Dh_{bcname}", "value": Dh[i]})
+        params_data["Parameters"].append({"name": f"Dh_{name}", "value": sum(Dh)/len(Dh)})
+        params_data["Parameters"].append({"name": f"Sh_{name}", "value": sum(Sh)})
         params_data["Parameters"].append({"name": f"Zmin_{name}", "value": Zmin})
         params_data["Parameters"].append({"name": f"Zmax_{name}", "value": Zmax})
 
     else:
-        for i in range(NCoolingSlits):
-            bcname = f"{name}_Slit{i+1}"
+        for i in range(NCoolingSlits+2):
+            bcname = f"{name}_Slit{i}"
             params_data["Parameters"].append(
                 {"name": f"hw_{bcname}", "value": convert_data(units, 58222.1, "h")}
             )
@@ -770,46 +768,16 @@ def create_bcs_bitter(
     meca_bcs_dir = {"boundary_Meca_Dir": []}  # name, value
     maxwell_bcs_dir = {"boundary_Maxwell_Dir": []}  # name, value
 
-    # TODO bcname depends on method_data[4] aka args.cooling
-    # mean: bcname = name_
-    # meanH: bcname = name_bcdomain with bcdomain = [rInt, rExt, Slit0, ...]
-    # grad: bcname = name_
-    # gradH: bcname = name_bcdomain with bcdomain = [rInt, rExt, Slit0, ...]
-
     if "th" in method_data[3]:
         fcooling = templates["cooling"]
-
-        """
-        # TODO make only one Bc for rInt and on for RExt
-        for thbc in ["rInt", "rExt"]:
+        for i in range(NCoolingSlits+2):
             bcname = name
             if "H" in method_data[4]:
-                bcname = f"{name}_{thbc}"
-            # Add markers list
+                bcname = f"{name}_Slit{i}"
             mdata = entry(
                 fcooling,
                 {
-                    "name": f"{name}_{thbc}",
-                    "markers": snames,
-                    "hw": f"{bcname}_hw",
-                    "Tw": f"{bcname}_Tw",
-                    "dTw": f"{bcname}_dTw",
-                },
-                debug,
-            )
-            thermic_bcs_rob["boundary_Therm_Robin"].append(
-                Merge({"name": f"{name}_{thbc}"}, mdata[f"{name}_{thbc}"])
-            )
-        """
-
-        for i in range(NCoolingSlits):
-            bcname = name
-            if "H" in method_data[4]:
-                bcname = f"{name}_Slit{i+1}"
-            mdata = entry(
-                fcooling,
-                {
-                    "name": f"{name}_Slit{i+1}",
+                    "name": f"{name}_Slit{i}",
                     "markers": snames,
                     "hw": f"hw_{bcname}",
                     "Tw": f"Tw_{bcname}",
@@ -820,7 +788,7 @@ def create_bcs_bitter(
                 debug,
             )
             thermic_bcs_rob["boundary_Therm_Robin"].append(
-                Merge({"name": f"{name}_Slit{i+1}"}, mdata[f"{name}_Slit{i+1}"])
+                Merge({"name": f"{name}_Slit{i}"}, mdata[f"{name}_Slit{i}"])
             )
 
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
