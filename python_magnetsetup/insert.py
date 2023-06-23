@@ -143,7 +143,11 @@ def Insert_setup(
     boundary_electric = []
 
     gdata = cad.get_params(MyEnv.yaml_repo)
-    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+    (NHelices, NRings, NChannels, Nsections, R1, R2, Dh, Sh, Zh) = gdata
+
+    Zmax = 0
+    for i, z in enumerate(Zh):
+        Zmax = max(Zmax, max(z))
 
     print(
         f"Insert: {cad.name}, NHelices={NHelices}, NRings={NRings}, NChannels={NChannels}"
@@ -315,9 +319,7 @@ def Insert_setup(
 
     # add T per magnet data: mdict = NMerge( mdict, {'T_magnet': T_data}, debug, "bitter_setup mdict")
     T_data = []
-    T_data.append(
-        {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
-    )
+    T_data.append({"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)})
     T_dict = {"T_magnet": T_data}
     NMerge(T_dict, mdict, debug, "insert_setup mdict")
     # print(f'T_data({mname}): {T_data}')
@@ -348,7 +350,7 @@ def Insert_setup(
     units = load_units(unit_Length)
     plotB_data = {
         "Rinf": convert_data(units, R2[-1], "Length"),
-        "Zinf": convert_data(units, Zmax[-1], "Length"),
+        "Zinf": convert_data(units, Zmax, "Length"),
     }
 
     # if method_data[3] != 'mag' and method_data[3] != 'mag_hcurl':

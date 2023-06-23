@@ -49,7 +49,7 @@ def Bitter_setup(
     print(f"Bitter_setup:  magnet={mname}, cad={cad.name}")
     print(f"cad={cad}")
     print(f"cad.get_params={cad.get_params(MyEnv.yaml_repo)}")
-    (NCoolingSlits, z0, z1, Dh, Sh) = cad.get_params(MyEnv.yaml_repo)
+    (NCoolingSlits, Dh, Sh, Zh) = cad.get_params(MyEnv.yaml_repo)
 
     part_thermic = []
     part_electric = []
@@ -105,8 +105,6 @@ def Bitter_setup(
         if "th" in method_data[3]:
             part_thermic.append(cad.name)
 
-    gdata = (name, snames, cad.axi.turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index)
-
     if debug:
         print("bitter part_thermic:", part_thermic)
         print("bitter part_electric:", part_electric)
@@ -121,6 +119,16 @@ def Bitter_setup(
         boundary_maxwell.append("Infty")
 
     # params section
+    gdata = (
+        name,
+        snames,
+        cad.axi.turns,
+        NCoolingSlits,
+        Dh,
+        Sh,
+        Zh,
+        ignore_index,
+    )
     params_data = create_params_bitter(mname, gdata, method_data, debug)
 
     # bcs section
