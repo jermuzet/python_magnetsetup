@@ -231,9 +231,8 @@ def create_params_insert(
         )
         params_data["Parameters"].append({"name": f"Tw_{prefix}Channel", "value": 290.671})
         params_data["Parameters"].append({"name": f"dTw_{prefix}Channel", "value": 12.74})
-        for i in range(NHelices + 1):
-            params_data["Parameters"].append({"name": f"Sh_{prefix}Channel{i}", "value": Sh[i]})
-            params_data["Parameters"].append({"name": f"Dh_{prefix}Channel{i}", "value": Dh[i]})
+        params_data["Parameters"].append({"name": f"Dh_{prefix}Channel", "value": sum(Dh)/len(Dh)})
+        params_data["Parameters"].append({"name": f"Sh_{prefix}Channel", "value": sum(Sh)})
         params_data["Parameters"].append({"name": f"Zmin_{prefix}Channel", "value": min(Zmin)})
         params_data["Parameters"].append({"name": f"Zmax_{prefix}Channel", "value": max(Zmax)})
 
