@@ -7,6 +7,7 @@ from python_magnetgeo.Insert import Insert
 
 from .jsonmodel import (
     create_params_insert,
+    create_params_csvfiles_insert,
     create_bcs_insert,
     create_materials_insert,
     create_models_insert,
@@ -143,7 +144,11 @@ def Insert_setup(
     boundary_electric = []
 
     gdata = cad.get_params(MyEnv.yaml_repo)
-    (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
+    (NHelices, NRings, NChannels, Nsections, R1, R2, Dh, Sh, Zh) = gdata
+
+    Zmax = 0
+    for i, z in enumerate(Zh):
+        Zmax = max(Zmax, max(z))
 
     print(
         f"Insert: {cad.name}, NHelices={NHelices}, NRings={NRings}, NChannels={NChannels}"
@@ -264,6 +269,12 @@ def Insert_setup(
 
     # params section
     params_data = create_params_insert(mname, gdata + (turns_h,), method_data, debug)
+    params_csv_files = create_params_csvfiles_insert(
+        mname, gdata + (turns_h,), method_data, debug
+    )
+    for key, value in params_csv_files.items():
+        print(f"save {key}.csv")
+        value.to_csv(f"{key}.csv", index=True)
 
     # bcs section
     bcs_data = create_bcs_insert(
@@ -315,9 +326,7 @@ def Insert_setup(
 
     # add T per magnet data: mdict = NMerge( mdict, {'T_magnet': T_data}, debug, "bitter_setup mdict")
     T_data = []
-    T_data.append(
-        {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
-    )
+    T_data.append({"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)})
     T_dict = {"T_magnet": T_data}
     NMerge(T_dict, mdict, debug, "insert_setup mdict")
     # print(f'T_data({mname}): {T_data}')
@@ -348,7 +357,7 @@ def Insert_setup(
     units = load_units(unit_Length)
     plotB_data = {
         "Rinf": convert_data(units, R2[-1], "Length"),
-        "Zinf": convert_data(units, Zmax[-1], "Length"),
+        "Zinf": convert_data(units, Zmax, "Length"),
     }
 
     # if method_data[3] != 'mag' and method_data[3] != 'mag_hcurl':

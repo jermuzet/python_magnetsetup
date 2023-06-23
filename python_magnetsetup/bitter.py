@@ -7,6 +7,7 @@ from python_magnetgeo.Bitter import Bitter
 
 from .jsonmodel import (
     create_params_bitter,
+    create_params_csvfiles_bitter,
     create_bcs_bitter,
     create_materials_bitter,
     create_models_bitter,
@@ -49,7 +50,7 @@ def Bitter_setup(
     print(f"Bitter_setup:  magnet={mname}, cad={cad.name}")
     print(f"cad={cad}")
     print(f"cad.get_params={cad.get_params(MyEnv.yaml_repo)}")
-    (NCoolingSlits, z0, z1, Dh, Sh) = cad.get_params(MyEnv.yaml_repo)
+    (NCoolingSlits, Dh, Sh, Zh) = cad.get_params(MyEnv.yaml_repo)
 
     part_thermic = []
     part_electric = []
@@ -105,8 +106,6 @@ def Bitter_setup(
         if "th" in method_data[3]:
             part_thermic.append(cad.name)
 
-    gdata = (name, snames, cad.axi.turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index)
-
     if debug:
         print("bitter part_thermic:", part_thermic)
         print("bitter part_electric:", part_electric)
@@ -121,7 +120,21 @@ def Bitter_setup(
         boundary_maxwell.append("Infty")
 
     # params section
+    gdata = (
+        name,
+        snames,
+        cad.axi.turns,
+        NCoolingSlits,
+        Dh,
+        Sh,
+        Zh,
+        ignore_index,
+    )
     params_data = create_params_bitter(mname, gdata, method_data, debug)
+    params_csv_files = create_params_csvfiles_bitter(mname, gdata, method_data, debug)
+    for key, value in params_csv_files.items():
+        print(f"save {key}.csv")
+        value.to_csv(f"{key}.csv", index=True)
 
     # bcs section
     bcs_data = create_bcs_bitter(

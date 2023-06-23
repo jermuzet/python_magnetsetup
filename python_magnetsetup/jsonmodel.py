@@ -11,13 +11,23 @@ from .utils import Merge
 from .units import load_units, convert_data
 
 
+def create_params_csvfiles_supra(
+    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+) -> dict:
+    """
+    Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
+    """
+    print("create_params_csvfiles_supra for mname={mname}")
+    return {}
+
+
 def create_params_supra(
     mname: str, gdata: tuple, method_data: List[str], debug: bool = False
 ) -> dict:
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
     """
-    print("create_params_supra")
+    print("create_params_supra for mname={mname}")
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5]  # "meter"
@@ -56,6 +66,82 @@ def create_params_supra(
     return params_data
 
 
+def create_params_csvfiles_bitter(
+    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+):
+    """
+    Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
+
+    method_data:
+    """
+    print(f"create_params_csvfiles_bitter for mname={mname} gdata[0]={gdata[0]}")
+
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = method_data[5]  # "meter"
+    units = load_units(unit_Length)
+
+    (name, snames, nturns, NCoolingSlits, Dh, Sh, Zh, ignore_index) = gdata
+    Zh = convert_data(units, Zh, "Length")
+
+    res = {}
+    import pandas as pd
+
+    for i in range(NCoolingSlits + 2):
+        bcname = f"{name}_Slit{i}"
+        Tw = [290.671] * len(Zh)
+        data = pd.DataFrame(list(zip(Zh, Tw)), columns=["Z", "Tw"])
+        res[f"Tw_{bcname}"] = data
+
+    return res
+
+
+def create_params_csvfiles_insert(
+    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+):
+    """
+    Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
+
+    method_data:
+    """
+    print(f"create_params_csvfiles_insert for mname={mname} gdata[0]={gdata[0]}")
+
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = method_data[5]  # "meter"
+    units = load_units(unit_Length)
+
+    (
+        NHelices,
+        NRings,
+        NChannels,
+        Nsections,
+        R1,
+        R2,
+        Dh,
+        Sh,
+        Zh,
+        turns_h,
+    ) = gdata
+
+    for i, z in enumerate(Zh):
+        Zh[i] = convert_data(units, z, "Length")
+
+    # TODO : initialization of parameters with cooling model
+    prefix = ""
+    if mname:
+        prefix = f"{mname}_"
+
+    res = {}
+    import pandas as pd
+
+    for i in range(NChannels):
+        bcname = f"{prefix}Channel{i}"
+        Tw = [290.671] * len(Zh)
+        data = pd.DataFrame(list(zip(Zh, Tw)), columns=["Z", "Tw"])
+        res[f"Tw_{bcname}"] = data
+
+    return res
+
+
 def create_params_bitter(
     mname: str, gdata: tuple, method_data: List[str], debug: bool = False
 ):
@@ -90,7 +176,9 @@ def create_params_bitter(
 
     params_data["Parameters"].append({"name": f"{prefix}Tinit", "value": 293})
 
-    (name, snames, nturns, NCoolingSlits, Zmin, Zmax, Dh, Sh, ignore_index) = gdata
+    (name, snames, nturns, NCoolingSlits, Dh, Sh, Zh, ignore_index) = gdata
+    Zmin = min(Zh)
+    Zmax = max(Zh)
     if debug:
         print("unit_Length", unit_Length)
         print("Zmax:", Zmax)
@@ -101,8 +189,6 @@ def create_params_bitter(
         Dh = convert_data(units, Dh, "Length")
         Sh = convert_data(units, Sh, "Area")
 
-    
-
     # depending on method_data[4] (aka args.cooling)
     if not "H" in method_data[4]:
         params_data["Parameters"].append(
@@ -110,13 +196,15 @@ def create_params_bitter(
         )
         params_data["Parameters"].append({"name": f"Tw_{name}", "value": 290.671})
         params_data["Parameters"].append({"name": f"dTw_{name}", "value": 12.74})
-        params_data["Parameters"].append({"name": f"Dh_{name}", "value": sum(Dh)/len(Dh)})
+        params_data["Parameters"].append(
+            {"name": f"Dh_{name}", "value": sum(Dh) / len(Dh)}
+        )
         params_data["Parameters"].append({"name": f"Sh_{name}", "value": sum(Sh)})
         params_data["Parameters"].append({"name": f"Zmin_{name}", "value": Zmin})
         params_data["Parameters"].append({"name": f"Zmax_{name}", "value": Zmax})
 
     else:
-        for i in range(NCoolingSlits+2):
+        for i in range(NCoolingSlits + 2):
             bcname = f"{name}_Slit{i}"
             params_data["Parameters"].append(
                 {"name": f"hw_{bcname}", "value": convert_data(units, 58222.1, "h")}
@@ -175,28 +263,27 @@ def create_params_insert(
         Nsections,
         R1,
         R2,
-        Z1,
-        Z2,
-        Zmin,
-        Zmax,
         Dh,
         Sh,
+        Zh,
         turns_h,
     ) = gdata
 
     if debug:
         print("unit_Length", unit_Length)
-        print("R1:", R1)
-        print("Zmin:", Zmin)
     if unit_Length == "meter":
         R1 = convert_data(units, R1, "Length")
         R2 = convert_data(units, R2, "Length")
-        Z1 = convert_data(units, Z1, "Length")
-        Z2 = convert_data(units, Z2, "Length")
-        Zmin = convert_data(units, Zmin, "Length")
-        Zmax = convert_data(units, Zmax, "Length")
+        for i, z in enumerate(Zh):
+            Zh[i] = convert_data(units, z, "Length")
         Dh = convert_data(units, Dh, "Length")
         Sh = convert_data(units, Sh, "Area")
+
+    Zmin = 0
+    Zmax = 0
+    for i, z in enumerate(Zh):
+        Zmin = min(Zmin, min(z))
+        Zmax = max(Zmax, max(z))
 
     # chech dim
     if debug:
@@ -236,13 +323,17 @@ def create_params_insert(
         params_data["Parameters"].append({"name": f"Zmin_{prefix}Channel", "value": min(Zmin)})
         params_data["Parameters"].append({"name": f"Zmax_{prefix}Channel", "value": max(Zmax)})
 
+
     # params per cooling channels
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
     else:
         for i in range(NHelices + 1):
             # get value from coolingmethod and Flow(I) value
             params_data["Parameters"].append(
-                {"name": f"hw_{prefix}Channel{i}", "value": convert_data(units, 58222.1, "h")}
+                {
+                    "name": f"hw_{prefix}Channel{i}",
+                    "value": convert_data(units, 58222.1, "h"),
+                }
             )
             params_data["Parameters"].append(
                 {"name": f"Tw_{prefix}Channel{i}", "value": 290.671}
@@ -251,13 +342,17 @@ def create_params_insert(
                 {"name": f"dTw_{prefix}Channel{i}", "value": 12.74}
             )
             params_data["Parameters"].append(
-                {"name": f"Zmin_{prefix}Channel{i}", "value": Zmin[i]}
+                {"name": f"Zmin_{prefix}Channel{i}", "value": min(Zh[i])}
             )
             params_data["Parameters"].append(
-                {"name": f"Zmax_{prefix}Channel{i}", "value": Zmax[i]}
+                {"name": f"Zmax_{prefix}Channel{i}", "value": max(Zh[i])}
             )
-            params_data["Parameters"].append({"name": f"Sh_{prefix}Channel{i}", "value": Sh[i]})
-            params_data["Parameters"].append({"name": f"Dh_{prefix}Channel{i}", "value": Dh[i]})
+            params_data["Parameters"].append(
+                {"name": f"Sh_{prefix}Channel{i}", "value": Sh[i]}
+            )
+            params_data["Parameters"].append(
+                {"name": f"Dh_{prefix}Channel{i}", "value": Dh[i]}
+            )
 
     # init values for U (Axi specific)
     if method_data[2] == "Axi":
@@ -353,7 +448,7 @@ def create_materials_bitter(
             units, confdata["material"][prop], prop
         )
 
-    (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
+    (name, snames, turns, NCoolingSlits, Dh, Sh, Zh, ignore_index) = gdata
 
     if method_data[2] == "Axi":
         if debug:
@@ -418,21 +513,7 @@ def create_materials_insert(
     fconductor = templates["conductor"]
     finsulator = templates["insulator"]
 
-    (
-        mname,
-        NHelices,
-        NRings,
-        NChannels,
-        Nsections,
-        R1,
-        R2,
-        Z1,
-        Z2,
-        Zmin,
-        Zmax,
-        Dh,
-        Sh,
-    ) = gdata
+    (mname, NHelices, NRings, NChannels, Nsections, R1, R2, Dh, Sh, Zh) = gdata
 
     prefix = ""
     if mname:
@@ -629,7 +710,7 @@ def create_models_bitter(
     unit_Length = method_data[5]  # "meter"
     units = load_units(unit_Length)
 
-    (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
+    (name, snames, turns, NCoolingSlits, Dh, Sh, Zh, ignore_index) = gdata
     if method_data[2] == "Axi":
         if maindata["part_insulators"]:
             mdata = entry(
@@ -756,7 +837,7 @@ def create_bcs_bitter(
     method_data: List[str],
     debug: bool = False,
 ) -> dict:
-    (name, snames, turns, NCoolingSlits, z0, z1, Dh, Sh, ignore_index) = gdata
+    (name, snames, turns, NCoolingSlits, Dh, Sh, Zh, ignore_index) = gdata
     print(f"create_bcs_bitter from templates for {name}")
     # print("snames=", snames)
 
@@ -769,7 +850,7 @@ def create_bcs_bitter(
 
     if "th" in method_data[3]:
         fcooling = templates["cooling"]
-        for i in range(NCoolingSlits+2):
+        for i in range(NCoolingSlits + 2):
             bcname = name
             if "H" in method_data[4]:
                 bcname = f"{name}_Slit{i}"
@@ -833,21 +914,7 @@ def create_bcs_insert(
     meca_bcs_dir = {"boundary_Meca_Dir": []}  # name, value
     maxwell_bcs_dir = {"boundary_Maxwell_Dir": []}  # name, value
 
-    (
-        mname,
-        NHelices,
-        NRings,
-        NChannels,
-        Nsections,
-        R1,
-        R2,
-        Z1,
-        Z2,
-        Zmin,
-        Zmax,
-        Dh,
-        Sh,
-    ) = gdata
+    (mname, NHelices, NRings, NChannels, Nsections, R1, R2, Dh, Sh, Zh) = gdata
 
     prefix = ""
     if mname:
@@ -868,7 +935,6 @@ def create_bcs_insert(
                         "dTw": f"dTw_{prefix}Channel{i}",
                         "Zmin": f"Zmin_{prefix}Channel{i}",
                         "Zmax": f"Zmax_{prefix}Channel{i}",
-                        
                     },
                     debug,
                 )
