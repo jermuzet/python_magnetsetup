@@ -119,3 +119,5 @@ log*
 .\#*
 
 *.hdf
+*.orig
+*.old
