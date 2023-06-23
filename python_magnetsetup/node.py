@@ -1,3 +1,5 @@
+import os
+import json
 import enum
 from dataclasses import dataclass
 
@@ -19,35 +21,44 @@ class NodeSpec:
     cores: int = 2
     multithreading: bool = True
     mgkeydir: str = r"/opt/MeshGems"
-    
+
+
 def load_machines(debug: bool = False):
     """
     load machines definition as a dict
     """
-    if debug: print("load_machines")
+    if debug:
+        print("load_machines")
 
     default_path = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(default_path, 'machines.json'), 'r') as cfg:
-        if debug: print(f"load_machines from: {cfg.name}")
+    with open(os.path.join(default_path, "machines.json"), "r") as cfg:
+        if debug:
+            print(f"load_machines from: {cfg.name}")
         data = json.load(cfg)
-        if debug: print(f"data={data}")
+        if debug:
+            print(f"data={data}")
 
     machines = {}
-    for item in data:
-        if debug: print(f"server: {item} type={data[item]['type']}")
+    for item, value in data.items():
+        if debug:
+            print(f"server: {item} type={value['type']}")
         server = NodeSpec(
             name=item,
-            otype=MachineType[data[item]['type']],
-            smp=data[item]['smp'],
-            dns=data[item]['dns'],
-            cores=data[item]['cores'],
-            multithreading=data[item]['multithreading'],
-            manager=jobmanager(otype=JobManagerType[data[item]['jobmanager']['type']], queues=data[item]['jobmanager']['queues']),
-            mgkeydir=data[item]['mgkeydir']
+            otype=NodeType[value["type"]],
+            smp=value["smp"],
+            dns=value["dns"],
+            cores=value["cores"],
+            multithreading=value["multithreading"],
+            manager=JobManager(
+                otype=JobManagerType[value["jobmanager"]["type"]],
+                queues=value["jobmanager"]["queues"],
+            ),
+            mgkeydir=value["mgkeydir"],
         )
-        machines[item]=server
-                
+        machines[item] = server
+
     return machines
+
 
 def loadmachines(server: str):
     """
@@ -60,4 +71,3 @@ def loadmachines(server: str):
     else:
         raise ValueError(f"loadmachine: {server} no such server defined")
     pass
-
