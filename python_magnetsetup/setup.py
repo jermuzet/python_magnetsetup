@@ -52,6 +52,9 @@ from .supra import Supra_setup, Supra_simfile
 
 from .file_utils import MyOpen, findfile, search_paths
 from .units import load_units, convert_data
+from glob import glob
+
+from .node import NodeSpec
 
 
 def magnet_simfile(
@@ -174,7 +177,7 @@ def magnet_setup(
                     cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
                 print(f"magnetsetup:magnet_setup: load a {mtype}: {cad.name}")
 
-                if isinstance(cad, Bitter) :
+                if isinstance(cad, Bitter):
                     (tdict, tmat, tmodels, tpost) = Bitter_setup(
                         MyEnv, mname, obj, cad, method_data, templates, current, debug
                     )
@@ -231,12 +234,13 @@ def magnet_setup(
                 print(f"magnet_setup: {mtype}, mname={mname}, tpost={tpost}")
                 print(f"magnet_setup: {mtype}, mname={mname}, mpost={mpost}")
 
-                
-                for key in ["Current","Power"] :
+                for key in ["Current", "Power"]:
                     list_current = []
                     for item in mpost[key]:
                         if isinstance(item, dict) and "part_electric" in item:
-                            list_current = list(set(list_current + item["part_electric"]))
+                            list_current = list(
+                                set(list_current + item["part_electric"])
+                            )
                     if list_current:
                         mpost[key] = [{"part_electric": list_current}]
                         if debug:
@@ -251,7 +255,7 @@ def magnet_setup(
 
                 # fix init_temp and power_magnet entries in mdict
                 print(f"mdict: key={mdict.keys()}")
-                for key in ["init_temp", "power_magnet","T_magnet"]:
+                for key in ["init_temp", "power_magnet", "T_magnet"]:
                     if len(mdict[key]) > 1:
                         # print(f"setup/magnet_setup mname={mname}: mdict[{key}]={mdict[key]}")
                         _key = [item["name"] for item in mdict[key]]
@@ -398,7 +402,7 @@ def msite_setup(
         tmodels.clear()
         tpost.clear()
 
-        for key in ["Current","Power"] :
+        for key in ["Current", "Power"]:
             list_current = []
             for item in mpost[key]:
                 if isinstance(item, dict) and "part_electric" in item:
@@ -406,9 +410,7 @@ def msite_setup(
             if list_current:
                 mpost[key] = [{"part_electric": list_current}]
                 if debug:
-                    print(
-                        f"msite_setup {mname}: force mpost[{key}]={mpost[key]}"
-                    )
+                    print(f"msite_setup {mname}: force mpost[{key}]={mpost[key]}")
         if debug:
             print("NewMerge:", mpost)
 
@@ -512,7 +514,7 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
                     mconfdata = magnet[mname]
                     if args.debug:
                         print(f"magnet[{mname}]: {mconfdata}")
-                    #if "Helix" in mconfdata:
+                    # if "Helix" in mconfdata:
                     todict[mname] = mconfdata["geom"].replace(".yaml", "")
                     """
                     else:
@@ -635,20 +637,26 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
                 print(f"{jfile}, filename={filename}, src={src}, dst={dst}")
             copyfile(src, dst)
 
-    return (yamlfile, cfgfile, jsonfile, xaofile, meshfile)  # , tarfilename)
+        csvfiles = glob("./*.csv")
+        print(f"csvfiles: {csvfiles}")
+        print(f"pwd: {os.getcwd()}")
+        print(f"ls: {os.listdir(os.curdir)}")
+
+    return (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles)  # , tarfilename)
 
 
 def setup_cmds(
     MyEnv,
     args,
-    node_spec,
-    yamlfile,
-    cfgfile,
-    jsonfile,
-    xaofile,
-    meshfile,
-    root_directory,
-    currents,
+    node_spec: NodeSpec,
+    yamlfile: str,
+    cfgfile: str,
+    jsonfile: str,
+    xaofile: str,
+    meshfile: str,
+    csvfiles: list,
+    root_directory: str,
+    currents: dict,
 ):
     """
     create cmds

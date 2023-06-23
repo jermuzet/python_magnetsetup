@@ -11,13 +11,23 @@ from .utils import Merge
 from .units import load_units, convert_data
 
 
+def create_params_csvfiles_supra(
+    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+) -> dict:
+    """
+    Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
+    """
+    print("create_params_csvfiles_supra for mname={mname}")
+    return {}
+
+
 def create_params_supra(
     mname: str, gdata: tuple, method_data: List[str], debug: bool = False
 ) -> dict:
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
     """
-    print("create_params_supra")
+    print("create_params_supra for mname={mname}")
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5]  # "meter"
@@ -54,6 +64,82 @@ def create_params_supra(
         print(params_data)
 
     return params_data
+
+
+def create_params_csvfiles_bitter(
+    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+):
+    """
+    Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
+
+    method_data:
+    """
+    print(f"create_params_csvfiles_bitter for mname={mname} gdata[0]={gdata[0]}")
+
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = method_data[5]  # "meter"
+    units = load_units(unit_Length)
+
+    (name, snames, nturns, NCoolingSlits, Dh, Sh, Zh, ignore_index) = gdata
+    Zh = convert_data(units, Zh, "Length")
+
+    res = {}
+    import pandas as pd
+
+    for i in range(NCoolingSlits + 2):
+        bcname = f"{name}_Slit{i}"
+        Tw = [290.671] * len(Zh)
+        data = pd.DataFrame(list(zip(Zh, Tw)), columns=["Z", "Tw"])
+        res[f"Tw_{bcname}"] = data
+
+    return res
+
+
+def create_params_csvfiles_insert(
+    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+):
+    """
+    Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
+
+    method_data:
+    """
+    print(f"create_params_csvfiles_insert for mname={mname} gdata[0]={gdata[0]}")
+
+    # TODO: length data are written in mm should be in SI instead
+    unit_Length = method_data[5]  # "meter"
+    units = load_units(unit_Length)
+
+    (
+        NHelices,
+        NRings,
+        NChannels,
+        Nsections,
+        R1,
+        R2,
+        Dh,
+        Sh,
+        Zh,
+        turns_h,
+    ) = gdata
+
+    for i, z in enumerate(Zh):
+        Zh[i] = convert_data(units, z, "Length")
+
+    # TODO : initialization of parameters with cooling model
+    prefix = ""
+    if mname:
+        prefix = f"{mname}_"
+
+    res = {}
+    import pandas as pd
+
+    for i in range(NChannels):
+        bcname = f"{prefix}Channel{i}"
+        Tw = [290.671] * len(Zh)
+        data = pd.DataFrame(list(zip(Zh, Tw)), columns=["Z", "Tw"])
+        res[f"Tw_{bcname}"] = data
+
+    return res
 
 
 def create_params_bitter(
@@ -236,7 +322,7 @@ def create_params_insert(
         params_data["Parameters"].append(
             {"name": f"dTw_{prefix}Channel", "value": 12.74}
         )
-        for i in range(NHelices + 1):
+        for i in range(NChannels):
             params_data["Parameters"].append(
                 {"name": f"Sh_{prefix}Channel{i}", "value": Sh[i]}
             )

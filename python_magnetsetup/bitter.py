@@ -7,6 +7,7 @@ from python_magnetgeo.Bitter import Bitter
 
 from .jsonmodel import (
     create_params_bitter,
+    create_params_csvfiles_bitter,
     create_bcs_bitter,
     create_materials_bitter,
     create_models_bitter,
@@ -130,6 +131,10 @@ def Bitter_setup(
         ignore_index,
     )
     params_data = create_params_bitter(mname, gdata, method_data, debug)
+    params_csv_files = create_params_csvfiles_bitter(mname, gdata, method_data, debug)
+    for key, value in params_csv_files.items():
+        print(f"save {key}.csv")
+        value.to_csv(f"{key}.csv", index=True)
 
     # bcs section
     bcs_data = create_bcs_bitter(
