@@ -188,6 +188,7 @@ def create_params_bitter(
         Zmax = convert_data(units, Zmax, "Length")
         Dh = convert_data(units, Dh, "Length")
         Sh = convert_data(units, Sh, "Area")
+        Zh = convert_data(units, Zh, "Length")
 
     # depending on method_data[4] (aka args.cooling)
     if not "H" in method_data[4]:
@@ -209,12 +210,35 @@ def create_params_bitter(
             params_data["Parameters"].append(
                 {"name": f"hw_{bcname}", "value": convert_data(units, 58222.1, "h")}
             )
-            params_data["Parameters"].append({"name": f"Tw_{bcname}", "value": 290.671})
-            params_data["Parameters"].append({"name": f"dTw_{bcname}", "value": 12.74})
+            # y for Axi, z for 3D
+            if "Z" in method_data[4]:
+                csv_data = {
+                    "type": "fit",
+                    "filename": f"$cfgdir/Tw_{bcname}.csv",
+                    "abscissa": "Z",
+                    "ordinate": "Tw",
+                    "interpolation": "P1",
+                    "expr": "y:y",
+                }
+                params_data["Parameters"].append(
+                    {"name": f"Tw_{bcname}", "value": csv_data}
+                )
+                print(f'{method_data[4]} {bcname}: {params_data["Parameters"][-1]}')
+            else:
+                params_data["Parameters"].append(
+                    {"name": f"Tw_{bcname}", "value": 290.671}
+                )
+                print(f'{method_data[4]} {bcname}: {params_data["Parameters"][-1]}')
+                params_data["Parameters"].append(
+                    {"name": f"dTw_{bcname}", "value": 12.74}
+                )
             params_data["Parameters"].append({"name": f"Sh_{bcname}", "value": Sh[i]})
             params_data["Parameters"].append({"name": f"Dh_{bcname}", "value": Dh[i]})
             params_data["Parameters"].append({"name": f"Zmin_{bcname}", "value": Zmin})
             params_data["Parameters"].append({"name": f"Zmax_{bcname}", "value": Zmax})
+            params_data["Parameters"].append(
+                {"name": f"Zh_{bcname}", "value": Zh}
+            )  # convert Zh to vector {...}
 
     # init values for U (Axi specific)
     print(f"create_params_bitter/nturns: {nturns}")
@@ -282,8 +306,9 @@ def create_params_insert(
     Zmin = 0
     Zmax = 0
     for i, z in enumerate(Zh):
-        Zmin = min(Zmin, min(z))
-        Zmax = max(Zmax, max(z))
+        Zh[i] = convert_data(units, z, "Length")
+        Zmin = min(Zmin, min(Zh[i]))
+        Zmax = max(Zmax, max(Zh[i]))
 
     # chech dim
     if debug:
@@ -316,13 +341,24 @@ def create_params_insert(
         params_data["Parameters"].append(
             {"name": f"hw_{prefix}Channel", "value": convert_data(units, 58222.1, "h")}
         )
-        params_data["Parameters"].append({"name": f"Tw_{prefix}Channel", "value": 290.671})
-        params_data["Parameters"].append({"name": f"dTw_{prefix}Channel", "value": 12.74})
-        params_data["Parameters"].append({"name": f"Dh_{prefix}Channel", "value": sum(Dh)/len(Dh)})
-        params_data["Parameters"].append({"name": f"Sh_{prefix}Channel", "value": sum(Sh)})
-        params_data["Parameters"].append({"name": f"Zmin_{prefix}Channel", "value": min(Zmin)})
-        params_data["Parameters"].append({"name": f"Zmax_{prefix}Channel", "value": max(Zmax)})
-
+        params_data["Parameters"].append(
+            {"name": f"Tw_{prefix}Channel", "value": 290.671}
+        )
+        params_data["Parameters"].append(
+            {"name": f"dTw_{prefix}Channel", "value": 12.74}
+        )
+        params_data["Parameters"].append(
+            {"name": f"Dh_{prefix}Channel", "value": sum(Dh) / len(Dh)}
+        )
+        params_data["Parameters"].append(
+            {"name": f"Sh_{prefix}Channel", "value": sum(Sh)}
+        )
+        params_data["Parameters"].append(
+            {"name": f"Zmin_{prefix}Channel", "value": min(Zmin)}
+        )
+        params_data["Parameters"].append(
+            {"name": f"Zmax_{prefix}Channel", "value": max(Zmax)}
+        )
 
     # params per cooling channels
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
@@ -335,12 +371,26 @@ def create_params_insert(
                     "value": convert_data(units, 58222.1, "h"),
                 }
             )
-            params_data["Parameters"].append(
-                {"name": f"Tw_{prefix}Channel{i}", "value": 290.671}
-            )
-            params_data["Parameters"].append(
-                {"name": f"dTw_{prefix}Channel{i}", "value": 12.74}
-            )
+            # y for Axi, z for 3D
+            if "Z" in method_data[4]:
+                csv_data = {
+                    "type": "fit",
+                    "filename": f"$cfgdir/Tw_{prefix}Channel{i}.csv",
+                    "abscissa": "Z",
+                    "ordinate": "Tw",
+                    "interpolation": "P1",
+                    "expr": "y:y",
+                }
+                params_data["Parameters"].append(
+                    {"name": f"Tw_{prefix}Channel{i}", "value": csv_data}
+                )
+            else:
+                params_data["Parameters"].append(
+                    {"name": f"Tw_{prefix}Channel{i}", "value": 290.671}
+                )
+                params_data["Parameters"].append(
+                    {"name": f"dTw_{prefix}Channel{i}", "value": 12.74}
+                )
             params_data["Parameters"].append(
                 {"name": f"Zmin_{prefix}Channel{i}", "value": min(Zh[i])}
             )
@@ -352,6 +402,9 @@ def create_params_insert(
             )
             params_data["Parameters"].append(
                 {"name": f"Dh_{prefix}Channel{i}", "value": Dh[i]}
+            )
+            params_data["Parameters"].append(
+                {"name": f"Zh_{prefix}Channel{i}", "value": Zh[i]}
             )
 
     # init values for U (Axi specific)
@@ -1079,14 +1132,23 @@ def create_json(
             "data": {_name: mpost[field] if field in mpost else {}},
         }
 
+    print(f"method_data[3]: {method_data[3]}")
+    print(f"post_keywords: {post_keywords.keys()}")
     if "th" in method_data[3] and "Stats_Flux" in post_keywords:
         print(f"cooling={method_data[4]}")
         print(f"templates keywords: {templates.keys()}")
         templatefile = templates["flux"]
+        print(f"templates[flux]: {templatefile}")
         post_keywords["Stats_Flux"]["template"] = templatefile
         print(
             f'post_keywords[Stats_Flux][template]={post_keywords["Stats_Flux"]["template"]}'
         )
+        """
+        if "Stats_FluxZ" in post_keywords:
+            templatefile = templates["fluxz"]
+            print(f"templates[fluxz]: {templatefile}")
+            post_keywords["Stats_FluxZ"]["template"] = templatefile
+        """
 
     print("post_keywords")
     for key in post_keywords:

@@ -173,6 +173,7 @@ def loadtemplates(
 
         dict["cooling"] = fcooling
         dict["flux"] = fflux
+        # dict["fluxz"] = os.path.join(template_path, "stats_Flux-gradZ.mustache")
 
     if check_templates(dict):
         pass

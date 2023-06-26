@@ -488,6 +488,20 @@ def Insert_setup(
                 {"header": f"T_{prefix}R{i+1}", "markers": {"name": f"{prefix}R{i+1}"}}
             )
 
+    fluxZ_data = []
+    for i in range(NChannels):
+        index_data = []
+        for s in range(len(Zh[i]) - 1):
+            index_data = [i, Zh[i][s], Zh[i][s + 1]]
+
+        data = {
+            "hw": f"hw_{prefix}Channel{i}",
+            "Tw": f"Twcsv_{prefix}Channel{i}",
+            "markers": f"{prefix}Channel{i}",
+            "index": index_data,
+        }
+        fluxZ_data.append(data)
+
     suffix = ""
     if "H" in method_data[4]:
         suffix = "%1%"
@@ -511,6 +525,9 @@ def Insert_setup(
         "Stress": Stress_data,
         "VonMises": VonMises_data,
     }
+
+    if "Z" in method_data[4]:
+        mpost["Flux"] = fluxZ_data
 
     if "mag" in method_data[3] or "mqs" in method_data[3]:
         mpost["B"] = plotB_data

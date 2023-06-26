@@ -131,6 +131,7 @@ def Bitter_setup(
         ignore_index,
     )
     params_data = create_params_bitter(mname, gdata, method_data, debug)
+    print(f"bitter: params_data: {params_data}")
     params_csv_files = create_params_csvfiles_bitter(mname, gdata, method_data, debug)
     for key, value in params_csv_files.items():
         print(f"save {key}.csv")
@@ -256,6 +257,20 @@ def Bitter_setup(
     else:
         print("bitter3D post not implemented")
 
+    fluxZ_data = []
+    for i in range(NCoolingSlits + 2):
+        index_data = []
+        for s in range(len(Zh) - 1):
+            index_data = [i, Zh[s], Zh[s + 1]]
+
+        data = {
+            "hw": f"hw_{name}_Slit{i}",
+            "Tw": f"Twcsv_{name}_Slit{i}",
+            "markers": f"{name}_Slit{i}",
+            "index": index_data,
+        }
+        fluxZ_data.append(data)
+
     bcname = name
     if "H" in method_data[4]:
         bcname = f"{name}_Slit%1%"
@@ -279,6 +294,9 @@ def Bitter_setup(
         "Stress": Stress_data,
         "VonMises": VonMises_data,
     }
+
+    if "Z" in method_data[4]:
+        mpost["Flux"] = fluxZ_data
 
     if "mag" in method_data[3] or "mqs" in method_data[3]:
         mpost["B"] = plotB_data
