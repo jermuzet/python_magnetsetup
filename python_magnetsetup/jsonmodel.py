@@ -211,6 +211,9 @@ def create_params_bitter(
                 {"name": f"hw_{bcname}", "value": convert_data(units, 58222.1, "h")}
             )
             # y for Axi, z for 3D
+            zcoord = "y"
+            if method_data[2] == "3D":
+                zcoord = "z"
             if "Z" in method_data[4]:
                 csv_data = {
                     "type": "fit",
@@ -218,7 +221,7 @@ def create_params_bitter(
                     "abscissa": "Z",
                     "ordinate": "Tw",
                     "interpolation": "P1",
-                    "expr": "y:y",
+                    "expr": f"{zcoord}:{zcoord}",
                 }
                 params_data["Parameters"].append(
                     {"name": f"Tw_{bcname}", "value": csv_data}
@@ -236,9 +239,11 @@ def create_params_bitter(
             params_data["Parameters"].append({"name": f"Dh_{bcname}", "value": Dh[i]})
             params_data["Parameters"].append({"name": f"Zmin_{bcname}", "value": Zmin})
             params_data["Parameters"].append({"name": f"Zmax_{bcname}", "value": Zmax})
+            """
             params_data["Parameters"].append(
                 {"name": f"Zh_{bcname}", "value": Zh}
             )  # convert Zh to vector {...}
+            """
 
     # init values for U (Axi specific)
     print(f"create_params_bitter/nturns: {nturns}")
@@ -372,6 +377,9 @@ def create_params_insert(
                 }
             )
             # y for Axi, z for 3D
+            zcoord = "y"
+            if method_data[2] == "3D":
+                zcoord = "z"
             if "Z" in method_data[4]:
                 csv_data = {
                     "type": "fit",
@@ -379,7 +387,7 @@ def create_params_insert(
                     "abscissa": "Z",
                     "ordinate": "Tw",
                     "interpolation": "P1",
-                    "expr": "y:y",
+                    "expr": f"{zcoord}:{zcoord}",
                 }
                 params_data["Parameters"].append(
                     {"name": f"Tw_{prefix}Channel{i}", "value": csv_data}

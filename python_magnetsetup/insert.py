@@ -274,7 +274,7 @@ def Insert_setup(
     )
     for key, value in params_csv_files.items():
         print(f"save {key}.csv")
-        value.to_csv(f"{key}.csv", index=True)
+        value.to_csv(f"{key}.csv", index=False)  # with index, add index=True
 
     # bcs section
     bcs_data = create_bcs_insert(
@@ -489,14 +489,20 @@ def Insert_setup(
             )
 
     fluxZ_data = []
+    for i, z in enumerate(Zh):
+        Zh[i] = convert_data(units, z, "Length")
+        print(f"Zh[{i}]: {Zh[i]}")
     for i in range(NChannels):
         index_data = []
         for s in range(len(Zh[i]) - 1):
-            index_data = [i, Zh[i][s], Zh[i][s + 1]]
+            print(
+                f"index_data: i={i}, Zh[{i}][{s}]={Zh[i][s]}, Zh[{i}][{s+1}]={Zh[i][s+1]}"
+            )
+            index_data.append([s, Zh[i][s], Zh[i][s + 1]])
 
         data = {
             "hw": f"hw_{prefix}Channel{i}",
-            "Tw": f"Twcsv_{prefix}Channel{i}",
+            "Tw": f"Tw_{prefix}Channel{i}",
             "markers": f"{prefix}Channel{i}",
             "index": index_data,
         }
