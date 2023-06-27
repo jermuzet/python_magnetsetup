@@ -135,7 +135,7 @@ def Bitter_setup(
     params_csv_files = create_params_csvfiles_bitter(mname, gdata, method_data, debug)
     for key, value in params_csv_files.items():
         print(f"save {key}.csv")
-        value.to_csv(f"{key}.csv", index=True)
+        value.to_csv(f"{key}.csv", index=False)  # with index add: index=True
 
     # bcs section
     bcs_data = create_bcs_bitter(
@@ -258,14 +258,17 @@ def Bitter_setup(
         print("bitter3D post not implemented")
 
     fluxZ_data = []
+    Zh = convert_data(units, Zh, "Length")
+    print(f"Zh: {Zh}")
     for i in range(NCoolingSlits + 2):
         index_data = []
         for s in range(len(Zh) - 1):
-            index_data = [i, Zh[s], Zh[s + 1]]
+            print(f"index_data: i={i}, Zh[{s}]={Zh[s]}, Zh[{s+1}]={Zh[s+1]}")
+            index_data.append([s, Zh[s], Zh[s + 1]])
 
         data = {
             "hw": f"hw_{name}_Slit{i}",
-            "Tw": f"Twcsv_{name}_Slit{i}",
+            "Tw": f"Tw_{name}_Slit{i}",
             "markers": f"{name}_Slit{i}",
             "index": index_data,
         }
