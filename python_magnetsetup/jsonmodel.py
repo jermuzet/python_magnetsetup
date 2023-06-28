@@ -308,12 +308,12 @@ def create_params_insert(
         Dh = convert_data(units, Dh, "Length")
         Sh = convert_data(units, Sh, "Area")
 
-    Zmin = 0
-    Zmax = 0
+    Zmin = []
+    Zmax = []
     for i, z in enumerate(Zh):
         Zh[i] = convert_data(units, z, "Length")
-        Zmin = min(Zmin, min(Zh[i]))
-        Zmax = max(Zmax, max(Zh[i]))
+        Zmin.append(min(Zh[i]))
+        Zmax.append(max(Zh[i]))
 
     # chech dim
     if debug:
@@ -400,19 +400,16 @@ def create_params_insert(
                     {"name": f"dTw_{prefix}Channel{i}", "value": 12.74}
                 )
             params_data["Parameters"].append(
-                {"name": f"Zmin_{prefix}Channel{i}", "value": min(Zh[i])}
+                {"name": f"Zmin_{prefix}Channel{i}", "value": Zmin[i]}
             )
             params_data["Parameters"].append(
-                {"name": f"Zmax_{prefix}Channel{i}", "value": max(Zh[i])}
+                {"name": f"Zmax_{prefix}Channel{i}", "value": Zmax[i]}
             )
             params_data["Parameters"].append(
                 {"name": f"Sh_{prefix}Channel{i}", "value": Sh[i]}
             )
             params_data["Parameters"].append(
                 {"name": f"Dh_{prefix}Channel{i}", "value": Dh[i]}
-            )
-            params_data["Parameters"].append(
-                {"name": f"Zh_{prefix}Channel{i}", "value": Zh[i]}
             )
 
     # init values for U (Axi specific)
