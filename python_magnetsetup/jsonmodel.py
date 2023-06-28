@@ -105,9 +105,7 @@ def create_params_csvfiles_insert(
     """
     print(f"create_params_csvfiles_insert for mname={mname} gdata[0]={gdata[0]}")
 
-    # TODO: length data are written in mm should be in SI instead
-    unit_Length = method_data[5]  # "meter"
-    units = load_units(unit_Length)
+    # !!! unit conversion already done !!!
 
     (
         NHelices,
@@ -122,9 +120,6 @@ def create_params_csvfiles_insert(
         turns_h,
     ) = gdata
 
-    for i, z in enumerate(Zh):
-        Zh[i] = convert_data(units, z, "Length")
-
     # TODO : initialization of parameters with cooling model
     prefix = ""
     if mname:
@@ -135,8 +130,8 @@ def create_params_csvfiles_insert(
 
     for i in range(NChannels):
         bcname = f"{prefix}Channel{i}"
-        Tw = [290.671] * len(Zh)
-        data = pd.DataFrame(list(zip(Zh, Tw)), columns=["Z", "Tw"])
+        Tw = [290.671] * len(Zh[i])
+        data = pd.DataFrame(list(zip(Zh[i], Tw)), columns=["Z", "Tw"])
         res[f"Tw_{bcname}"] = data
 
     return res
@@ -311,7 +306,6 @@ def create_params_insert(
     Zmin = []
     Zmax = []
     for i, z in enumerate(Zh):
-        Zh[i] = convert_data(units, z, "Length")
         Zmin.append(min(Zh[i]))
         Zmax.append(max(Zh[i]))
 

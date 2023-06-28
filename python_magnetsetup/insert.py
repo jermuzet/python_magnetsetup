@@ -268,25 +268,27 @@ def Insert_setup(
         print("insert part_mat_conductors:", part_mat_conductors)
 
     # params section
-    params_data = create_params_insert(mname, gdata + (turns_h,), method_data, debug)
-    params_csv_files = create_params_csvfiles_insert(
-        mname, gdata + (turns_h,), method_data, debug
-    )
+    ngdata = (NHelices, NRings, NChannels, Nsections, R1, R2, Dh, Sh, Zh, turns_h)
+    params_data = create_params_insert(mname, ngdata, method_data, debug)
+    params_csv_files = create_params_csvfiles_insert(mname, ngdata, method_data, debug)
     for key, value in params_csv_files.items():
-        print(f"save {key}.csv")
+        # print(f"save {key}.csv")
         value.to_csv(f"{key}.csv", index=False)  # with index, add index=True
+    ngdata = ()
 
     # bcs section
+    ngdata = (mname, NHelices, NRings, NChannels, Nsections, R1, R2, Dh, Sh, Zh)
     bcs_data = create_bcs_insert(
         boundary_meca,
         boundary_maxwell,
         boundary_electric,
-        (mname,) + gdata,
+        ngdata,
         confdata,
         templates,
         method_data,
         debug,
     )  # merge all bcs dict
+    ngdata = ()
     # print(f'bcs_data({mname}): {bcs_data}')
 
     # build dict from geom for templates
@@ -344,7 +346,7 @@ def Insert_setup(
     }
     NMerge(main_data, mdict, debug, "insert_setup params")
 
-    print("insert_setup: post-processing section")
+    # print("insert_setup: post-processing section")
     currentH_data = []
     powerH_data = []
     meanT_data = []
@@ -355,6 +357,7 @@ def Insert_setup(
 
     unit_Length = method_data[5]  # "meter"
     units = load_units(unit_Length)
+    # print(f"Rinf={R2[-1]}, Zinf={Zmax}")
     plotB_data = {
         "Rinf": convert_data(units, R2[-1], "Length"),
         "Zinf": convert_data(units, Zmax, "Length"),
@@ -489,15 +492,20 @@ def Insert_setup(
             )
 
     fluxZ_data = []
+    """
     for i, z in enumerate(Zh):
         Zh[i] = convert_data(units, z, "Length")
         print(f"Zh[{i}]: {Zh[i]}")
+    """
     for i in range(NChannels):
+        # print(f"Zh[{i}]: {Zh[i]}")
         index_data = []
         for s in range(len(Zh[i]) - 1):
+            """
             print(
                 f"index_data: i={i}, Zh[{i}][{s}]={Zh[i][s]}, Zh[{i}][{s+1}]={Zh[i][s+1]}"
             )
+            """
             index_data.append([s, Zh[i][s], Zh[i][s + 1]])
 
         data = {
