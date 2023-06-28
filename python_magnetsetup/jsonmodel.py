@@ -1117,9 +1117,10 @@ def create_json(
 
     post_keywords = {}
 
-    print("templates[stats]")
-    for field in templates["stats"]:
-        print(field)
+    if debug:
+        print("templates[stats]")
+        for field in templates["stats"]:
+            print(field)
 
     for field in templates["stats"]:
         _data = templates["stats"][field]
@@ -1131,49 +1132,45 @@ def create_json(
             "data": {_name: mpost[field] if field in mpost else {}},
         }
 
-    print(f"method_data[3]: {method_data[3]}")
-    print(f"post_keywords: {post_keywords.keys()}")
+    if debug:
+        print(f"method_data[3]: {method_data[3]}")
+        print(f"post_keywords: {post_keywords.keys()}")
     if "th" in method_data[3] and "Stats_Flux" in post_keywords:
-        print(f"cooling={method_data[4]}")
-        print(f"templates keywords: {templates.keys()}")
         templatefile = templates["flux"]
-        print(f"templates[flux]: {templatefile}")
         post_keywords["Stats_Flux"]["template"] = templatefile
-        print(
-            f'post_keywords[Stats_Flux][template]={post_keywords["Stats_Flux"]["template"]}'
-        )
-        """
-        if "Stats_FluxZ" in post_keywords:
-            templatefile = templates["fluxz"]
-            print(f"templates[fluxz]: {templatefile}")
-            post_keywords["Stats_FluxZ"]["template"] = templatefile
-        """
+        if debug:
+            print(f"cooling={method_data[4]}")
+            print(f"templates keywords: {templates.keys()}")
+            print(f"templates[flux]: {templatefile}")
+            print(
+                f'post_keywords[Stats_Flux][template]={post_keywords["Stats_Flux"]["template"]}'
+            )
 
-    print("post_keywords")
+    if debug:
+        print("post_keywords")
+        for key in post_keywords:
+            msg = key
+            field = post_keywords[key]
+            if field["physic"] in data["PostProcess"]:
+                msg += " - written to {field['physic']}"
+            print(msg)
+
     for key in post_keywords:
-        msg = key
         field = post_keywords[key]
         if field["physic"] in data["PostProcess"]:
-            msg += " - written to {field['physic']}"
-        print(msg)
-
-    for key in post_keywords:
-        field = post_keywords[key]
-        if field["physic"] in data["PostProcess"]:
+            _data = field["data"]
             if debug:
                 print(f"{key}: field={field}")
-            _data = field["data"]
-            if key == "Stats_Flux":
-                print(f"{key} (type={type(_data)}): {_data}")
-            if debug:
+                if key == "Stats_Flux":
+                    print(f"{key} (type={type(_data)}): {_data}")
                 print(f"{key} (type={type(_data)}): {_data}")
             add = data["PostProcess"][field["physic"]]["Measures"]["Statistics"]
             # print(f"{key}: add={add}")
             odata = entry(field["template"], _data, debug)
             if debug:
                 print(f"{key}: odata={odata}")
-            if field == "Stats_Flux":
-                print(f"{key}: odata={odata}")
+                if field == "Stats_Flux":
+                    print(f"{key}: odata={odata}")
             for md in odata[key]:
                 # print(f'{key}: add[{md}], odata[{key}][{md}]={odata[key][md]}')
                 add[md] = odata[key][md]
