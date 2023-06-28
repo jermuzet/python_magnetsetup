@@ -132,10 +132,13 @@ def Bitter_setup(
     )
     params_data = create_params_bitter(mname, gdata, method_data, debug)
     # print(f"bitter: params_data: {params_data}")
-    params_csv_files = create_params_csvfiles_bitter(mname, gdata, method_data, debug)
-    for key, value in params_csv_files.items():
-        # print(f"save {key}.csv")
-        value.to_csv(f"{key}.csv", index=False)  # with index add: index=True
+    if "Z" in method_data[4]:
+        params_csv_files = create_params_csvfiles_bitter(
+            mname, gdata, method_data, debug
+        )
+        for key, value in params_csv_files.items():
+            # print(f"save {key}.csv")
+            value.to_csv(f"{key}.csv", index=False)  # with index add: index=True
 
     # bcs section
     bcs_data = create_bcs_bitter(

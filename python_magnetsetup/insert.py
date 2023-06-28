@@ -127,7 +127,6 @@ def Insert_setup(
     debug: bool = False,
 ):
     print(f"Insert_setup: mname={mname}, cad={cad.name}")
-    print(f"MyEnv: {type(MyEnv)}")
 
     part_thermic = []
     part_electric = []
@@ -270,10 +269,13 @@ def Insert_setup(
     # params section
     ngdata = (NHelices, NRings, NChannels, Nsections, R1, R2, Dh, Sh, Zh, turns_h)
     params_data = create_params_insert(mname, ngdata, method_data, debug)
-    params_csv_files = create_params_csvfiles_insert(mname, ngdata, method_data, debug)
-    for key, value in params_csv_files.items():
-        # print(f"save {key}.csv")
-        value.to_csv(f"{key}.csv", index=False)  # with index, add index=True
+    if "Z" in method_data[4]:
+        params_csv_files = create_params_csvfiles_insert(
+            mname, ngdata, method_data, debug
+        )
+        for key, value in params_csv_files.items():
+            # print(f"save {key}.csv")
+            value.to_csv(f"{key}.csv", index=False)  # with index, add index=True
     ngdata = ()
 
     # bcs section
