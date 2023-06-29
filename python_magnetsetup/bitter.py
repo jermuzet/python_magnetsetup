@@ -131,10 +131,14 @@ def Bitter_setup(
         ignore_index,
     )
     params_data = create_params_bitter(mname, gdata, method_data, debug)
-    params_csv_files = create_params_csvfiles_bitter(mname, gdata, method_data, debug)
-    for key, value in params_csv_files.items():
-        print(f"save {key}.csv")
-        value.to_csv(f"{key}.csv", index=True)
+    # print(f"bitter: params_data: {params_data}")
+    if "Z" in method_data[4]:
+        params_csv_files = create_params_csvfiles_bitter(
+            mname, gdata, method_data, debug
+        )
+        for key, value in params_csv_files.items():
+            # print(f"save {key}.csv")
+            value.to_csv(f"{key}.csv", index=False)  # with index add: index=True
 
     # bcs section
     bcs_data = create_bcs_bitter(
@@ -221,6 +225,7 @@ def Bitter_setup(
 
     unit_Length = method_data[5]  # "meter"
     units = load_units(unit_Length)
+    # print(f"Rinf={cad.r[-1]}, Zinf={cad.z[-1]}")
     plotB_data = {
         "Rinf": convert_data(units, cad.r[-1], "Length"),
         "Zinf": convert_data(units, cad.z[-1], "Length"),
@@ -256,6 +261,23 @@ def Bitter_setup(
     else:
         print("bitter3D post not implemented")
 
+    fluxZ_data = []
+    Zh = convert_data(units, Zh, "Length")
+    # print(f"Zh: {Zh}")
+    for i in range(NCoolingSlits + 2):
+        index_data = []
+        for s in range(len(Zh) - 1):
+            # print(f"index_data: i={i}, Zh[{s}]={Zh[s]}, Zh[{s+1}]={Zh[s+1]}")
+            index_data.append([s, Zh[s], Zh[s + 1]])
+
+        data = {
+            "hw": f"hw_{name}_Slit{i}",
+            "Tw": f"Tw_{name}_Slit{i}",
+            "markers": f"{name}_Slit{i}",
+            "index": index_data,
+        }
+        fluxZ_data.append(data)
+
     bcname = name
     if "H" in method_data[4]:
         bcname = f"{name}_Slit%1%"
@@ -279,6 +301,9 @@ def Bitter_setup(
         "Stress": Stress_data,
         "VonMises": VonMises_data,
     }
+
+    if "Z" in method_data[4]:
+        mpost["Flux"] = fluxZ_data
 
     if "mag" in method_data[3] or "mqs" in method_data[3]:
         mpost["B"] = plotB_data

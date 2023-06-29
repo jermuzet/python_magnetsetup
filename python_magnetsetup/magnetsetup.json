@@ -5,7 +5,7 @@
 	"mesh": {
 		"hifimagnet": "/opt/SALOME-9.10.0-UB20.04/INSTALL/HIFIMAGNET/bin/salome",
 		"salome": "hifimagnet-salome-9.10.0.sif",
-		"gsmh": "magnetgmsh-0.1.0-6.sif",
+		"gsmh": "magnetgmsh-0.1.0-17.sif",
 		"partitioner": "feelpp_mesh_partitioner",
 		"3D": {
 			"MeshGems": "",
@@ -39,13 +39,15 @@
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
+						"gradH": "channel-gradH.mustache",
+						"gradHZ": "channel-gradZ.mustache"
 					},
 					"cooling-post": {
 						"mean": "stats_Flux-mean.mustache",
 						"grad": "stats_Flux-grad.mustache",
 						"meanH": "stats_Flux-meanH.mustache",
-						"gradH": "stats_Flux-gradH.mustache"
+						"gradH": "stats_Flux-gradH.mustache",
+						"gradHZ": "stats_Flux-gradZ.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-static.json",
@@ -228,13 +230,15 @@
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
+						"gradH": "channel-gradH.mustache",
+						"gradHZ": "channel-gradZ.mustache"
 					},
 					"cooling-post": {
 						"mean": "stats_Flux-mean.mustache",
 						"grad": "stats_Flux-grad.mustache",
 						"meanH": "stats_Flux-meanH.mustache",
-						"gradH": "stats_Flux-gradH.mustache"
+						"gradH": "stats_Flux-gradH.mustache",
+						"gradHZ": "stats_Flux-gradZ.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-static.json",
@@ -307,13 +311,15 @@
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
+						"gradH": "channel-gradH.mustache",
+						"gradHZ": "channel-gradZ.mustache"
 					},
 					"cooling-post": {
 						"mean": "stats_Flux-mean.mustache",
 						"grad": "stats_Flux-grad.mustache",
 						"meanH": "stats_Flux-meanH.mustache",
-						"gradH": "stats_Flux-gradH.mustache"
+						"gradH": "stats_Flux-gradH.mustache",
+						"gradHZ": "stats_Flux-gradZ.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-static.json",
@@ -389,13 +395,15 @@
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
+						"gradH": "channel-gradH.mustache",
+						"gradHZ": "channel-gradZ.mustache"
 					},
 					"cooling-post": {
 						"mean": "stats_Flux-mean.mustache",
 						"grad": "stats_Flux-grad.mustache",
 						"meanH": "stats_Flux-meanH.mustache",
-						"gradH": "stats_Flux-gradH.mustache"
+						"gradH": "stats_Flux-gradH.mustache",
+						"gradHZ": "stats_Flux-gradZ.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-static.json",
@@ -487,13 +495,15 @@
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
+						"gradH": "channel-gradH.mustache",
+						"gradHZ": "channel-gradZ.mustache"
 					},
 					"cooling-post": {
 						"mean": "stats_Flux-mean.mustache",
 						"grad": "stats_Flux-grad.mustache",
 						"meanH": "stats_Flux-meanH.mustache",
-						"gradH": "stats_Flux-gradH.mustache"
+						"gradH": "stats_Flux-gradH.mustache",
+						"gradHZ": "stats_Flux-gradZ.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-static.json",
@@ -703,13 +713,15 @@
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
+						"gradH": "channel-gradH.mustache",
+						"gradHZ": "channel-gradZ.mustache"
 					},
 					"cooling-post": {
 						"mean": "stats_Flux-mean.mustache",
 						"grad": "stats_Flux-grad.mustache",
 						"meanH": "stats_Flux-meanH.mustache",
-						"gradH": "stats_Flux-gradH.mustache"
+						"gradH": "stats_Flux-gradH.mustache",
+						"gradHZ": "stats_Flux-gradZ.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-transient.json",
@@ -786,13 +798,15 @@
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
+						"gradH": "channel-gradH.mustache",
+						"gradHZ": "channel-gradZ.mustache"
 					},
 					"cooling-post": {
 						"mean": "stats_Flux-mean.mustache",
 						"grad": "stats_Flux-grad.mustache",
 						"meanH": "stats_Flux-meanH.mustache",
-						"gradH": "stats_Flux-gradH.mustache"
+						"gradH": "stats_Flux-gradH.mustache",
+						"gradHZ": "stats_Flux-gradZ.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-transient.json",
@@ -877,13 +891,15 @@
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
+						"gradH": "channel-gradH.mustache",
+						"gradHZ": "channel-gradZ.mustache"
 					},
 					"cooling-post": {
 						"mean": "stats_Flux-mean.mustache",
 						"grad": "stats_Flux-grad.mustache",
 						"meanH": "stats_Flux-meanH.mustache",
-						"gradH": "stats_Flux-gradH.mustache"
+						"gradH": "stats_Flux-gradH.mustache",
+						"gradHZ": "stats_Flux-gradZ.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-transient.json",
@@ -984,13 +1000,15 @@
 						"mean": "channel-mean.mustache",
 						"grad": "channel-grad.mustache",
 						"meanH": "channel-meanH.mustache",
-						"gradH": "channel-gradH.mustache"
+						"gradH": "channel-gradH.mustache",
+						"gradHZ": "channel-gradZ.mustache"
 					},
 					"cooling-post": {
 						"mean": "stats_Flux-mean.mustache",
 						"grad": "stats_Flux-grad.mustache",
 						"meanH": "stats_Flux-meanH.mustache",
-						"gradH": "stats_Flux-gradH.mustache"
+						"gradH": "stats_Flux-gradH.mustache",
+						"gradHZ": "stats_Flux-gradZ.mustache"
 					},
 					"filename": {
 						"conductor": "conductor-transient.json",
