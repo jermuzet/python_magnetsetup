@@ -42,6 +42,13 @@
 	"Meshes": {
         "cfpdes": {
             "Fields": {
+				{{#field_h5}}
+				"{{name}}":
+				{
+					"filename": "$cfgdir/{{path}}.h5",
+					"basis":"{{basis}}"
+				},
+				{{/field_h5}}
                 "U": {
                     "filename": "$cfgdir/U.h5",
                     "basis": "Pdh0"
@@ -56,6 +63,25 @@
 	    	
 		}
     },
+	{{#init_cond}}
+	"InitialConditions":
+    {
+		"magnetic":
+		{
+			"Atheta":
+			{
+				"File":
+				{
+					"ic":
+					{
+						"filename": "$cfgdir/{{path}}.h5",
+                        "format": "hdf5"
+					},
+				}
+			}
+		}
+    },
+	{{/init_cond}}
     "BoundaryConditions":
     {
 		"magnetic":
@@ -90,6 +116,13 @@
 						"expr":"materials_U:materials_U",
 						"markers": {{part_electric}}
 		    		},
+					{{#JcB}}
+					"JcB":
+		    		{
+						"expr":"materials_JcB:materials_JcB",
+						"markers": {{markers}}
+		    		},
+					{{/JcB}}
 		    		"Jth":
 		    		{
 						"expr":"-materials_sigma*materials_U/(2*pi*x):materials_sigma:materials_U:x",
@@ -123,7 +156,15 @@
 						}
 					}
 				}
-			}
+			},
+			"Save": {
+                "Fields": {
+                    "names": [
+                        "Atheta"
+                    ],
+                    "format": "hdf5"
+                }
+            }
 		}
     }
 }

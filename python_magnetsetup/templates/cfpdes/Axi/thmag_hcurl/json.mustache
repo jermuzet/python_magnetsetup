@@ -57,6 +57,13 @@
 	"Meshes": {
         "cfpdes": {
             "Fields": {
+				{{#field_h5}}
+				"{{name}}":
+				{
+					"filename": "$cfgdir/{{path}}.h5",
+					"basis":"{{basis}}"
+				},
+				{{/field_h5}}
                 "U": {
                     "filename": "$cfgdir/U.h5",
                     "basis": "Pdh0"
@@ -100,6 +107,22 @@
     },
     "InitialConditions":
     {
+		{{#init_cond}}
+		"magnetic":
+		{
+			"Atheta":
+			{
+				"File":
+				{
+					"ic":
+					{
+						"filename": "$cfgdir/{{path}}.h5",
+                        "format": "hdf5"
+					},
+				}
+			}
+		},
+		{{/init_cond}}
 		"heat":{
 			"temperature":
 			{
@@ -114,7 +137,7 @@
 					{{/init_temp}}
 				}
 			}
-		}
+		}	
     },
     "PostProcess":
     {
@@ -156,7 +179,8 @@
 	    	{
 				"Fields":
 				{
-		    		"names":["Atheta"]
+		    		"names":["Atheta"],
+                    "format": "hdf5"
 				}
 	    	},
 	    	"Measures": 
