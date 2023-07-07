@@ -334,6 +334,10 @@ def create_params_insert(
         prefix = f"{mname}_"
 
     params_data["Parameters"].append({"name": f"{prefix}Tinit", "value": 293})
+    for i in range(NHelices):
+        params_data["Parameters"].append(
+            {"name": f"Area_{prefix}H{i+1}", "value": abs((R2[i]-R1[i])*(Zmax[i]-Zmin[i]))}
+        )
 
     # get value from coolingmethod and Flow(I) value
     if not "H" in method_data[4]:
