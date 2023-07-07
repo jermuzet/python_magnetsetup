@@ -622,6 +622,15 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
     if args.time == "transient":
         material_generic_def.append("conduct-nosource")  # only for transient with mqs
 
+    fit=None
+    if "geom" in confdata:  #Magnet
+        if "Supra" in confdata :
+            fit="hilton" #replace with value in args
+    elif "magnets" in confdata: #Site
+        for magnet in confdata["magnets"]: #browse Magnets
+            if "Supra" in next(iter(magnet.values())) :
+                fit="hilton" #replace with value in args
+
     if args.method == "cfpdes":
         if args.debug:
             print("cwd=", cwd)
@@ -640,6 +649,19 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
             if args.debug:
                 print(f"{jfile}, filename={filename}, src={src}, dst={dst}")
             copyfile(src, dst)
+        
+        if fit :
+            filename = "fit_" + fit + ".json"
+            src = os.path.join(
+                MyEnv.template_path(), args.method, args.geom, args.model, filename
+            )
+            dst = os.path.join(
+                os.getcwd(), f"superconductor-{args.method}-{args.model}-{args.geom}.json"
+            )
+            if args.debug:
+                print(f"superconductor, filename={filename}, src={src}, dst={dst}")
+            copyfile(src, dst)
+
 
         csvfiles = glob("./*.csv")
         print(f"csvfiles: {csvfiles}")
