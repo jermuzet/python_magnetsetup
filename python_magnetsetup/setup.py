@@ -127,6 +127,7 @@ def magnet_setup(
     """
 
     print(f"magnet_setup: mname={mname}")
+    print(f"magnet_setup: templates={templates}")
     if debug:
         print(f"magnet_setup: confdata={confdata}"),
 
@@ -201,9 +202,10 @@ def magnet_setup(
                 )
                 # print(f"magnet_setup: {mtype}, mname={mname}, tdict={tdict}")
                 # print(f"magnet_setup: {mtype}, mname={mname}, mdict={mdict}")
-                print(
-                    f'magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict["init_temp"]}'
-                )
+                if not isinstance(cad, Supra):
+                    print(
+                        f'magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict["init_temp"]}'
+                    )
                 # print(f"magnet_setup: {mtype}, mname={mname}, mdict[power_magnet]={mdict['power_magnet']}")
                 # list_name = [item['name'] for item in mdict['int_temp']]
 
@@ -232,19 +234,20 @@ def magnet_setup(
                     print(f"magnet_setup: {mtype}, mname={mname}, tpost={tpost}")
                     print(f"magnet_setup: {mtype}, mname={mname}, mpost={mpost}")
 
-                for key in ["Current", "Power"]:
-                    list_current = []
-                    for item in mpost[key]:
-                        if isinstance(item, dict) and "part_electric" in item:
-                            list_current = list(
-                                set(list_current + item["part_electric"])
-                            )
-                    if list_current:
-                        mpost[key] = [{"part_electric": list_current}]
-                        if debug:
-                            print(
-                                f"magnet_setup {mname}: force mpost[{key}]={mpost[key]}"
-                            )
+                if not isinstance(cad, Supra):
+                    for key in ["Current", "Power"]:
+                        list_current = []
+                        for item in mpost[key]:
+                            if isinstance(item, dict) and "part_electric" in item:
+                                list_current = list(
+                                    set(list_current + item["part_electric"])
+                                )
+                        if list_current:
+                            mpost[key] = [{"part_electric": list_current}]
+                            if debug:
+                                print(
+                                    f"magnet_setup {mname}: force mpost[{key}]={mpost[key]}"
+                                )
 
                 tdict.clear()
                 tmat.clear()
@@ -253,35 +256,36 @@ def magnet_setup(
 
                 # fix init_temp and power_magnet entries in mdict
                 print(f"mdict: key={mdict.keys()}")
-                for key in ["init_temp", "power_magnet", "T_magnet"]:
-                    if len(mdict[key]) > 1:
-                        # print(f"setup/magnet_setup mname={mname}: mdict[{key}]={mdict[key]}")
-                        _key = [item["name"] for item in mdict[key]]
-                        _keys = list(set(_key))
-                        if key == "init_temp":
-                            _pref = [item["prefix"] for item in mdict[key]]
-                            _prefs = list(set(_pref))
-                        if len(_keys) > 1:
-                            raise Exception(
-                                f"setup/magnet_setup mname={mname}: mdict[{key}] seems broken - mdict[{key}]={mdict[key]}"
-                            )
+                if not isinstance(cad, Supra):
+                    for key in ["init_temp", "power_magnet", "T_magnet"]:
+                        if len(mdict[key]) > 1:
+                            # print(f"setup/magnet_setup mname={mname}: mdict[{key}]={mdict[key]}")
+                            _key = [item["name"] for item in mdict[key]]
+                            _keys = list(set(_key))
+                            if key == "init_temp":
+                                _pref = [item["prefix"] for item in mdict[key]]
+                                _prefs = list(set(_pref))
+                            if len(_keys) > 1:
+                                raise Exception(
+                                    f"setup/magnet_setup mname={mname}: mdict[{key}] seems broken - mdict[{key}]={mdict[key]}"
+                                )
 
-                        _list = [item["magnet_parts"] for item in mdict[key]]
-                        _lists = list(set(list(itertools.chain(*_list))))
-                        if key == "init_temp":
-                            mdict[key] = [
-                                {
-                                    "name": _keys[0],
-                                    "prefix": _prefs[0],
-                                    "magnet_parts": _lists,
-                                }
-                            ]
-                        else:
-                            mdict[key] = [{"name": _keys[0], "magnet_parts": _lists}]
-                        if debug:
-                            print(
-                                f"setup/magnet_setup mname={mname}: force mdict[{key}] to = {{'name': _keys[0], 'magnet_parts': _lists}}"
-                            )
+                            _list = [item["magnet_parts"] for item in mdict[key]]
+                            _lists = list(set(list(itertools.chain(*_list))))
+                            if key == "init_temp":
+                                mdict[key] = [
+                                    {
+                                        "name": _keys[0],
+                                        "prefix": _prefs[0],
+                                        "magnet_parts": _lists,
+                                    }
+                                ]
+                            else:
+                                mdict[key] = [{"name": _keys[0], "magnet_parts": _lists}]
+                            if debug:
+                                print(
+                                    f"setup/magnet_setup mname={mname}: force mdict[{key}] to = {{'name': _keys[0], 'magnet_parts': _lists}}"
+                                )
         # else:
         #     print(f"{mtype} not in confdata={confdata}")
 

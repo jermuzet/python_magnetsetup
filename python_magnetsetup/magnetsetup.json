@@ -107,6 +107,7 @@
 					"model": "json.mustache",
 					"model-nonlinear": "json-nonlinear.mustache",
 					"conductor-linear": "conductor-linear-static.mustache",
+					"conductor-super": "superconductor-static.mustache",
 					"insulator": "insulator-static.mustache",
 					"models": {
 						"magnetic-conductor": "magnetic-conductor.mustache",
@@ -117,6 +118,22 @@
 						"insulator": "insulator-static.json"
 					},
 					"stats": {
+						"Ics": {
+							"name": "Stats_Ics",
+							"template": "stats_Ics.mustache",
+							"physic": "magnetic",
+							"data": {
+								"Ics_H": ""
+							}
+						},
+						"Linf": {
+							"name": "Stats_Linf",
+							"template": "stats_Linf.mustache",
+							"physic": "magnetic",
+							"data": {
+								"Linf_": ""
+							}
+						},
 						"T": {
 							"name": "Stats_T",
 							"template": "stats_T.mustache",
@@ -219,6 +236,7 @@
 					"model-nonlinear": "json-nonlinear.mustache",
 					"conductor-linear": "conductor-linear-static.mustache",
 					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
+					"conductor-super": "superconductor-static.mustache",
 					"insulator": "insulator-static.mustache",
 					"models": {
 						"heat-conductor": "heat-conductor.mustache",
@@ -245,6 +263,22 @@
 						"insulator": "insulator-static.json"
 					},
 					"stats": {
+						"Ics": {
+							"name": "Stats_Ics",
+							"template": "stats_Ics.mustache",
+							"physic": "magnetic",
+							"data": {
+								"Ics_H": ""
+							}
+						},
+						"Linf": {
+							"name": "Stats_Linf",
+							"template": "stats_Linf.mustache",
+							"physic": "magnetic",
+							"data": {
+								"Linf_": ""
+							}
+						},
 						"T": {
 							"name": "Stats_T",
 							"template": "stats_T.mustache",

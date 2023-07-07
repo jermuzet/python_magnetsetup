@@ -27,7 +27,9 @@ def create_params_supra(
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
     """
-    print("create_params_supra for mname={mname}")
+    print("create_params_supra")
+
+    (name, snames, r, z, n, detail, struct)=gdata
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5]  # "meter"
@@ -36,18 +38,18 @@ def create_params_supra(
     # Tini, Aini for transient cases??
     params_data = {"Parameters": []}
     # for cfpdes only
-    if method_data[0] == "cfpdes" and method_data[3] in [
-        "thmagel",
-        "thmagel_hcurl",
-        "thmqsel",
-        "thmqsel_hcurl",
-    ]:
-        params_data["Parameters"].append({"name": "bool_laplace", "value": "1"})
-        params_data["Parameters"].append({"name": "bool_dilatation", "value": "1"})
+    # if method_data[0] == "cfpdes" and method_data[3] in [
+    #     "thmagel",
+    #     "thmagel_hcurl",
+    #     "thmqsel",
+    #     "thmqsel_hcurl",
+    # ]:
+    #     params_data["Parameters"].append({"name": "bool_laplace", "value": 1})
+    #     params_data["Parameters"].append({"name": "bool_dilatation", "value": 1})
 
     # TODO : initialization of parameters with cooling model
     prefix = ""
-    if prefix:
+    if mname:
         prefix = f"{mname}_"
 
     params_data["Parameters"].append({"name": f"{prefix}Tinit", "value": 4})
@@ -60,6 +62,50 @@ def create_params_supra(
     # eg. detail=None: Nturns total number of tapes, Area
     #     detail=dblpancake Nturns number of tapes per dblpancake, Area of a dblpancake
     #     and so on for detail=pancake and detail=tape (NB turns=1)
+    if detail is None:
+        Area=convert_data(units,(r[1]-r[0])*(z[1]-z[0]), "Area")
+        
+        params_data["Parameters"].append({"name": f"{prefix}Nturns", "value": n})
+        params_data["Parameters"].append({"name": f"{prefix}Area", "value": Area})
+        
+        params_data["Parameters"].append({"name": f"{prefix}ec", "value": 1e-4})
+        params_data["Parameters"].append({"name": f"{prefix}n", "value": 25})
+        params_data["Parameters"].append({"name": f"{prefix}thickness_tape", "value": 1e-6})
+        params_data["Parameters"].append({"name": f"{prefix}thickness_cell", "value": 0.07616438356164383e-3})
+        params_data["Parameters"].append({"name": f"{prefix}height_tape", "value": 6e-3})
+        params_data["Parameters"].append({"name": f"{prefix}I0", "value": 300})
+
+
+    elif detail == "dblpancake":
+        pass
+    elif detail == "pancake":
+        pass
+    elif detail == "tape":
+
+        with open(struct) as file:
+            data_struct = json.load(file)
+
+        Area=convert_data(units,(r[1]-r[0])*(z[1]-z[0]), "Area")
+        thickness_cell=convert_data(units,data_struct["pancake"]["tape"]["w"], "Length")
+        height_tape=convert_data(units,data_struct["pancake"]["tape"]["h"], "Length")
+
+        params_data["Parameters"].append({"name": f"{prefix}Nturns", "value": n})
+        params_data["Parameters"].append({"name": f"{prefix}Area", "value": Area})
+        
+        params_data["Parameters"].append({"name": f"{prefix}thickness_tape", "value": 1e-6})
+        params_data["Parameters"].append({"name": f"{prefix}thickness_cell", "value": thickness_cell})
+        params_data["Parameters"].append({"name": f"{prefix}height_tape", "value": height_tape})
+        
+        params_data["Parameters"].append({"name": f"{prefix}ec", "value": 1e-4})
+        params_data["Parameters"].append({"name": f"{prefix}n", "value": 25})
+        params_data["Parameters"].append({"name": f"{prefix}I0", "value": 300})
+
+    else:
+        raise RuntimeError(
+            f"Supra_Setup: {snames} - cad.detail unsupported value {detail}- expected None|dblpancake|pancake|tape"
+        )
+    
+    
     if debug:
         print(params_data)
 
@@ -442,7 +488,9 @@ def create_params_insert(
 
 
 def create_materials_supra(
+    mname:str,
     gdata: tuple,
+    maindata: dict,
     confdata: dict,
     templates: dict,
     method_data: List[str],
@@ -451,8 +499,14 @@ def create_materials_supra(
     materials_dict = {}
     if debug:
         print("create_material_supra:", confdata)
+    (name, snames, r, z, n, detail, struct) =gdata
+    print("template materials : ",templates)
+    fconductor = templates["superconductor"]
+    finsulator = templates["insulator"]
 
-    fconductor = templates["conductor"]
+    prefix = ""
+    if mname:
+        prefix = f"{mname}_"
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5]  # "meter"
@@ -468,10 +522,45 @@ def create_materials_supra(
         )
 
     if method_data[2] == "Axi":
-        pass
-    else:
-        pass
+        if debug:
+            print("create_material_supra: Conductor_", name)
+        mdata = entry(
+            fconductor,
+            Merge(
+                {
+                    "name": f"Conductor_{name}",
+                    "part_mat_conductor": maindata["part_electric"],
+                    "thickness_tape": f"{prefix}thickness_tape",
+                    "thickness_cell": f"{prefix}thickness_cell",
+                    "height": f"{prefix}height_tape",
+                },
+                confdata["material"],
+            ),
+            debug,
+        )
+        materials_dict[f"Conductor_{name}"] = mdata[f"Conductor_{name}"]
 
+
+        if maindata["part_mat_insulator"]:
+            if debug:
+                print("create_material_supra: Insulator_", name)
+            mdata = entry(
+                finsulator,
+                Merge(
+                    {
+                        "name": f"Insulator_{name}",
+                        "part_mat_insulator": maindata["part_mat_insulator"],
+                    },
+                    confdata["material"],
+                ),
+                debug,
+            )
+            materials_dict[f"Insulator_{name}"] = mdata[f"Insulator_{name}"]
+    else:
+        return {}
+
+    if debug:
+        print(materials_dict)
     return materials_dict
 
 
@@ -713,6 +802,7 @@ def create_materials_insert(
 
 def create_models_supra(
     gdata: tuple,
+    maindata: dict,
     confdata: dict,
     templates: dict,
     method_data: List[str],
@@ -723,7 +813,9 @@ def create_models_supra(
     if debug:
         print("create_models_supra:", confdata)
 
+    (name, snames, r, z, n, detail, struct) =gdata
     fconductor = templates[equation + "-conductor"]
+    finsulator = templates[equation + "-insulator"]
 
     # TODO: length data are written in mm should be in SI instead
     unit_Length = method_data[5]  # "meter"
@@ -738,11 +830,32 @@ def create_models_supra(
             units, confdata["material"][prop], prop
         )
 
-    if method_data[2] == "Axi":
-        pass
-    else:
-        pass
+    if method_data[2] == "Axi" and equation=="magnetic" :
+        if maindata["part_insulators"]:
+            mdata = entry(
+                finsulator,
+                {
+                    "name": f"Insulator_{name}",
+                    "part_insulator": maindata["part_insulators"],
+                },
+                debug,
+            )
+            models_dict[f"Insulator_{name}"] = mdata
 
+        mdata = entry(
+            fconductor,
+            {
+                "name": f"Conductor_{name}",
+                "part_conductor": maindata["part_conductors"],
+            },
+            debug,
+        )
+        models_dict[f"Conductor_{name}"] = mdata
+    else:
+        return {}
+
+    if debug:
+        print(models_dict)
     return models_dict
 
 

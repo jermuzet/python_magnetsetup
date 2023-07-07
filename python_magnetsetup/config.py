@@ -143,6 +143,11 @@ def loadtemplates(
         "material_def": material_generic_def,
     }
 
+    if model in ["mag_hcurl", "thmag_hcurl"]:
+        superconductor_model = modelcfg["conductor-super"]
+        fsuperconductor = os.path.join(template_path, superconductor_model)
+        dict["superconductor"] = fsuperconductor
+
     if "stats" in modelcfg:
         _cfg = modelcfg["stats"]
         for field in _cfg:
