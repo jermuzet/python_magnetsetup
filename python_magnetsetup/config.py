@@ -143,6 +143,8 @@ def loadtemplates(
         "material_def": material_generic_def,
     }
 
+    #add template for superconductor materials
+    #(superconductor only defined in mag_hcurl, thmag_hcurl )
     if model in ["mag_hcurl", "thmag_hcurl"]:
         superconductor_model = modelcfg["conductor-super"]
         fsuperconductor = os.path.join(template_path, superconductor_model)

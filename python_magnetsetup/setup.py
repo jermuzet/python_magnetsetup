@@ -202,7 +202,7 @@ def magnet_setup(
                 )
                 # print(f"magnet_setup: {mtype}, mname={mname}, tdict={tdict}")
                 # print(f"magnet_setup: {mtype}, mname={mname}, mdict={mdict}")
-                if not isinstance(cad, Supra):
+                if not isinstance(cad, Supra):  #No init_temp in supra
                     print(
                         f'magnet_setup: {mtype}, mname={mname}, mdict[init_temp]={mdict["init_temp"]}'
                     )
@@ -234,7 +234,8 @@ def magnet_setup(
                     print(f"magnet_setup: {mtype}, mname={mname}, tpost={tpost}")
                     print(f"magnet_setup: {mtype}, mname={mname}, mpost={mpost}")
 
-                if not isinstance(cad, Supra):
+
+                if not isinstance(cad, Supra): #No merge for "Current", "Power" in supra
                     for key in ["Current", "Power"]:
                         list_current = []
                         for item in mpost[key]:
@@ -256,7 +257,7 @@ def magnet_setup(
 
                 # fix init_temp and power_magnet entries in mdict
                 print(f"mdict: key={mdict.keys()}")
-                if not isinstance(cad, Supra):
+                if not isinstance(cad, Supra): #No merge for "init_temp", "power_magnet", "T_magnet" in supra
                     for key in ["init_temp", "power_magnet", "T_magnet"]:
                         if len(mdict[key]) > 1:
                             # print(f"setup/magnet_setup mname={mname}: mdict[{key}]={mdict[key]}")
@@ -622,13 +623,15 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
     if args.time == "transient":
         material_generic_def.append("conduct-nosource")  # only for transient with mqs
 
+    #Superconductor materials use a json file for the JcB fit
+    # TO DO : put the fit in args (default None)
     fit=None
-    if "geom" in confdata:  #Magnet
+    if "geom" in confdata:  # if Magnet check if supra
         if "Supra" in confdata :
             fit="hilton" #replace with value in args
-    elif "magnets" in confdata: #Site
-        for magnet in confdata["magnets"]: #browse Magnets
-            if "Supra" in next(iter(magnet.values())) :
+    elif "magnets" in confdata: # if Site
+        for magnet in confdata["magnets"]: #browse all Magnets in site
+            if "Supra" in next(iter(magnet.values())) : #check in supra IN Magnet dict
                 fit="hilton" #replace with value in args
 
     if args.method == "cfpdes":
@@ -650,6 +653,8 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
                 print(f"{jfile}, filename={filename}, src={src}, dst={dst}")
             copyfile(src, dst)
         
+        #if fit is not None : there is a supra
+        #Create json file superconductor with corresponding fit template
         if fit :
             filename = "fit_" + fit + ".json"
             src = os.path.join(

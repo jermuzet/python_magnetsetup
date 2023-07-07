@@ -56,7 +56,7 @@ def Supra_setup(
 
     part_thermic = []
     part_electric = []
-    part_mat_insulator = []
+    part_mat_insulator = [] #no part_thermic so need a part_insulator for the material insulator_HTS
 
     part_conductors = []
     part_insulators = []
@@ -78,8 +78,10 @@ def Supra_setup(
     name = f"{prefix}{cad.name}"
     # TODO eventually get details
 
+    #find path for .yaml and struct.json
     files=Supra_simfile(MyEnv, confdata, cad, debug)
 
+    #if struct exist give path
     cad_struct = cad.struct
     if len(files)==2:
         cad_struct=files[1]
@@ -169,6 +171,7 @@ def Supra_setup(
     NMerge(bcs_data, mdict, debug, "supra_setup bcs_data")
     # mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "supra_setup mdict")
 
+    #add part field for files .h5 (P.h5, A.h5)
     field_h5_data = []
     field_h5_data.append(
         {"name": "P", "path":"P", "basis": "Pdh0"}
@@ -180,6 +183,7 @@ def Supra_setup(
     NMerge(field_h5_dict, mdict, debug, name="supra_setup h5")
     print('supra_setup: add field_h5 mdict[field_h5] = {mdict["field_h5"]}')
 
+    #Add magnetic initial conditions that take the result of the previous simulation A.h5
     init_cond_data = []
     init_cond_data.append(
         {"path":"feelppdb/np_$np/magnetic.save/A"}
@@ -205,7 +209,7 @@ def Supra_setup(
     power_dict = {"power_magnet": power_data}
     NMerge(power_dict, mdict, debug, "supra_setup power")
 
-
+    #Add export for JcB
     print("supra_setup: add JcB")
     jcb_data = []
     jcb_data.append(
@@ -239,6 +243,7 @@ def Supra_setup(
     meanT_data = []
     Stress_data = []
     VonMises_data = []
+    #New post-pro stat Ics & Linf
     Ics_data = []
     Linf_data = []
 
@@ -251,6 +256,7 @@ def Supra_setup(
         "Zinf": convert_data(units, cad.z[-1], "Length"),
     }
 
+    #use deepcopy or resistive magnet's part_electric an HTS' part_electric get mixed in Site
     if method_data[2] == "Axi":
         currentH_data.append({"part_electric": copy.deepcopy(part_electric)})
         meanT_data.append({"header": f"T_{name}", "markers": copy.deepcopy(part_electric)})

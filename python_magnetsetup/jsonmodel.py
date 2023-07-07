@@ -81,11 +81,12 @@ def create_params_supra(
     elif detail == "pancake":
         pass
     elif detail == "tape":
-
+        # open HTS json file to retrieve data for some parameters
         with open(struct) as file:
             data_struct = json.load(file)
 
         Area=convert_data(units,(r[1]-r[0])*(z[1]-z[0]), "Area")
+        #data from HTS json :
         thickness_cell=convert_data(units,data_struct["pancake"]["tape"]["w"], "Length")
         height_tape=convert_data(units,data_struct["pancake"]["tape"]["h"], "Length")
 
@@ -501,6 +502,7 @@ def create_materials_supra(
         print("create_material_supra:", confdata)
     (name, snames, r, z, n, detail, struct) =gdata
     print("template materials : ",templates)
+    #use different tempalte for conductor : superconductor
     fconductor = templates["superconductor"]
     finsulator = templates["insulator"]
 
