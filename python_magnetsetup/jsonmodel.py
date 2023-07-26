@@ -89,6 +89,12 @@ def create_params_supra(
         #data from HTS json :
         thickness_cell=convert_data(units,data_struct["pancake"]["tape"]["w"], "Length")
         height_tape=convert_data(units,data_struct["pancake"]["tape"]["h"], "Length")
+        
+        tapes_spacing=convert_data(units,height_tape+data_struct["pancake"]["tape"]["e"], "Length")
+        inner_radius=convert_data(units,data_struct["pancake"]["r0"], "Length")
+        
+        npancakes=2*data_struct["dblpancakes"]["n"]
+        ntapes=data_struct["pancake"]["ntapes"]
 
         params_data["Parameters"].append({"name": f"{prefix}Nturns", "value": n})
         params_data["Parameters"].append({"name": f"{prefix}Area", "value": Area})
@@ -96,6 +102,11 @@ def create_params_supra(
         params_data["Parameters"].append({"name": f"{prefix}thickness_tape", "value": 1e-6})
         params_data["Parameters"].append({"name": f"{prefix}thickness_cell", "value": thickness_cell})
         params_data["Parameters"].append({"name": f"{prefix}height_tape", "value": height_tape})
+        params_data["Parameters"].append({"name": f"{prefix}tapes_spacing", "value": tapes_spacing})
+        params_data["Parameters"].append({"name": f"{prefix}inner_radius", "value": inner_radius})
+        
+        params_data["Parameters"].append({"name": f"{prefix}npancakes", "value": npancakes})
+        params_data["Parameters"].append({"name": f"{prefix}ntapes", "value": ntapes})
         
         params_data["Parameters"].append({"name": f"{prefix}ec", "value": 1e-4})
         params_data["Parameters"].append({"name": f"{prefix}n", "value": 25})
