@@ -928,6 +928,10 @@ def create_bcs_bitter(
             )
 
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
+    
+    if "el" in method_data[3] and method_data[3] != "thelec":
+        for bc in boundary_meca:
+            meca_bcs_dir["boundary_Meca_Dir"].append({"name": bc, "value": "{0,0}"})
 
     if method_data[3] == "thelec":
         if method_data[2] == "Axi":
