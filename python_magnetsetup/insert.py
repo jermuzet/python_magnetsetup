@@ -244,8 +244,8 @@ def Insert_setup(
             boundary_maxwell.append("InfR1")
 
     else:
-        boundary_meca.append(f"{prefix}H1_HP")
-        boundary_meca.append(f"{prefix}H_HP")
+        boundary_meca.append(f"{prefix}H1_BP")
+        boundary_meca.append(f"{prefix}H{NRings + 1}_BP")
 
         if "mag" in method_data[3]:
             boundary_maxwell.append("ZAxis")
