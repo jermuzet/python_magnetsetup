@@ -579,7 +579,7 @@
 						"Stress": {
 							"name": "Stats_Stress",
 							"template": "stats_Stress.mustache",
-							"physic": "heat",
+							"physic": "elastic",
 							"data": {
 								"Stress_H": ""
 							}
@@ -587,7 +587,7 @@
 						"VonMises": {
 							"name": "Stats_VonMises",
 							"template": "stats_VonMises.mustache",
-							"physic": "heat",
+							"physic": "elastic",
 							"data": {
 								"VonMises_H": ""
 							}
