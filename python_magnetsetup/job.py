@@ -11,4 +11,4 @@ class JobManagerType(str, enum.Enum):
 @dataclass
 class JobManager:
     otype: JobManagerType = JobManagerType.none
-    queues: list = field(default_factory=list)
+    queues: list = field(default_factory=lambda: [])
