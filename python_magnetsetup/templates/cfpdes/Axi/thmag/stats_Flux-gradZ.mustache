@@ -9,6 +9,12 @@
       "markers": "{{markers}}",
       "index1": {{index}}
    },
+   "Flux_{{markers}}":
+   {
+      "type": "integrate",
+      "expr": "{{hw}}*(heat_T-{{Tw}})*2*pi*x:x:y:heat_T:{{hw}}:{{Tw}}",
+      "markers": "{{markers}}"
+   },
    {{/Stats_Flux}}
    }
 }
