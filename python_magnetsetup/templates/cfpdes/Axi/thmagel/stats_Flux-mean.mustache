@@ -2,12 +2,12 @@
    "Stats_Flux":
    {
    {{#Stats_Flux}}
-   "Flux_{{prefix}}%1%":
+   "Flux_{{prefix}}":
    {
       "type": "integrate",
-      "expr": "{{hw}}*(heat_T-({{Tw}}+{{dTw}}/2.))*2*pi*x:x:heat_T:{{hw}}:{{Tw}}:{{dTw}}",
-      "markers": "{{prefix}}%1%",
-      "index1": "{{index_h}}"
+      "expr": "%1_2%*{{hw}}*(heat_T-({{Tw}}+{{dTw}}/2.))*2*pi*x:x:heat_T:{{hw}}:{{Tw}}:{{dTw}}",
+      "markers": {{markers}},
+      "index1": {{index_h}}
    },
    {{/Stats_Flux}}
    }
