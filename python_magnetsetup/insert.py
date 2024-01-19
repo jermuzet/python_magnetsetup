@@ -306,11 +306,14 @@ def Insert_setup(
     iname = cad.name
     if prefix:
         iname = mname
+    init_name = mname
+    if not init_name:
+        init_name = "Insert"
     init_temp_data = []
     init_temp_data.append(
         {
-            "name": f"{mname}",
-            "prefix": f"{prefix}",
+            "name": init_name,
+            "prefix": prefix,
             "magnet_parts": copy.deepcopy(part_thermic),
         }
     )
@@ -493,6 +496,7 @@ def Insert_setup(
                 {"header": f"T_{prefix}R{i+1}", "markers": {"name": f"{prefix}R{i+1}"}}
             )
 
+    flux_data = []
     fluxZ_data = []
     """
     for i, z in enumerate(Zh):
@@ -500,6 +504,12 @@ def Insert_setup(
         print(f"Zh[{i}]: {Zh[i]}")
     """
     for i in range(NChannels):
+        markers = f'["{prefix}Channel{i}"]'
+        filling_factor = 1
+
+        if method_data[2] == "Axi":
+            flux_data.append([i, filling_factor])
+
         # print(f"Zh[{i}]: {Zh[i]}")
         index_data = []
         for s in range(len(Zh[i]) - 1):
@@ -511,16 +521,18 @@ def Insert_setup(
             index_data.append([s, Zh[i][s], Zh[i][s + 1]])
 
         data = {
+            "prefix": f"{prefix}Channel{i}",
             "hw": f"hw_{prefix}Channel{i}",
             "Tw": f"Tw_{prefix}Channel{i}",
-            "markers": f"{prefix}Channel{i}",
-            "index": index_data,
+            "markers": markers,
+            "index_h": [flux_data[-1]],
+            "index_z": index_data,
         }
         fluxZ_data.append(data)
 
     suffix = ""
     if "H" in method_data[4]:
-        suffix = "%1%"
+        suffix = "%1_1%"
 
     mpost = {
         "Power": currentH_data,
@@ -528,13 +540,14 @@ def Insert_setup(
         "Current": currentH_data,
         "Flux": [
             {
-                "prefix": f"{prefix}Channel",
+                "prefix": f"{prefix}Channel%1_1%",
+                "markers": f'["{prefix}Channel%1_1%"]',
                 "hw": f"hw_{prefix}Channel{suffix}",
                 "Tw": f"Tw_{prefix}Channel{suffix}",
                 "dTw": f"dTw_{prefix}Channel{suffix}",
                 "Zmin": f"Zmin_{prefix}Channel{suffix}",
                 "Zmax": f"Zmax_{prefix}Channel{suffix}",
-                "index_h": f"0:{str(NChannels)}",
+                "index_h": flux_data,
             }
         ],
         "T": meanT_data,

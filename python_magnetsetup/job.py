@@ -1,6 +1,5 @@
 import enum
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
 
 
 class JobManagerType(str, enum.Enum):
@@ -12,4 +11,4 @@ class JobManagerType(str, enum.Enum):
 @dataclass
 class JobManager:
     otype: JobManagerType = JobManagerType.none
-    queues: Optional[list] = None
+    queues: list = field(default_factory=lambda: [])

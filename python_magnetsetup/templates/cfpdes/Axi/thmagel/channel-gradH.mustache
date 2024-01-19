@@ -1,7 +1,8 @@
 {
     "{{name}}":
 {
-    "expr1":"x*{{hw}}:{{hw}}:x",
-    "expr2":"x*{{hw}}*({{Tw}}*(y<{{Zmin}}) + ({{dTw}}/({{Zmax}}-{{Zmin}})*(y-{{Zmin}})+{{Tw}})*(y>{{Zmin}})*(y<{{Zmax}}) + ({{Tw}}+{{dTw}})*(y>{{Zmax}})):x:y:{{hw}}:{{Tw}}:{{dTw}}:{{Zmin}}:{{Zmax}}"
+    "markers": {{markers}},
+    "expr1":"x*{{fillingfactor}}*{{hw}}:{{hw}}:x",
+    "expr2":"x*{{fillingfactor}}*{{hw}}*({{Tw}}*(y<{{Zmin}}) + ({{dTw}}/({{Zmax}}-{{Zmin}})*(y-{{Zmin}})+{{Tw}})*(y>{{Zmin}})*(y<{{Zmax}}) + ({{Tw}}+{{dTw}})*(y>{{Zmax}})):x:y:{{hw}}:{{Tw}}:{{dTw}}:{{Zmin}}:{{Zmax}}"
 }
 }
