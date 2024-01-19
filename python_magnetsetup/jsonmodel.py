@@ -138,7 +138,17 @@ def create_params_csvfiles_bitter(
     unit_Length = method_data[5]  # "meter"
     units = load_units(unit_Length)
 
-    (name, snames, nturns, NCoolingSlits, Dh, Sh, Zh, ignore_index) = gdata
+    (
+        name,
+        snames,
+        nturns,
+        NCoolingSlits,
+        Dh,
+        Sh,
+        Zh,
+        fillingfactor,
+        ignore_index,
+    ) = gdata
     Zh = convert_data(units, Zh, "Length")
 
     res = {}
@@ -229,7 +239,17 @@ def create_params_bitter(
 
     params_data["Parameters"].append({"name": f"{prefix}Tinit", "value": 293})
 
-    (name, snames, nturns, NCoolingSlits, Dh, Sh, Zh, ignore_index) = gdata
+    (
+        name,
+        snames,
+        nturns,
+        NCoolingSlits,
+        Dh,
+        Sh,
+        Zh,
+        fillingfactor,
+        ignore_index,
+    ) = gdata
     Zmin = min(Zh)
     Zmax = max(Zh)
     if debug:
@@ -394,7 +414,10 @@ def create_params_insert(
     params_data["Parameters"].append({"name": f"{prefix}Tinit", "value": 293})
     for i in range(NHelices):
         params_data["Parameters"].append(
-            {"name": f"Area_{prefix}H{i+1}", "value": abs((R2[i]-R1[i])*(Zmax[i]-Zmin[i]))}
+            {
+                "name": f"Area_{prefix}H{i+1}",
+                "value": abs((R2[i] - R1[i]) * (Zmax[i] - Zmin[i])),
+            }
         )
 
     # get value from coolingmethod and Flow(I) value
@@ -606,7 +629,17 @@ def create_materials_bitter(
             units, confdata["material"][prop], prop
         )
 
-    (name, snames, turns, NCoolingSlits, Dh, Sh, Zh, ignore_index) = gdata
+    (
+        name,
+        snames,
+        turns,
+        NCoolingSlits,
+        Dh,
+        Sh,
+        Zh,
+        fillingfactor,
+        ignore_index,
+    ) = gdata
 
     if method_data[2] == "Axi":
         if debug:
@@ -892,7 +925,17 @@ def create_models_bitter(
     unit_Length = method_data[5]  # "meter"
     units = load_units(unit_Length)
 
-    (name, snames, turns, NCoolingSlits, Dh, Sh, Zh, ignore_index) = gdata
+    (
+        name,
+        snames,
+        turns,
+        NCoolingSlits,
+        Dh,
+        Sh,
+        Zh,
+        fillingfactor,
+        ignore_index,
+    ) = gdata
     if method_data[2] == "Axi":
         if maindata["part_insulators"]:
             mdata = entry(
@@ -1019,9 +1062,19 @@ def create_bcs_bitter(
     method_data: List[str],
     debug: bool = False,
 ) -> dict:
-    (name, snames, turns, NCoolingSlits, Dh, Sh, Zh, ignore_index) = gdata
+    (
+        name,
+        snames,
+        turns,
+        NCoolingSlits,
+        Dh,
+        Sh,
+        Zh,
+        fillingfactor,
+        ignore_index,
+    ) = gdata
     print(f"create_bcs_bitter from templates for {name}")
-    # print("snames=", snames)
+    print(f"snames={snames}")
 
     electric_bcs_dir = {"boundary_Electric_Dir": []}  # name, value, vol
     electric_bcs_neu = {"boundary_Electric_Neu": []}  # name, value
@@ -1036,11 +1089,22 @@ def create_bcs_bitter(
             bcname = name
             if "H" in method_data[4]:
                 bcname = f"{name}_Slit{i}"
+
+            markers = f'["{name}_Slit{i}"]'
+            if method_data[2] == "Axi":
+                if i != 0 and i != NCoolingSlits + 1:
+                    markers = f'["{name}_Slit{i}_l","{name}_Slit{i}_r"]'
+
+            # change template
+            # add: %1_1%: s, %1_2%: nslit, %1_3%: slit.r, %1_4%: rslit
+            # change "markers" to a list: f"[{name}_Slit{i}_l, {name}_Slit{i}_r]"
+            # if i ==0 or i == NCooling+1: "markers" : f"{name}_Slit{i}"
             mdata = entry(
                 fcooling,
                 {
                     "name": f"{name}_Slit{i}",
-                    "markers": snames,
+                    "markers": markers,
+                    "fillingfactor": fillingfactor[i],
                     "hw": f"hw_{bcname}",
                     "Tw": f"Tw_{bcname}",
                     "dTw": f"dTw_{bcname}",
@@ -1049,12 +1113,13 @@ def create_bcs_bitter(
                 },
                 debug,
             )
+
             thermic_bcs_rob["boundary_Therm_Robin"].append(
                 Merge({"name": f"{name}_Slit{i}"}, mdata[f"{name}_Slit{i}"])
             )
 
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
-    
+
     if "el" in method_data[3] and method_data[3] != "thelec":
         for bc in boundary_meca:
             meca_bcs_dir["boundary_Meca_Dir"].append({"name": bc, "value": "{0,0}"})
@@ -1116,6 +1181,8 @@ def create_bcs_insert(
                     fcooling,
                     {
                         "name": f"{prefix}Channel{i}",
+                        "markers": f'["{prefix}Channel{i}"]',
+                        "fillingfactor": 1,
                         "hw": f"hw_{prefix}Channel{i}",
                         "Tw": f"Tw_{prefix}Channel{i}",
                         "dTw": f"dTw_{prefix}Channel{i}",
@@ -1134,6 +1201,8 @@ def create_bcs_insert(
                     fcooling,
                     {
                         "name": f"{prefix}Channel{i}",
+                        "markers": f'["{prefix}Channel{i}"]',
+                        "fillingfactor": 1,
                         "hw": f"hw_{prefix}Channel",
                         "Tw": f"Tw_{prefix}Channel",
                         "dTw": f"dTw_{prefix}Channel",

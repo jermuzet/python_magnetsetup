@@ -1,62 +1,62 @@
 {
-    "calcul18":{
+	"calcul18": {
 		"type": "compute",
 		"smp": "True",
 		"dns": "calcul18.lncmig.local",
-		"jobmanager":{
-	    	"type":"none",
-	    	"queues":{}
+		"jobmanager": {
+			"type": "none",
+			"queues": []
 		},
 		"cores": 8,
 		"multithreading": "True",
-		"mgkeydir" : "/opt/MeshGems"
-    },
-    "calcul19":{
+		"mgkeydir": "/opt/MeshGems"
+	},
+	"calcul19": {
 		"type": "compute",
 		"smp": "True",
 		"dns": "calcul19.lncmig.local",
-		"jobmanager":{
-	    	"type":"none",
-	    	"queues":{}
+		"jobmanager": {
+			"type": "none",
+			"queues": []
 		},
 		"cores": 8,
 		"multithreading": "True",
-		"mgkeydir" : "/opt/MeshGems"
-    },
-    "calcul22":{
+		"mgkeydir": "/opt/MeshGems"
+	},
+	"calcul22": {
 		"type": "compute",
 		"smp": "True",
 		"dns": "calcul22.lncmig.local",
-		"jobmanager":{
-	    	"type":"none",
-	    	"queues":{}
+		"jobmanager": {
+			"type": "none",
+			"queues": []
 		},
 		"cores": 40,
 		"multithreading": "True",
-		"mgkeydir" : "/opt/MeshGems"
-    },
-    "kelvin":{
+		"mgkeydir": "/opt/MeshGems"
+	},
+	"kelvin": {
 		"type": "compute",
 		"smp": "True",
 		"dns": "kelvin.lncmig.local",
-		"jobmanager":{
-	    	"type":"none",
-	    	"queues":{}
+		"jobmanager": {
+			"type": "none",
+			"queues": []
 		},
 		"cores": 64,
 		"multithreading": "True",
-		"mgkeydir" : "/opt/MeshGems"
-    },
-    "stokes":{
+		"mgkeydir": "/opt/MeshGems"
+	},
+	"stokes": {
 		"type": "compute",
 		"smp": "True",
 		"dns": "stokes.lncmig.local",
-		"jobmanager":{
-	    	"type":"slurm",
-	    	"queues":{}
+		"jobmanager": {
+			"type": "slurm",
+			"queues": []
 		},
 		"cores": 64,
 		"multithreading": "True",
-		"mgkeydir" : "/opt/MeshGems"
-    }
+		"mgkeydir": "/opt/MeshGems"
+	}
 }

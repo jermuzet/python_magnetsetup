@@ -1,7 +1,7 @@
 import os
 import json
 import enum
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .job import JobManager, JobManagerType
 
@@ -17,7 +17,7 @@ class NodeSpec:
     dns: str
     otype: NodeType = NodeType.compute
     smp: bool = True
-    manager: JobManager = JobManager(JobManagerType.none)
+    manager: JobManager = field(default_factory=lambda: JobManager())
     cores: int = 2
     multithreading: bool = True
     mgkeydir: str = r"/opt/MeshGems"
@@ -27,6 +27,7 @@ def load_machines(debug: bool = False):
     """
     load machines definition as a dict
     """
+    print("load machines", flush=True)
     if debug:
         print("load_machines")
 

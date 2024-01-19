@@ -50,7 +50,7 @@ def Bitter_setup(
     print(f"Bitter_setup:  magnet={mname}, cad={cad.name}")
     print(f"cad={cad}")
     print(f"cad.get_params={cad.get_params(MyEnv.yaml_repo)}")
-    (NCoolingSlits, Dh, Sh, Zh) = cad.get_params(MyEnv.yaml_repo)
+    (NCoolingSlits, Dh, Sh, Zh, fillingfactor) = cad.get_params(MyEnv.yaml_repo)
 
     part_thermic = []
     part_electric = []
@@ -128,6 +128,7 @@ def Bitter_setup(
         Dh,
         Sh,
         Zh,
+        fillingfactor,
         ignore_index,
     )
     params_data = create_params_bitter(mname, gdata, method_data, debug)
@@ -165,12 +166,16 @@ def Bitter_setup(
     # mdict = NMerge( NMerge(main_data, params_data), bcs_data, debug, "bitter_setup mdict")
 
     # add init data:
+    init_name = mname
+    if not init_name:
+        init_name = "Bitter"
     init_temp_data = []
     # init_temp_data.append( {'name': f'{mname}', "part_thermic_part": part_thermic } )
+    print(f"bitter: init_temp: name={init_name}")
     init_temp_data.append(
         {
-            "name": f"{mname}",
-            "prefix": f"{prefix}",
+            "name": init_name,
+            "prefix": prefix,
             "magnet_parts": copy.deepcopy(part_thermic),
         }
     )
@@ -261,41 +266,99 @@ def Bitter_setup(
     else:
         print("bitter3D post not implemented")
 
+    flux_data = []
     fluxZ_data = []
     Zh = convert_data(units, Zh, "Length")
     # print(f"Zh: {Zh}")
     for i in range(NCoolingSlits + 2):
+        markers = f'["{name}_Slit{i}"]'
+        filling_factor = 1
+
+        if method_data[2] == "Axi":
+            filling_factor = fillingfactor[i]  # get filling factor from magnetgeo??
+            if i != 0 and i != NCoolingSlits + 1:
+                markers = f'["{name}_Slit{i}_l","{name}_Slit{i}_r"]'
+            flux_data.append([i, filling_factor])
+
         index_data = []
         for s in range(len(Zh) - 1):
             # print(f"index_data: i={i}, Zh[{s}]={Zh[s]}, Zh[{s+1}]={Zh[s+1]}")
+
+            """
+            index_data:
+            %1_1%: s
+            %1_2%: nslit
+            %1_3%: slit.r
+            %1_4%: rslit
+            -> group them in fillingfactor
+            %1_5%: Zh[s]
+            %1_6% : Zh[s+1]
+            %1_7%: f"[{name}_Slit{i}_l,{name}_Slit{i}_r]" ??
+
+            f"[{name}_Slit{i}_l,{name}_Slit{i}_r]"
+            """
+
             index_data.append([s, Zh[s], Zh[s + 1]])
 
         data = {
+            "prefix": f"{name}_Slit{i}",
             "hw": f"hw_{name}_Slit{i}",
             "Tw": f"Tw_{name}_Slit{i}",
-            "markers": f"{name}_Slit{i}",
-            "index": index_data,
+            "markers": markers,
+            "index_h": [flux_data[-1]],
+            "index_z": index_data,
         }
+
         fluxZ_data.append(data)
 
+    # TODO change for slit0 and latest slit
     bcname = name
+    bcname_first = name
+    bcname_last = name
     if "H" in method_data[4]:
-        bcname = f"{name}_Slit%1%"
+        bcname = f"{name}_Slit%1_1%"
+        bcname_first = f"{name}_Slit0"
+        bcname_last = f"{name}_Slit{NCoolingSlits+1}"
+
+    # markers_dict = {"name": f"{name}_Slit%1_1%%2%", "index2": ["_l", "_r"]}
 
     mpost = {
         "Power": currentH_data,
         "PowerH": powerH_data,
         "Current": currentH_data,
+        # add id, fillingfactor, markers list to index_h
+        # and change template stats_Flux-gradZ
         "Flux": [
             {
-                "prefix": f"{name}_Slit",
+                "prefix": f"{name}_Slit0",
+                "markers": f'["{name}_Slit0"]',
+                "hw": f"hw_{bcname_first}",
+                "Tw": f"Tw_{bcname_first}",
+                "dTw": f"dTw_{bcname_first}",
+                "Zmin": f"Zmin_{bcname_first}",
+                "Zmax": f"Zmax_{bcname_first}",
+                "index_h": [flux_data[0]],
+            },
+            {
+                "prefix": f"{name}_Slit%1_1%",
+                "markers": f'["{name}_Slit{i}_l","{name}_Slit{i}_r"]',
                 "hw": f"hw_{bcname}",
                 "Tw": f"Tw_{bcname}",
                 "dTw": f"dTw_{bcname}",
                 "Zmin": f"Zmin_{bcname}",
                 "Zmax": f"Zmax_{bcname}",
-                "index_h": f"0:{str(NCoolingSlits+2)}",
-            }
+                "index_h": flux_data[1:-1],
+            },
+            {
+                "prefix": f"{name}_Slit{NCoolingSlits+1}",
+                "markers": f'["{name}_Slit{NCoolingSlits+1}"]',
+                "hw": f"hw_{bcname_last}",
+                "Tw": f"Tw_{bcname_last}",
+                "dTw": f"dTw_{bcname_last}",
+                "Zmin": f"Zmin_{bcname_last}",
+                "Zmax": f"Zmax_{bcname_last}",
+                "index_h": [flux_data[-1]],
+            },
         ],
         "T": meanT_data,
         "Stress": Stress_data,
