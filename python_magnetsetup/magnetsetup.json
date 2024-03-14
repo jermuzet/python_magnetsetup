@@ -442,6 +442,14 @@
 								"current_H": ""
 							}
 						},
+						"Displ": {
+							"name": "Stats_Displ",
+							"template": "stats_Displ.mustache",
+							"physic": "elastic",
+							"data": {
+								"Displ_H": ""
+							}
+						},
 						"Stress": {
 							"name": "Stats_Stress",
 							"template": "stats_Stress.mustache",
@@ -540,6 +548,14 @@
 							"physic": "heat",
 							"data": {
 								"current_H": ""
+							}
+						},
+						"Displ": {
+							"name": "Stats_Displ",
+							"template": "stats_Displ.mustache",
+							"physic": "elastic",
+							"data": {
+								"Displ_H": ""
 							}
 						},
 						"Stress": {
@@ -939,6 +955,14 @@
 								"current_H": ""
 							}
 						},
+						"Displ": {
+							"name": "Stats_Displ",
+							"template": "stats_Displ.mustache",
+							"physic": "elastic",
+							"data": {
+								"Displ_H": ""
+							}
+						},
 						"Stress": {
 							"name": "Stats_Stress",
 							"template": "stats_Stress.mustache",
@@ -1046,6 +1070,14 @@
 							"physic": "heat",
 							"data": {
 								"current_H": ""
+							}
+						},
+						"Displ": {
+							"name": "Stats_Displ",
+							"template": "stats_Displ.mustache",
+							"physic": "elastic",
+							"data": {
+								"Displ_H": ""
 							}
 						},
 						"Stress": {
