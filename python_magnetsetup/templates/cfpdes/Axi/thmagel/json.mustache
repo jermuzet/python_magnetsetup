@@ -106,6 +106,7 @@
 				{{#boundary_Therm_Robin}}
 				"{{name}}":
 				{
+					"markers": {{markers}},
 					"expr1": "{{expr1}}",
 					"expr2": "{{expr2}}"
 				},
@@ -228,7 +229,7 @@
 		    		"MagneticEnergy":
 		    		{
 						"type":"integrate",
-						"expr":"-2*pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi):magnetic_phi:materials_sigma:materials_U:x",
+						"expr":"-pi*magnetic_phi/x*materials_sigma*(materials_U/2/pi):magnetic_phi:materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
 				}
 				},
