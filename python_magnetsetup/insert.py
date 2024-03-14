@@ -355,6 +355,7 @@ def Insert_setup(
     currentH_data = []
     powerH_data = []
     meanT_data = []
+    Displ_data = []
     Stress_data = []
     VonMises_data = []
 
@@ -387,6 +388,15 @@ def Insert_setup(
                     "markers": {
                         "name": f"{prefix}H{i+1}_Cu%1%",
                         "index1": index_Helices_e[i],
+                    },
+                }
+            )
+            Displ_data.append(
+                {
+                    "header": f"Displ_{prefix}H{i+1}",
+                    "markers": {
+                        "name": f"{prefix}H{i+1}_Cu%1%",
+                        "index1": index_Helices[i],
                     },
                 }
             )
@@ -428,6 +438,12 @@ def Insert_setup(
                     "markers": {"name": f"{prefix}H{i+1}_Cu"},
                 }
             )
+            Displ_data.append(
+                {
+                    "header": f"Displ_{prefix}H{i+1}",
+                    "markers": {"name": f"{prefix}H{i+1}_Cu"},
+                }
+            )
             Stress_data.append(
                 {
                     "header": f"Stress_{prefix}H{i+1}",
@@ -437,10 +453,7 @@ def Insert_setup(
             VonMises_data.append(
                 {
                     "header": f"VonMises_{prefix}H{i+1}",
-                    "markers": {
-                        "name": f"{prefix}H{i+1}_Cu%1%",
-                        "index1": index_Helices[i],
-                    },
+                    "markers": {"name": f"{prefix}H{i+1}_Cu"},
                 }
             )
 
@@ -551,6 +564,7 @@ def Insert_setup(
             }
         ],
         "T": meanT_data,
+        "Displ": Displ_data,
         "Stress": Stress_data,
         "VonMises": VonMises_data,
     }
