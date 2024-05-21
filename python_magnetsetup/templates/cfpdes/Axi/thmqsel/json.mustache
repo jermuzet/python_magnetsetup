@@ -166,7 +166,7 @@
 		{
 	    	"Exports":
 	    	{
-				"fields":["heat.temperature","elastic1.displacement"],
+				"fields":["heat.temperature","elastic1.displacement","pid"],
 				"expr":
 				{
 		    		"atheta":"magnetic_phi/x:magnetic_phi:x",
@@ -178,7 +178,8 @@
 		    		"U":
 		    		{
 						"expr":"materials_U:materials_U",
-						"markers": {{part_electric}}
+						"markers": {{part_electric}},
+						"representation":["element"]
 		    		},
 		    		"Jth":
 		    		{
@@ -353,27 +354,6 @@
 				"Fields":
 				{
 		    		"names":["speed"]
-				}
-	    	},
-			"Measures":
-	    	{
-				"Statistics":
-				{
-		    		"Stat_Displ": 
-		    		{
-						"type":["min","max","mean"], 
-						"field":"displacement" 
-		    		},
-		    		"Stat_Stress": 
-		    		{
-						"type":["min","max","mean"], 
-						"expr":"materials_stress_thth:materials_stress_thth" 
-		    		},
-		    		"Stat_VonMises": 
-		    		{
-						"type":["min","max","mean"], 
-						"expr":"sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3"
-		    		}
 				}
 	    	}
 		}

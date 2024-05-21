@@ -77,6 +77,7 @@
 		{
 	    	"Exports":
 	    	{
+				"fields":["pid"],
 				"expr":
 				{
 		    		"atheta":"magnetic_phi/x:magnetic_phi:x",
@@ -88,7 +89,8 @@
 					"U":
 		    		{
 						"expr":"materials_U:materials_U",
-						"markers": {{part_electric}}
+						"markers": {{part_electric}},
+						"representation":["element"]
 		    		},
 		    		"Jth":
 		    		{

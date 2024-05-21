@@ -85,13 +85,14 @@
 		{
 	    	"Exports":
 	    	{
-				"fields":["heat.temperature"],
+				"fields":["all"],
 				"expr":
 				{
 		    		"U":
 		    		{
 						"expr":"materials_U:materials_U",
-						"markers": {{part_electric}}
+						"markers": {{part_electric}},
+						"representation":["element"]
 		    		},
 		    		"Jth":
 		    		{
