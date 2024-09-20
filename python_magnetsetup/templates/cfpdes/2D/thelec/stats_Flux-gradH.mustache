@@ -1,0 +1,14 @@
+{
+   "Stats_Flux":
+   {
+   {{#Stats_Flux}}
+   "Flux_{{prefix}}%1%":
+   {
+      "type": "integrate",
+      "expr": "{{hw}}*(heat_T-({{Tw}}*(Z0<{{Zmin}}) + ({{dTw}}/({{Zmax}}-{{Zmin}})*(Z0-{{Zmin}})+{{Tw}})*(Z0>{{Zmin}})*(Z0<{{Zmax}}) + ({{Tw}}+{{dTw}})*(Z0>{{Zmax}}))):Z0:heat_T:{{hw}}:{{Tw}}:{{dTw}}:{{Zmin}}:{{Zmax}}",
+      "markers": "{{prefix}}%1%",
+      "index1": "{{index_h}}"
+   },
+   {{/Stats_Flux}}
+   }
+}

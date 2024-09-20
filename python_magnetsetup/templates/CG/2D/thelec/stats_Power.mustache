@@ -1,0 +1,15 @@
+{
+    "Stats_Power":
+    {
+    {{#Stats_Power}}
+    "Power_%1%": 
+    {
+        "type": "integrate",
+        "expr": "materials_sigma*L*(electric_grad_V_0*electric_grad_V_0+electric_grad_V_1*electric_grad_V_1):L:materials_sigma:electric_grad_V_0:electric_grad_V_1",
+        "markers": "%1%",
+        "index1": {{part_electric}}
+    },
+    {{/Stats_Power}}
+    }
+}
+                    

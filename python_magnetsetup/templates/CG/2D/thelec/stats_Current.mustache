@@ -1,0 +1,15 @@
+{
+    "Stats_Current":
+    {
+    {{#Stats_Current}}
+    "Intensity_%1%": 
+    {
+        "type": "integrate",
+        "expr": "L_%1%*materials_sigma*(electric_grad_P_0*nx+electric_grad_P_1*ny)/N_%1%:N_%1%:L:materials_sigma:electric_grad_P_0:electric_grad_P_1:nx:ny",
+        "markers": "%1%",
+        "index1": {{markers}}
+    },
+    {{/Stats_Current}}
+    }
+}
+                    

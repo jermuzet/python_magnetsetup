@@ -7,35 +7,48 @@
 		"{{name}}": "{{value}}",
 		{{/Parameters}}
 		
-        "T0":"293",
-	    "Tin":"293"
+        "T0":"293"
+    },
+    "Meshes": {
+        "cfpdes": {
+            "Fields": {
+                "U": {
+                    "filename": "$cfgdir/U.h5",
+                    "basis": "Pdh0"
+                }
+            }
+        }
     },
     "Materials":
     {
     },
     "BoundaryConditions":
     {
-        "electric-potential":
-        {
-			"Dirichlet":
-	    		{
-				{{#boundary_Electric_Dir}}
-				"{{name}}": { expr: "{{value}}"}
-				{{/boundary_Electric_Dir}}
-	    		}
+        "electric": {
+            "ground": {
+                "markers": "{{iLead}}"
+            },
+            "electric_potential": {
+                "{{oLead}}": {
+                    "expr": "{{expr}}"
+                }
+            }
         },
 		"temperature":
 		{
-	    	"Robin":
-	    	{
-				{{#boundary_Therm_Robin}}
-				"{{name}}":
-				{
-					"expr1": "{{expr1}}",
-					"expr2": "{{expr2}}"
-				},
-				{{/boundary_Therm_Robin}}
-	    	}
+	    	"heat":
+            {
+                "convective_heat_flux":
+                {
+                    {{#boundary_Therm_Robin}}
+                    "{{name}}":
+                    {
+                        "h": "{{expr1}}",
+                        "Text": "{{expr2}}"
+                    },
+                    {{/boundary_Therm_Robin}}
+                }
+            }
 		}
     },
     "InitialConditions":
@@ -79,15 +92,7 @@
 	        {
 	            "Fields":
 		        {
-		            "names":["electric-potential"]{
-                "name":"electric",
-                "unknown": 
-                {
-                    "basis":"Pch1",
-                    "name":"V",
-                    "symbol":"V"
-                }
-            },
+		            "names":["electric-potential"]
 		        }
 	        },
             "Measures":

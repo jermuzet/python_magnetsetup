@@ -5,8 +5,7 @@
     "Parameters":
     {
         "T0":"293",
-	    "Tin":"293",
-        "V0":"1000",
+        "intensity":"31000",
 
         {{#Parameters}}
 		"{{name}}": "{{value}}",
@@ -19,6 +18,15 @@
     {
         "electric-potential":
         {
+            "Integral":
+            {
+                {{#boundary_Electric_Int}}
+				"{{name}}":
+				{
+					"expr": "{{value}}"
+				},
+				{{/boundary_Electric_Int}}
+            }
             "Dirichlet":
             {
                 {{#boundary_Electric_Dir}}
@@ -83,6 +91,27 @@
             "Exports":
             {
                 "fields":"all"
+            },
+            "Save": {
+                "Fields": {
+                    "names": [
+                        "electric-potential"
+                    ]
+                }
+            },
+            "Measures":
+            {
+                "Statistics":{
+                    "intensity_%1%": {
+                        "type": "integrate",
+                        "field": "current-density",
+                        "markers": "%1%",
+                        "index1": [
+                            "{{iLead}}",
+                            "{{oLead}}"
+                        ]
+                    }
+                }
             }
         },
         "heat":
@@ -90,6 +119,26 @@
             "Exports":
             {
                 "fields":"all"
+            },
+            "Save": {
+                "Fields": {
+                    "names": [
+                        "temperature"
+                    ]
+                }
+            },
+            "Measures":
+            {
+                "Statistics":{
+                    "Stat_T": {
+                        "type": [
+                            "min",
+                            "max",
+                            "mean"
+                        ],
+                        "field": "temperature"
+                    }
+                }
             }
         }
     }

@@ -1,0 +1,14 @@
+{
+   "Stats_Flux":
+   {
+   {{#Stats_Flux}}
+   "FluxZ%1_1%_{{markers}}":
+   {
+      "type": "integrate",
+      "expr": "{{hw}}*(heat_T-{{Tw}})*rectangle(Z0,%1_2%,%1_3%):Z0:heat_T:{{hw}}:{{Tw}}",
+      "markers": "{{markers}}",
+      "index1": {{index}}
+   },
+   {{/Stats_Flux}}
+   }
+}

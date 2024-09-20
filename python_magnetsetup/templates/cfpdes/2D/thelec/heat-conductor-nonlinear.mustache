@@ -1,0 +1,10 @@
+{
+    "name":"heat_{{name}}",
+    "materials":{{part_conductor}},
+    "setup":{
+        "coefficients":{
+            "c":"materials_k:materials_k",
+            "f":"materials_sigma*(electric_grad_V_rt_0*electric_grad_V_rt_0+electric_grad_V_rt_1*electric_grad_V_rt_1):materials_sigma:electric_grad_V_rt_0:electric_grad_V_rt_1"
+        }
+    }
+}

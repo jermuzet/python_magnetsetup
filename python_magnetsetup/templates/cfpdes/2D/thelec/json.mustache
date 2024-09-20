@@ -1,0 +1,178 @@
+{
+    "Name": "ThermoElectric 2D Stationnary model",
+    "ShortName":"2DThermoElectricStat",
+    "Models":
+    {
+		"cfpdes":{
+			"equations": [
+                "electric",
+                "heat"
+            ]
+		},
+        "electric": {
+            "common": {
+                "setup": {
+                    "unknown": {
+                        "basis": "Pch1",
+                        "name": "V",
+                        "symbol": "V"
+                    }
+                }
+            },
+            "models": [
+
+			]
+		},
+		"heat":{
+			"common":{
+				"setup":{
+					"unknown":{
+						"basis":"Pch1",
+						"name":"temperature",
+						"symbol":"T"
+					}
+				}
+			},
+			"models":[
+				
+			]
+		}
+    },
+    "Parameters":
+    {
+		{{#Parameters}}
+		"{{name}}": {{value}},
+		{{/Parameters}}
+		
+		"Z0":0,
+		"T0":"293."
+    },
+	"Meshes": {
+        "cfpdes": {
+            "Fields": {
+                "U": {
+                    "filename": "$cfgdir/U.h5",
+                    "basis": "Pdh0"
+                }
+            }
+        }
+    },
+    "Materials":
+    {
+		
+    },
+    "BoundaryConditions":
+    {
+		"heat":
+		{
+	    	"Robin":
+	    	{
+				{{#boundary_Therm_Robin}}
+				"{{name}}":
+				{
+					"expr1": "{{expr1}}",
+					"expr2": "{{expr2}}"
+				},
+				{{/boundary_Therm_Robin}}
+	    	}
+		}
+    },
+    "InitialConditions":
+    {
+		"heat":{
+			"temperature":
+			{
+				"Expression":
+				{
+					{{#init_temp}}
+					"{{name}}":
+					{
+						"markers": {{magnet_parts}},
+						"expr":"{{prefix}}Tinit:{{prefix}}Tinit"
+					},
+					{{/init_temp}}
+				}
+			}
+		}
+    },
+    "PostProcess":
+    {
+		"use-model-name":1,
+		"cfpdes":
+		{
+	    	"Exports":
+	    	{
+				"fields":["heat.temperature"],
+				"expr":
+				{
+		    		"U":
+		    		{
+						"expr":"materials_U:materials_U",
+						"markers": {{part_electric}}
+		    		},
+		    		"J":
+		    		{
+						"expr":{-materials_sigma*electric_grad_V_0,-materials_sigma*electric_grad_V_1}:materials_sigma:electric_grad_V_0:electric_grad_V_1",
+                        "markers": {{part_electric}}
+		    		},
+		    		"Q":
+		    		{
+						"expr":"materials_sigma*(electric_grad_V_0*electric_grad_V_0+electric_grad_V_1*electric_grad_V_1):materials_sigma:electric_grad_V_0:electric_grad_V_1",
+                        "markers": {{part_electric}}
+					},
+					"sigma": {
+                        "expr": "materials_sigma:materials_sigma",
+                        "markers": {{part_thermic}}
+                    },
+                    "k": {
+                        "expr": "materials_k:materials_k",
+                        "markers": {{part_thermic}}
+                    }
+				}
+	    	}
+		},
+		"heat":
+		{
+	    	"Save":
+	    	{
+				"Fields":
+				{
+		    		"names":["temperature"]
+				}
+	    	},
+	    	"Measures":
+	    	{
+				"Statistics":
+				{
+					{{#power_magnet}}
+					"PowerM_{{name}}":
+					{
+        				"type": "integrate",
+        				"expr": "materials_sigma*L*(electric_grad_V_0*electric_grad_V_0+electric_grad_V_1*electric_grad_V_1):L:materials_sigma:electric_grad_V_0:electric_grad_V_1",
+        				"markers": {{magnet_parts}}
+					},
+					{{/power_magnet}}
+		    		"Power":
+				    {
+        				"type": "integrate",
+        				"expr": "materials_sigma*L*(electric_grad_V_0*electric_grad_V_0+electric_grad_V_1*electric_grad_V_1):L:materials_sigma:electric_grad_V_0:electric_grad_V_1",
+        				"markers": {{part_electric}}
+    				},
+					{{#T_magnet}}
+					"Stat_T_{{name}}":
+					{
+        				"type":["min","max","mean"], 
+						"field":"temperature",
+        				"markers": {{magnet_parts}}
+					},
+					{{/T_magnet}}
+					"Stat_T": 
+		    		{
+						"type":["min","max","mean"], 
+						"field":"temperature" 
+		    		}
+				}
+	    	}
+		}
+    }
+}

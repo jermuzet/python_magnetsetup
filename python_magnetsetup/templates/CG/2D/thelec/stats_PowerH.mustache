@@ -1,0 +1,14 @@
+{
+    "Stats_PowerH":
+    {
+    {{#Stats_PowerH}}
+    "{{header}}": 
+    {
+        "type": "integrate",
+        "expr": "materials_sigma*L*(electric_grad_V_0*electric_grad_V_0+electric_grad_V_1*electric_grad_V_1):L:materials_sigma:electric_grad_V_0:electric_grad_V_1",
+        "markers":{{markers}}
+    },
+    {{/Stats_PowerH}}
+    }
+}
+                    

@@ -1,29 +1,41 @@
 {
     "Name": "ThermoElectric 3D Stationnary model",
     "ShortName":"3DThermoElectricStat",
-    "Models":
-    {
-		"equations":
-	    [
-            {
-                "name":"electric",
-                "unknown": 
-                {
-                    "basis":"Pch1",
-                    "name":"V",
-                    "symbol":"V"
+    "Models": {
+        "cfpdes": {
+            "equations": [
+                "electric",
+                "heat"
+            ]
+        },
+        "electric": {
+            "common": {
+                "setup": {
+                    "unknown": {
+                        "basis": "Pch1",
+                        "name": "electric-potential",
+                        "symbol": "V"
+                    }
                 }
             },
-            {
-                "name":"heat",
-                "unknown":
-                {
-                    "basis":"Pch1",
-                    "name":"temperature",
-                    "symbol":"T"
+            "models": [
+
+            ]
+        },
+        "heat": {
+            "common": {
+                "setup": {
+                    "unknown": {
+                        "basis": "Pch1",
+                        "name": "temperature",
+                        "symbol": "T"
+                    }
                 }
-            }
-	    ]
+            },
+            "models": [
+                
+            ]
+        }
     },
     "Parameters":
     {
@@ -105,20 +117,15 @@
 				"fields":["heat.temperature"],
 				"expr":
 				{
-		    		"U":
+		    		"J":
 		    		{
-						"expr":"materials_U:materials_U",
-						"markers": {{part_electric}}
+						"expr":"{-materials_sigma*electric_grad_V_0,-materials_sigma*electric_grad_V_1, -materials_sigma*electric_grad_V_2}:materials_sigma:electric_grad_V_0:electric_grad_V_1:electric_grad_V_2",
+                        "markers": {{part_electric}}
 		    		},
-		    		"Jth":
+		    		"Q":
 		    		{
-						"expr":"{-materials_sigma*electric_grad_V_0, -materials_sigma*electric_grad_V_1, -materials_sigma*electric_grad_V_2}:materials_sigma:electric_grad_V_0:electric_grad_V_1:electric_grad_V_2",
-						"markers": {{part_electric}}
-		    		},
-		    		"Qth":
-		    		{
-						"expr":"materials_sigma*(electric_grad_V_0*electric_grad_V_0+electric_grad_V_1*electric_grad_V_1+electric_grad_V_2*electric_grad_V_2):materials_sigma:electric_grad_V_0:electric_grad_V_1:electric_grad_V_2",
-        				"markers": {{part_electric}}
+						"expr": "materials_sigma*(electric_grad_V_0*electric_grad_V_0+electric_grad_V_1*electric_grad_V_1+electric_grad_V_2*electric_grad_V_2):materials_sigma:electric_grad_V_0:electric_grad_V_1:electric_grad_V_2",
+                        "markers": {{part_electric}}
 		    		}
 				}
 	    	}
@@ -129,7 +136,7 @@
 	    	{
 				"Fields":
 				{
-		    		"names":["V"]
+		    		"names":["electric-potential"]
 				}
 	    	},
 			"Measures":
@@ -155,14 +162,14 @@
 		    		"Power":
 				    {
         				"type": "integrate",
-        				"expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
-        				"markers": {{part_electric}}
+        				"expr": "materials_sigma*(electric_grad_V_0*electric_grad_V_0+electric_grad_V_1*electric_grad_V_1+electric_grad_V_2*electric_grad_V_2):materials_sigma:electric_grad_V_0:electric_grad_V_1:electric_grad_V_2",
+                        "markers": {{part_electric}}
     				},
-					"Intensity_%1_1%":
+					"Intensity_%1%":
 					{
     					"type":"integrate",
-						"expr":"-materials_%1_2%_sigma*(electric_grad_V_0*nx+electric_grad_V_1*ny+electric_grad_V_2*nz:materials_%1_2%_sigma:electric_grad_V_0:electric_grad_v_1:electric_grad_V_2:nx:ny:nz",
-    					"markers": "%1_1%",
+						"expr":"materials_sigma*(electric_dn_V):materials_sigma:electric_dn_P",
+                        "markers": "%1%",
 			    		"index1": {{index_V0}}
 					},
 					"Stat_T": 

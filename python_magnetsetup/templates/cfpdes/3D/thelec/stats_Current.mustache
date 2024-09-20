@@ -5,7 +5,7 @@
     "{{header}}": 
     {
         "type": "integrate",
-        "expr": "-materials_sigma*(electric_grad_V_0*nx+electric_grad_V_1*ny+electric_grad_V_2*nz):materials_sigma:electric_grad_V_0:electric_grad_V_1:electric_grad_V_2:nx:ny:nz",
+        "expr": "-materials_sigma*(electric_dn_V):materials_sigma:electric_dn_V",
         "markers":  {{markers}}
     },
     {{/Stats_Current}}

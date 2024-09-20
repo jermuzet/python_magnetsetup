@@ -1,0 +1,128 @@
+{
+    "Name": "ThermoElectric 2D Stationnary model",
+    "ShortName":"2DThermoElectricStat",
+    "Parameters":
+    {
+		{{#Parameters}}
+		"{{name}}": {{value}},
+		{{/Parameters}}
+		
+		"Z0":0,
+		"T0":"293."
+    },
+	"Meshes": {
+        "cfpdes": {
+            "Fields": {
+                "U": {
+                    "filename": "$cfgdir/U.h5",
+                    "basis": "Pdh0"
+                }
+            }
+        }
+    },
+    "Materials":
+    {
+		
+    },
+    "BoundaryConditions":
+    {
+		"heat":
+		{
+	    	"convective_heat_flux":
+	    	{
+				{{#boundary_Therm_Robin}}
+				"{{name}}":
+				{
+					"h": "{{expr1}}",
+					"Text": "{{expr2}}"
+				},
+				{{/boundary_Therm_Robin}}
+	    	}
+		},
+		"electric": {
+            "ground": {
+                "markers": "{{V0}}"
+            },
+            "electric_potential": {
+                "{{V1}}": {
+                    "expr": "{{expr}}"
+                }
+            }
+        }
+    },
+    "InitialConditions":
+    {
+		"heat":{
+			"temperature":
+			{
+				"Expression":
+				{
+					{{#init_temp}}
+					"{{name}}":
+					{
+						"markers": {{magnet_parts}},
+						"expr":"{{prefix}}Tinit:{{prefix}}Tinit"
+					},
+					{{/init_temp}}
+				}
+			}
+		}
+    },
+    "PostProcess":
+    {
+		"thermoelectric": {
+            "Exports": {
+                "fields": [
+                    "heat.temperature",
+                    "electric.electric-potential",
+                    "electric.current-density",
+                    "electric.electric-field",
+                    "pid"
+                ]
+            }
+        },
+		"heat":
+		{
+	    	"Save":
+	    	{
+				"Fields":
+				{
+		    		"names":["temperature"]
+				}
+	    	},
+	    	"Measures":
+	    	{
+				"Statistics":
+				{
+					{{#power_magnet}}
+					"PowerM_{{name}}":
+					{
+        				"type": "integrate",
+        				"expr": "materials_sigma*L*(electric_grad_P_0*electric_grad_P_0+electric_grad_P_1*electric_grad_P_1):L:materials_sigma:electric_grad_P_0:electric_grad_P_1",
+        				"markers": {{magnet_parts}}
+					},
+					{{/power_magnet}}
+		    		"Power":
+				    {
+        				"type": "integrate",
+        				"expr": "materials_sigma*L*(electric_grad_P_0*electric_grad_P_0+electric_grad_P_1*electric_grad_P_1):L:materials_sigma:electric_grad_P_0:electric_grad_P_1",
+        				"markers": {{part_electric}}
+    				},
+					{{#T_magnet}}
+					"Stat_T_{{name}}":
+					{
+        				"type":["min","max","mean"], 
+						"field":"temperature",
+        				"markers": {{magnet_parts}}
+					},
+					{{/T_magnet}}
+					"Stat_T": 
+		    		{
+						"type":["min","max","mean"], 
+						"field":"temperature" 
+		    		}
+				}
+	    	}
+		}
+    }
+}

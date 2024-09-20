@@ -1,55 +1,54 @@
 directory={{method}}-{{model}}{{geom}}-{{time}}-{{linear}}/{{name}}
-
 case.dimension={{dim}}
 case.discretization=P1
 
 [exporter]
 element-spaces=P0
 
-[hdg.poisson.electro]
+[electric]
 filename=$cfgdir/{{jsonfile}}
-conductivity_json=sigma0
-conductivityNL_json=sigma
 pc-type=gasm
 sub-pc-factor-mat-solver-package-type=umfpack
 sub-pc-type=lu
-ksp-rtol=1e-12 #1e-14
+ksp-rtol=1e-14
 ksp-monitor=true
 use-sc=true
+backend.rebuild=true
 
-[hdg.poisson.electro.sc]
+[electric.sc]
 ksp-monitor=true
 pc-type=gamg
 ksp-rtol=1e-12
+backend.rebuild=true
 
-#[sc]
-#ibc_partitioning=true
-#ibc_partitioning.marker=V1
+[sc]
+ibc_partitioning=true
+ibc_partitioning.marker=V1
 
-[hdg.poisson.thermo]
+[heat]
 filename=$cfgdir/{{jsonfile}}
-conductivity_json=k0
-conductivityNL_json=k
 pc-type=gasm
 sub-pc-factor-mat-solver-package-type=umfpack
 sub-pc-type=lu
-ksp-rtol=1e-12 #1e-14
+ksp-rtol=1e-14
 ksp-monitor=true
 use-sc=true
+backend.rebuild=true
 
-[hdg.poisson.thermo.sc]
+[heat.sc]
 ksp-monitor=true
 pc-type=gamg
 ksp-rtol=1e-12
+backend.rebuild=true
 
 [thermoelectric]
 tolerance=1e-8
 itmax=20
 continuation=false
 
-#[thermoelectric.continuation]
-#steps=1
-#marker=V1
+[thermoelectric.continuation]
+steps=1
+marker=V1
 
 [gmsh]
 filename=$cfgdir/test.med
