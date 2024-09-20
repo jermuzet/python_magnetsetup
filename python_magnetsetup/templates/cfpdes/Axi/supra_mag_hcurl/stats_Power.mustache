@@ -1,0 +1,15 @@
+{
+    "Stats_Power":
+    {
+    {{#Stats_Power}}
+    "Power_%1%": 
+    {
+        "type": "integrate",
+        "expr": "2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x",
+        "markers": "%1%",
+        "index1": {{part_electric}}
+    },
+    {{/Stats_Power}}
+    }
+}
+                    

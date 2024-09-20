@@ -1,0 +1,9 @@
+{
+    "Jc0": 3.28e11,
+    "b0": 0.93,
+    "k1": 0.041,
+    "alpha1": 0.623,
+    "JcB": "Jc0/(1+sqrt((magnetic_grad_A_rt_0+magnetic_A_rt/x)^2*k1^2+(-magnetic_grad_A_rt_1)^2))^alpha1:Jc0:magnetic_grad_A_rt_0:magnetic_A_rt:x:k1:magnetic_grad_A_rt_1:alpha1",
+    "IcB": "JcB*h_tape*t_tape:JcB:h_tape:t_tape",
+    "j_th": "JcB*p*(t_tape/t_cell):t_tape:t_cell:JcB:p"
+}

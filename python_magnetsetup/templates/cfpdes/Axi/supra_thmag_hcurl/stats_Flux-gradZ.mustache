@@ -1,0 +1,22 @@
+{
+   "Stats_Flux":
+   {
+   {{#Stats_Flux}}
+   "FluxZ%2_1%_{{prefix}}":
+   {
+      "type": "integrate",
+      "expr": "%1_2%*{{hw}}*(heat_T-{{Tw}})*2*pi*x*rectangle(y,%2_2%,%2_3%):x:y:heat_T:{{hw}}:{{Tw}}",
+      "markers": {{markers}},
+      "index1": {{index_h}},
+      "index2": {{index_z}}
+   },
+   "Flux_{{prefix}}":
+   {
+      "type": "integrate",
+      "expr": "%1_2%*{{hw}}*(heat_T-{{Tw}})*2*pi*x:x:y:heat_T:{{hw}}:{{Tw}}",
+      "markers": {{markers}},
+      "index1": {{index_h}}
+   },
+   {{/Stats_Flux}}
+   }
+}

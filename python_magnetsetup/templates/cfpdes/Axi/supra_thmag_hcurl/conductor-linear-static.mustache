@@ -1,0 +1,13 @@
+{
+    "{{name}}":
+{
+    "markers":{{part_mat_conductor}},
+    "sigma":"{{ElectricalConductivity}}",
+    "k":"{{ThermalConductivity}}",
+    "mu": "{{MagnetPermeability}}*mu0:mu0",
+
+    "U":"meshes_cfpdes_fields_U:meshes_cfpdes_fields_U",
+
+    "j_th":"-sigma*U/2/pi/x:sigma:U:x"
+}
+}

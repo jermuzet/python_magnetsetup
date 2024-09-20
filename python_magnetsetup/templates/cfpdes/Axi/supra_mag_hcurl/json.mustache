@@ -1,0 +1,176 @@
+{
+    "Name": "Axi Magneto Stationnary model",
+    "ShortName":"AxiMagnetoStatic",
+    "Models":
+    {
+		"cfpdes":{
+			"equations":"magnetic"
+		},
+		"magnetic":{
+			"common":{
+                "setup":{
+					"unknown":
+					{
+						"basis":"Pch1",
+						"name":"Atheta",
+						"symbol":"Atheta"
+					}
+				}
+			},
+			"models":[
+				{
+					"name":"magnetic_Air",
+					"materials":"Air",
+					"setup":{
+						"coefficients":{
+							"c":"x/mu0:x:mu0",
+							"a":"1/mu0/x:x:mu0"
+						}
+					}
+				}
+			]
+		}
+    },
+    "Parameters":
+    {
+		{{#Parameters}}
+		"{{name}}": {{value}},
+		{{/Parameters}}
+
+		"T0":"293."
+    },
+	"Meshes": {
+        "cfpdes": {
+            "Fields": {
+				{{#field_h5}}
+				"{{name}}":
+				{
+					"filename": "$cfgdir/{{path}}.h5",
+					"basis":"{{basis}}"
+				},
+				{{/field_h5}}
+                "U": {
+                    "filename": "$cfgdir/U.h5",
+                    "basis": "Pdh0"
+                }
+            }
+        }
+    },
+    "Materials":
+    {
+		"Air":
+		{
+	    	
+		}
+    },
+	{{#init_cond}}
+	"InitialConditions":
+    {
+		"magnetic":
+		{
+			"Atheta":
+			{
+				"File":
+				{
+					"ic":
+					{
+						"filename": "$cfgdir/{{path}}.h5",
+                        "format": "hdf5"
+					},
+				}
+			}
+		}
+    },
+	{{/init_cond}}
+    "BoundaryConditions":
+    {
+		"magnetic":
+		{
+		    "Dirichlet":
+	    	{
+				"magdir":
+				{
+		    		"markers":["ZAxis","Infty"],
+		    		"expr":"0"
+				}
+			}
+	    }
+    },
+    "PostProcess":
+    {
+		"use-model-name":1,
+		"cfpdes":
+		{
+	    	"Exports":
+	    	{
+				"fields":["all"],
+				"expr":
+				{
+		    		"B":
+		    		{
+						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x",
+						"representation":["element"]
+		    		},
+					"U":
+		    		{
+						"expr":"materials_U:materials_U",
+						"markers": {{part_electric}},
+						"representation":["element"]
+		    		},
+					{{#JcB}}
+					"JcB":
+		    		{
+						"expr":"materials_JcB:materials_JcB",
+						"markers": {{markers}}
+		    		},
+					{{/JcB}}
+		    		"Jth":
+		    		{
+						"expr":"-materials_sigma*materials_U/(2*pi*x):materials_sigma:materials_U:x",
+						"markers": {{part_electric}}
+		    		},
+		    		"sigma":
+		    		{
+						"expr":"materials_sigma:materials_sigma",
+						"markers": {{part_electric}}
+					}
+				}
+	    	}
+		},
+		"magnetic":
+		{
+	    	"Measures": 
+	    	{
+				"Statistics":
+				{
+		    		"MagneticEnergy":
+		    		{
+						"type":"integrate",
+						"expr":"-pi*magnetic_Atheta*materials_sigma*(materials_U/2/pi):magnetic_Atheta:materials_sigma:materials_U",
+						"markers": {{part_electric}}
+		    		}
+				},
+				"Points":
+				{
+					"B0":
+					{
+						"coord":"{1e-7,0.}",
+						"fields":"Atheta",
+						"expressions":
+						{
+							"Bz": "magnetic_grad_Atheta_0+magnetic_Atheta/x:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x"
+						}
+					}
+				}
+			},
+			"Save": {
+                "Fields": {
+                    "names": [
+                        "Atheta"
+                    ],
+                    "format": "hdf5"
+                }
+            }
+		}
+    }
+}
